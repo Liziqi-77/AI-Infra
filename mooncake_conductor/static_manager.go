@@ -26,26 +26,8 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/vllm-project/aibrix/pkg/cache/kvcache"
+	"github.com/vllm-project/aibrix/pkg/utils"
 )
-
-// ServiceType defines the type of service (vLLM or Mooncake)
-type ServiceType string
-
-const (
-	ServiceTypeVLLM     ServiceType = "vLLM"
-	ServiceTypeMooncake ServiceType = "Mooncake"
-)
-
-// ServiceConfig defines static connection information for a service instance.
-// It replaces the dynamic Pod discovery mechanism from Kubernetes.
-type ServiceConfig struct {
-	Name      string      // Unique identifier (e.g., "vllm-worker-0")
-	IP        string      // Service IP address
-	Port      int         // ZMQ publisher port (e.g., 5557)
-	Type      ServiceType // Service type (vLLM/Mooncake)
-	ModelName string      // Model name hosted by the service
-	LoraID    int64       // LoRA ID (-1 if not applicable)
-}
 
 // StaticManager manages KV event subscriptions for a fixed set of services.
 // It is designed for scenarios where vLLM/Mooncake instances are static and
@@ -59,9 +41,8 @@ type StaticManager struct {
 	services []ServiceConfig
 
 	// Subscriber management
-	// Map key: ServiceConfig.Name (string)
-	// Map value: *kvcache.ZMQClient
-	subscribers sync.Map
+	// Using utils.SyncMap for type safety with Generics
+	subscribers utils.SyncMap[string, *kvcache.ZMQClient]
 
 	// Lifecycle management
 	ctx     context.Context
@@ -142,8 +123,8 @@ func (m *StaticManager) Stop() {
 	m.cancel()
 
 	// 2. Stop all ZMQ clients
-	m.subscribers.Range(func(key, value interface{}) bool {
-		client := value.(*kvcache.ZMQClient)
+	// With utils.SyncMap, 'client' is already *kvcache.ZMQClient, no type assertion needed
+	m.subscribers.Range(func(key string, client *kvcache.ZMQClient) bool {
 		client.Stop()
 		klog.Infof("Stopped subscription for %s", key)
 		return true
@@ -227,28 +208,17 @@ func (h *staticEventHandler) HandleEvent(event kvcache.KVEvent) error {
 	// We pass these directly to the Indexer logic.
 	switch e := event.(type) {
 	case *kvcache.BlockStoredEvent:
-		// Convert to internal event type if necessary, or pass directly if interfaces match.
-		// Assuming SyncIndexer.ProcessBlockStored accepts a compatible struct.
-		// For strict typing, we might need conversion code here similar to original manager.go:
-		// syncEvent := convertToSyncStoredEvent(e, h.modelName, h.loraID, h.svcName)
-		// return indexer.ProcessBlockStored(ctx, syncEvent)
-		
-		// Using the raw event for demonstration as per requirement "other helpers config as needed"
-		// In real implementation, uncomment conversion logic.
+		// Mock call to satisfy interface
 		klog.V(4).Infof("[%s] BlockStored: %d blocks", h.svcName, len(e.BlockHashes))
-		
-		// Mock call to satisfy interface - assumes SyncIndexer methods accept these types
-		// or adapt them accordingly.
-		// return indexer.ProcessBlockStored(ctx, *e) 
-		return nil 
+		// In real implementation: return indexer.ProcessBlockStored(ctx, *e)
+		return nil
 
 	case *kvcache.BlockRemovedEvent:
 		klog.V(4).Infof("[%s] BlockRemoved: %d blocks", h.svcName, len(e.BlockHashes))
-		// return indexer.ProcessBlockRemoved(ctx, *e)
+		// In real implementation: return indexer.ProcessBlockRemoved(ctx, *e)
 		return nil
 
 	default:
 		return nil
 	}
 }
-
