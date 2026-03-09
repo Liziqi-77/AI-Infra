@@ -14,8 +14,9 @@
 
 FourOverSix (4/6) 是一个针对NVFP4格式的量化算法，其核心创新是**自适应块缩放(Adaptive Block Scaling)**。该项目提供了完整的量化、反量化和矩阵乘法实现，支持模型推理和训练。
 
-**项目地址**: https://github.com/mit-han-lab/fouroversix  
+**项目地址**: https://github.com/mit-han-lab/fouroversix   
 **论文**: [Four Over Six: More Accurate NVFP4 Quantization with Adaptive Block Scaling](https://arxiv.org/abs/2512.02010)
+rkU4uuhwvzQ
 
 ### 1.2 代码仓库结构
 
