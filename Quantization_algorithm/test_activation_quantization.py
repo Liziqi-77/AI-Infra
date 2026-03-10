@@ -184,33 +184,61 @@ def compare_strategies(
     
     results = {}
     
-    # 测试不同策略
-    strategies = [
-        ("自适应(mse)", ScaleRule.mse, False),
+    # 先运行自适应选择，获取选择比例
+    config_adaptive = QuantizationConfig(
+        dtype=dtype,
+        scale_rule=ScaleRule.mse,
+        backend=QuantizeBackend.pytorch,
+        log_fouroversix=True,
+    )
+    quantized_adaptive = quantize_to_fp4(data.clone(), config_adaptive)
+    dequantized_adaptive = quantized_adaptive.dequantize(torch.bfloat16)
+    mae_adaptive = (dequantized_adaptive - data).abs().mean().item()
+    results["自适应(mse)"] = mae_adaptive
+    
+    # 测试固定策略
+    fixed_strategies = [
         ("强制max=4", ScaleRule.mse, True),
         ("静态max=6", ScaleRule.static_6, False),
         ("静态max=4", ScaleRule.static_4, False),
     ]
     
-    for strategy_name, scale_rule, force_max_4 in strategies:
+    for strategy_name, scale_rule, force_max_4 in fixed_strategies:
         config = QuantizationConfig(
             dtype=dtype,
             scale_rule=scale_rule,
             backend=QuantizeBackend.pytorch,
             force_max_4=force_max_4,
-            log_fouroversix=(strategy_name == "自适应(mse)"),
         )
         
         quantized = quantize_to_fp4(data.clone(), config)
         dequantized = quantized.dequantize(torch.bfloat16)
         mae = (dequantized - data).abs().mean().item()
-        
         results[strategy_name] = mae
-        print(f"  {strategy_name}: MAE = {mae:.6f}")
     
-    # 找出最优策略
-    best_strategy = min(results, key=results.get)
-    print(f"\n最优策略: {best_strategy} (MAE = {results[best_strategy]:.6f})")
+    # 输出结果
+    print("\n量化误差对比:")
+    for strategy_name, mae in results.items():
+        marker = " ← 最优" if mae == min(results.values()) else ""
+        print(f"  {strategy_name}: MAE = {mae:.6f}{marker}")
+    
+    # 计算自适应选择相对于固定策略的改进
+    improvement_vs_max6 = (results["静态max=6"] - results["自适应(mse)"]) / results["静态max=6"] * 100
+    improvement_vs_max4 = (results["强制max=4"] - results["自适应(mse)"]) / results["强制max=4"] * 100
+    
+    print(f"\n自适应选择改进:")
+    print(f"  相比静态max=6: {improvement_vs_max6:+.2f}%")
+    print(f"  相比强制max=4: {improvement_vs_max4:+.2f}%")
+    
+    # 判断哪种情况
+    if results["自适应(mse)"] < results["静态max=6"] and results["自适应(mse)"] < results["强制max=4"]:
+        print(f"\n  ✓ 自适应选择优于所有固定策略！")
+    elif results["自适应(mse)"] == results["静态max=6"]:
+        print(f"\n  → 所有块都选择了max=6（自适应=静态max=6）")
+    elif results["自适应(mse)"] == results["强制max=4"]:
+        print(f"\n  → 所有块都选择了max=4（自适应=强制max=4）")
+    else:
+        print(f"\n  → 自适应选择混合使用了max=4和max=6")
     
     return results
 
