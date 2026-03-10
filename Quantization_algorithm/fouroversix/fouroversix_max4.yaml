@@ -1,0 +1,21 @@
+# FourOverSix优化数据集任务配置
+# 用于lm-eval框架
+
+task: fouroversix_max4
+dataset_path: json
+dataset_kwargs:
+  data_files:
+    train: fouroversix_text/train.jsonl
+    test: fouroversix_text/test.jsonl
+output_type: loglikelihood_rolling
+test_split: test
+doc_to_text: ""
+doc_to_target: "{{text}}"
+should_decontaminate: false
+metric_list:
+  - metric: word_perplexity
+  - metric: byte_perplexity
+  - metric: bits_per_byte
+metadata:
+  version: 1.0
+  description: "FourOverSix optimized dataset for demonstrating max=4 quantization advantages"

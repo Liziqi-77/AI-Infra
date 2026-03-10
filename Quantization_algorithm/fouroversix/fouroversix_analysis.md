@@ -14,9 +14,8 @@
 
 FourOverSix (4/6) 是一个针对NVFP4格式的量化算法，其核心创新是**自适应块缩放(Adaptive Block Scaling)**。该项目提供了完整的量化、反量化和矩阵乘法实现，支持模型推理和训练。
 
-**项目地址**: https://github.com/mit-han-lab/fouroversix   
+**项目地址**: https://github.com/mit-han-lab/fouroversix  
 **论文**: [Four Over Six: More Accurate NVFP4 Quantization with Adaptive Block Scaling](https://arxiv.org/abs/2512.02010)
-rkU4uuhwvzQ
 
 ### 1.2 代码仓库结构
 
@@ -2324,3 +2323,489 @@ class DataType(str, Enum):
 1. Four Over Six论文: https://arxiv.org/abs/2512.02010
 2. NVIDIA Blackwell架构文档: https://docs.nvidia.com/cutlass/latest/media/docs/cpp/blackwell_functionality.html
 3. MXFP规范: https://www.opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf
+
+---
+
+## 5. MXFP4格式FourOverSix算法修改记录
+
+### 5.1 修改概述
+
+本节记录了对代码仓库的修改，以支持MXFP4格式的FourOverSix自适应量化算法。
+
+### 5.2 修改文件列表
+
+| 文件路径 | 修改类型 | 修改说明 |
+|----------|----------|----------|
+| `src/fouroversix/utils.py` | 修改 | 新增`is_adaptive()`方法，更新文档注释 |
+| `src/fouroversix/quantize/backend.py` | 修改 | 移除MXFP4只支持静态规则的限制 |
+| `src/fouroversix/quantize/pytorch/reference.py` | 修改 | 新增`select_fouroversix_mxfp4()`函数，重构量化分支逻辑 |
+| `tests/test_correctness.py` | 新增 | 新增MXFP4量化测试用例 |
+
+### 5.3 详细修改说明
+
+#### 5.3.1 `src/fouroversix/utils.py`
+
+**修改内容**：
+1. 更新`ScaleRule`类的文档注释，说明支持NVFP4和MXFP4
+2. 新增`is_adaptive()`方法，用于判断是否为自适应缩放规则
+
+```python
+def is_adaptive(self) -> bool:
+    """Return True if the rule is adaptive (4/6 selection), False otherwise.
+    
+    [MODIFIED] 新增方法：判断是否为自适应缩放规则
+    自适应规则包括: mse, mae, abs_max
+    静态规则包括: static_6, static_4
+    """
+    return self in {ScaleRule.mse, ScaleRule.mae, ScaleRule.abs_max}
+```
+
+#### 5.3.2 `src/fouroversix/quantize/backend.py`
+
+**修改内容**：
+移除MXFP4只支持静态规则的限制，允许MXFP4使用自适应缩放规则
+
+```python
+# [MODIFIED] 移除MXFP4只支持静态规则的限制
+# MXFP4现在支持自适应缩放规则(mse, mae, abs_max)以实现FourOverSix算法
+# 原代码:
+# if config.dtype == DataType.mxfp4 and config.scale_rule not in {
+#     ScaleRule.static_6,
+#     ScaleRule.static_4,
+# }:
+#     msg = (
+#         "MXFP4 quantization only supports the `static_6` and `static_4` scale "
+#         "rules"
+#     )
+#     raise ValueError(msg)
+```
+
+#### 5.3.3 `src/fouroversix/quantize/pytorch/reference.py`
+
+**修改内容**：
+
+1. **修改`quantize_to_mxfp4()`函数**：移除断言，允许自适应规则调用
+
+```python
+def quantize_to_mxfp4(
+    x_scale_blocks: torch.Tensor,
+    *,
+    scale_rule: ScaleRule = ScaleRule.mse,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """
+    [MODIFIED] 修改MXFP4量化函数，移除只支持静态规则的断言
+    现在支持自适应缩放规则，但此函数仅用于静态规则
+    """
+    # [MODIFIED] 移除断言，允许自适应规则调用此函数
+    # assert scale_rule in {ScaleRule.static_6, ScaleRule.static_4}
+    ...
+```
+
+2. **新增`select_fouroversix_mxfp4()`函数**：MXFP4格式的FourOverSix自适应选择函数
+
+```python
+def select_fouroversix_mxfp4(
+    x_scale_blocks: torch.Tensor,
+    x_block_scaled_6: torch.Tensor,
+    scales_6: torch.Tensor,
+    x_block_scaled_4: torch.Tensor,
+    scales_4: torch.Tensor,
+    *,
+    scale_rule: ScaleRule = ScaleRule.mse,
+    round_style: RoundStyle = RoundStyle.nearest,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """
+    [NEW] 新增函数：MXFP4格式的FourOverSix自适应选择函数
+    
+    与NVFP4的select_fouroversix函数类似，但针对MXFP4的E8M0缩放因子格式进行调整
+    
+    Args:
+        x_scale_blocks: 原始数据块 [num_blocks, 32]
+        x_block_scaled_6: 方案A(max=6)的缩放后数据
+        scales_6: 方案A的E8M0格式缩放因子
+        x_block_scaled_4: 方案B(max=4)的缩放后数据
+        scales_4: 方案B的E8M0格式缩放因子
+        scale_rule: 误差度量规则 (mse/mae/abs_max)
+        round_style: 舍入方式
+    
+    Returns:
+        x_fake_quantized: 选择的伪量化结果
+        scales: 选择的缩放因子 (E8M0格式)
+    """
+    # 1. 对两种方案进行伪量化
+    # 2. 反量化以计算误差（MXFP4使用E8M0格式）
+    # 3. 计算量化误差
+    # 4. 选择误差更小的方案
+    ...
+```
+
+3. **重构`quantize_to_fp4()`函数**：添加MXFP4自适应量化分支
+
+```python
+# [MODIFIED] 重构量化分支逻辑，支持MXFP4的自适应量化
+if fp4_format == DataType.mxfp4:
+    # MXFP4量化分支
+    if scale_rule.is_adaptive():
+        # [NEW] MXFP4自适应量化 (FourOverSix for MXFP4)
+        # 方案A: max=6
+        x_block_scaled_6, scales_6 = quantize_to_mxfp4(
+            x_scale_blocks,
+            scale_rule=ScaleRule.static_6,
+        )
+        # 方案B: max=4
+        x_block_scaled_4, scales_4 = quantize_to_mxfp4(
+            x_scale_blocks,
+            scale_rule=ScaleRule.static_4,
+        )
+        # 调用MXFP4的自适应选择函数
+        x_fake_quantized, scales = select_fouroversix_mxfp4(
+            x_scale_blocks,
+            x_block_scaled_6,
+            scales_6,
+            x_block_scaled_4,
+            scales_4,
+            scale_rule=scale_rule,
+            round_style=round_style,
+        )
+    else:
+        # MXFP4静态量化 (static_6 或 static_4)
+        x_block_scaled, scales = quantize_to_mxfp4(
+            x_scale_blocks,
+            scale_rule=scale_rule,
+        )
+```
+
+#### 5.3.4 `tests/test_correctness.py`
+
+**新增测试**：
+
+1. **`test_mxfp4_quantization()`**: 测试MXFP4格式的量化，包括自适应缩放规则
+
+```python
+@pytest.mark.parametrize("input_type", ["zeros", "ones", "rand01", "randn"])
+@pytest.mark.parametrize("input_shape", [(1024, 1024), (1024, 512), (512, 1024)])
+@pytest.mark.parametrize("scale_rule", [
+    ScaleRule.abs_max,
+    ScaleRule.mae,
+    ScaleRule.mse,
+    ScaleRule.static_4,
+    ScaleRule.static_6,
+])
+def test_mxfp4_quantization(input_type, input_shape, scale_rule):
+    """
+    [NEW] 测试MXFP4格式的量化，包括自适应缩放规则
+    
+    测试内容：
+    1. 静态规则 (static_6, static_4) - 标准MXFP4量化
+    2. 自适应规则 (mse, mae, abs_max) - MXFP4 FourOverSix量化
+    """
+    ...
+```
+
+2. **`test_mxfp4_vs_nvfp4_quantization()`**: 对比MXFP4和NVFP4的量化结果
+
+```python
+@pytest.mark.parametrize("input_shape", [(256, 256)])
+@pytest.mark.parametrize("scale_rule", [ScaleRule.mse, ScaleRule.static_6])
+def test_mxfp4_vs_nvfp4_quantization(input_shape, scale_rule):
+    """
+    [NEW] 对比MXFP4和NVFP4的量化结果
+    
+    验证：
+    1. 两种格式的量化都能正常工作
+    2. 自适应规则在两种格式下都能正常工作
+    """
+    ...
+```
+
+### 5.4 MXFP4与NVFP4 FourOverSix对比
+
+| 特性 | NVFP4 FourOverSix | MXFP4 FourOverSix |
+|------|-------------------|-------------------|
+| 块大小 | 16 | 32 |
+| 缩放因子格式 | E4M3 (float8) | E8M0 (uint8) |
+| 全局amax | 需要 | 不需要 |
+| 方案A缩放 | `max/6` | `max/6` (E8M0) |
+| 方案B缩放 | `max/6 * 1.5` | `max/4` (E8M0) |
+| 反量化公式 | `x * scale * amax / (6 * 256)` | `x * scale_e8m0` |
+| 自适应选择函数 | `select_fouroversix()` | `select_fouroversix_mxfp4()` |
+
+### 5.5 使用示例
+
+#### 5.5.1 MXFP4标准量化
+
+```python
+from fouroversix import quantize_to_fp4, QuantizationConfig, DataType, ScaleRule
+
+config = QuantizationConfig(
+    dtype=DataType.mxfp4,
+    scale_rule=ScaleRule.static_6,  # 或 ScaleRule.static_4
+)
+
+quantized = quantize_to_fp4(x, config)
+```
+
+#### 5.5.2 MXFP4 FourOverSix自适应量化
+
+```python
+from fouroversix import quantize_to_fp4, QuantizationConfig, DataType, ScaleRule
+
+config = QuantizationConfig(
+    dtype=DataType.mxfp4,
+    scale_rule=ScaleRule.mse,  # 或 ScaleRule.mae, ScaleRule.abs_max
+)
+
+quantized = quantize_to_fp4(x, config)
+```
+
+#### 5.5.3 模型量化
+
+```python
+from fouroversix import ModelQuantizationConfig, DataType, ScaleRule
+from fouroversix.model import quantize_model
+
+config = ModelQuantizationConfig(
+    dtype=DataType.mxfp4,
+    activation_scale_rule=ScaleRule.mse,
+    weight_scale_rule=ScaleRule.mse,
+)
+
+quantize_model(model, config)
+```
+
+### 5.6 注意事项
+
+1. **E8M0缩放因子格式**：MXFP4使用E8M0格式（8位指数，无尾数），与NVFP4的E4M3格式不同
+2. **块大小差异**：MXFP4块大小为32，NVFP4为16，这会影响量化粒度
+3. **无全局amax**：MXFP4不需要全局amax，每个块的缩放因子独立计算
+4. **后端兼容性**：目前只有PyTorch后端完整支持MXFP4的自适应量化，CUDA和Triton后端需要额外修改
+
+### 5.7 新增功能（v2）
+
+#### 5.7.1 强制使用max=4参数
+
+**修改文件**：`src/fouroversix/quantize/config.py`
+
+新增 `force_max_4` 参数，用于强制FourOverSix算法使用max=4方案：
+
+```python
+@dataclass
+class QuantizationConfig:
+    # ...
+    force_max_4: bool = False  # [NEW] 强制使用max=4
+    # ...
+```
+
+**使用示例**：
+
+```python
+from fouroversix import quantize_to_fp4, QuantizationConfig, DataType, ScaleRule
+
+# 强制使用max=4（跳过自适应选择）
+config = QuantizationConfig(
+    dtype=DataType.mxfp4,
+    scale_rule=ScaleRule.mse,  # 自适应规则
+    force_max_4=True,  # 强制使用max=4
+)
+
+quantized = quantize_to_fp4(x, config)
+```
+
+#### 5.7.2 FourOverSix选择日志
+
+**修改文件**：`src/fouroversix/quantize/config.py`
+
+新增 `log_fouroversix` 参数，用于记录自适应选择的统计信息：
+
+```python
+@dataclass
+class QuantizationConfig:
+    # ...
+    log_fouroversix: bool = False  # [NEW] 记录FourOverSix选择日志
+    # ...
+```
+
+**日志输出示例**：
+
+```
+============================================================
+[NVFP4 FourOverSix] 自适应选择统计:
+  总块数: 1024
+  选择 max=4 的块数: 423 (41.31%)
+  选择 max=6 的块数: 601 (58.69%)
+  误差度量规则: mse
+  全局amax: 12.345678
+  max=4 误差统计: mean=0.001234, min=0.000001, max=0.012345
+  max=6 误差统计: mean=0.002345, min=0.000002, max=0.023456
+  强制使用 max=4: False
+============================================================
+```
+
+**使用示例**：
+
+```python
+import logging
+
+# 配置日志级别
+logging.basicConfig(level=logging.INFO)
+
+from fouroversix import quantize_to_fp4, QuantizationConfig, DataType, ScaleRule
+
+config = QuantizationConfig(
+    dtype=DataType.mxfp4,
+    scale_rule=ScaleRule.mse,
+    log_fouroversix=True,  # 启用日志
+)
+
+quantized = quantize_to_fp4(x, config)
+```
+
+#### 5.7.3 修改文件列表
+
+| 文件路径 | 修改类型 | 修改说明 |
+|----------|----------|----------|
+| `src/fouroversix/quantize/config.py` | 修改 | 新增 `force_max_4` 和 `log_fouroversix` 参数 |
+| `src/fouroversix/quantize/pytorch/reference.py` | 修改 | 新增日志记录功能，支持强制使用max=4 |
+| `src/fouroversix/quantize/pytorch/backend.py` | 修改 | 传递新参数到量化函数 |
+
+#### 5.7.4 日志输出字段说明
+
+| 字段 | 说明 |
+|------|------|
+| 总块数 | 输入张量分块后的总块数 |
+| 选择 max=4 的块数 | 自适应选择max=4方案的块数和比例 |
+| 选择 max=6 的块数 | 自适应选择max=6方案的块数和比例 |
+| 误差度量规则 | 使用的误差度量方法（mse/mae/abs_max） |
+| 全局amax | 输入张量的全局最大值（仅NVFP4） |
+| max=4 误差统计 | max=4方案的误差均值、最小值、最大值 |
+| max=6 误差统计 | max=6方案的误差均值、最小值、最大值 |
+| 强制使用 max=4 | 是否强制使用max=4 |
+
+---
+
+## 6. 数据集生成与测试
+
+### 6.1 为什么wikitext上都是max=6
+
+**FourOverSix算法的核心**：
+- **max=6**：量化范围大（0-6），量化步长大，适合有离群值的数据
+- **max=4**：量化范围小（0-4），量化步长小，适合数据集中在较小值的情况
+
+**wikitext的特点**：
+- 自然语言数据，激活值分布有长尾特性
+- 存在离群值，导致块最大值较大
+- 最大值/6的分布更常见
+
+**max=4更优的条件**：
+1. 块最大值接近4的倍数（4.0, 8.0, 12.0等）
+2. 数据分布均匀，无大离群值
+3. 数据集中在较小值范围
+
+### 6.2 生成适合max=4的数据集
+
+**脚本位置**：`scripts/generate_fouroversix_dataset.py`
+
+```bash
+# 生成所有类型的数据集
+python scripts/generate_fouroversix_dataset.py --type all --num-samples 1000 --output-dir datasets
+
+# 只生成文本数据集
+python scripts/generate_fouroversix_dataset.py --type text --num-samples 1000
+
+# 只生成激活值数据集
+python scripts/generate_fouroversix_dataset.py --type activation --num-samples 1000
+
+# 生成对比数据集（包含多种分布）
+python scripts/generate_fouroversix_dataset.py --type comparison --num-samples 100
+```
+
+**生成的数据集**：
+
+| 数据集类型 | 文件位置 | 说明 |
+|------------|----------|------|
+| 文本数据集 | `datasets/fouroversix_text/` | 兼容lm-eval框架 |
+| 激活值数据集 | `datasets/fouroversix_activations/` | 直接测试量化效果 |
+| 对比数据集 | `datasets/fouroversix_comparison/` | 包含多种分布类型 |
+
+### 6.3 直接测试激活值量化
+
+**脚本位置**：`test_activation_quantization.py`
+
+```bash
+# 基本测试
+python test_activation_quantization.py --dtype mxfp4 --scale-rule mse
+
+# 比较不同策略
+python test_activation_quantization.py --dtype mxfp4 --compare
+
+# 自定义数据形状
+python test_activation_quantization.py --shape 512,512 --compare
+```
+
+**测试的数据分布类型**：
+
+| 分布类型 | 生成函数 | 特点 |
+|----------|----------|------|
+| max=4优化 | `generate_max4_optimized_activation` | 块最大值接近4的倍数 |
+| 均匀分布 | `generate_uniform_activation` | 数据在[-4, 4]均匀分布 |
+| 正态分布 | `generate_normal_activation` | 标准正态分布×2 |
+| 稀疏分布 | `generate_sparse_activation` | 90%的值为0 |
+| 双峰分布 | `generate_bimodal_activation` | 峰值在2和4附近 |
+| 有离群值 | `generate_outlier_activation` | 类似wikitext |
+| 最大值恰好为4 | `generate_exact_max4_activation` | 最有利于max=4 |
+
+### 6.4 使用新数据集进行测试
+
+**方式1：使用lm-eval框架**
+
+```bash
+# 先生成数据集
+python scripts/generate_fouroversix_dataset.py --type text
+
+# 使用新数据集测试
+python -m scripts.ptq \
+    --model-name meta-llama/Llama-3.2-1B \
+    --ptq-method rtn \
+    --task fouroversix_max4 \
+    --dtype mxfp4 \
+    --a-scale-rule mse \
+    --w-scale-rule mse
+```
+
+**方式2：直接测试激活值**
+
+```bash
+# 比较不同策略
+python test_activation_quantization.py --dtype mxfp4 --compare
+```
+
+### 6.5 预期结果
+
+| 数据分布 | 预期选择max=4的比例 | 最优策略 |
+|----------|---------------------|----------|
+| 最大值恰好为4 | > 80% | max=4 |
+| max=4优化 | > 50% | 自适应或max=4 |
+| 均匀分布 | > 30% | 自适应 |
+| 稀疏分布 | > 20% | 自适应 |
+| 正态分布 | < 20% | max=6 |
+| 有离群值 | < 10% | max=6 |
+
+### 6.6 数据集文件结构
+
+```
+datasets/
+├── fouroversix_text/
+│   ├── train.jsonl      # 训练集
+│   ├── test.jsonl       # 测试集
+│   └── metadata.json    # 元数据
+├── fouroversix_activations/
+│   ├── activations_train.npy
+│   └── activations_test.npy
+└── fouroversix_comparison/
+    ├── max4_optimized.npy
+    ├── uniform.npy
+    ├── normal.npy
+    ├── sparse.npy
+    ├── bimodal.npy
+    └── outlier.npy
+```
