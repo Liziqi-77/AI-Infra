@@ -31,15 +31,15 @@
 
 一条 SFT 样本通常是 `(prompt, 标准答案)`。模型在 teacher forcing 下看到标准答案前缀，最小化交叉熵：
 
-\[
+$$
 \mathcal L_{\text{SFT}} = -\sum_t \log \pi_\theta(y_t^* \mid x, y^*_{<t})
-\]
+$$
 
 其中：
 
 - `x` 是 prompt；
 - `y*` 是人或数据集给出的标准 token 序列；
-- \(\pi_\theta\) 是参数为 \(\theta\) 的语言模型；
+- $\pi_\theta$ 是参数为 $\theta$ 的语言模型；
 - 每个 token 的“正确目标”在训练开始前已经写在数据中。
 
 **SFT 的本质**：让模型模仿已给定答案分布。
@@ -48,9 +48,9 @@
 
 Kernel 代码优化很难为每个 prompt 准备唯一的“最佳实现”。两个都正确的 Triton kernel，可能一个更快；甚至模型能通过多次尝试、读取编译或 profiling 反馈后修正代码。因此这里使用结果型（outcome）奖励：
 
-\[
+$$
 J(\theta)=\mathbb E_{y\sim\pi_\theta(\cdot\mid x)}[R(x,y)]
-\]
+$$
 
 训练不是指定模型必须输出什么 token，而是：
 
@@ -89,7 +89,7 @@ J(\theta)=\mathbb E_{y\sim\pi_\theta(\cdot\mid x)}[R(x,y)]
 | reward | 环境对结果的标量评分 | `token_level_scores` 的末 token 位置 |
 | return | 从一个 turn 到轨迹结尾累积的奖励 | `returns` |
 | baseline | 用来减少方差的比较基准，不是额外奖励 | 同题同轮的其他 rollout 平均 return |
-| advantage | “比基线好多少”：\(A=G-b\) | `advantages` |
+| advantage | “比基线好多少”：$A=G-b$ | `advantages` |
 | old policy | 产生当前 batch rollout 时的策略 | `old_log_probs` |
 | reference policy | 用于 KL 约束的冻结参考模型；本配方默认不启用 | `ref_log_prob` |
 | FSDP | Fully Sharded Data Parallel；分片存模型、梯度、优化器状态 | `verl_patch.workers.code.fsdp_workers` |
@@ -143,9 +143,9 @@ checkpoint、console/W&B metrics、下一轮 rollout
 
 在没有超时、空 turn 或筛选的理想上界，生成/训练记录数是：
 
-\[
+$$
 16\text{ prompts}\times16\text{ rollouts/prompt}\times3\text{ turns}=768\text{ turn records}
-\]
+$$
 
 它**不是** 768 个独立问题：每 16 个候选共享一个原始 prompt；每 3 条 turn record 又属于同一候选轨迹。`kernel_trainer.py:2900–2912` 正是按照 `ROLLOUT_N × MAX_TURN` 复制原 batch，使它能与生成输出对齐。
 
@@ -643,10 +643,10 @@ N_GPUS_PER_NODE=${N_GPUS_PER_NODE:-${GPUS_PER_NODE:-${ARNOLD_WORKER_GPU:-8}}}
 
 `generate_model_micro_token()` 会用正则 `([0-9]+)B` 从模型名提取规模：7B→8192，14B→4096，32B→2048。之后检查：
 
-\[
+$$
 \text{PPO\_MICRO\_TOKEN}\times\text{SP\_SIZE}
 \geq \text{MAX\_PROMPT\_LENGTH}+\text{MAX\_RESPONSE\_LENGTH}
-\]
+$$
 
 不满足就停止，因为单条最大序列都装不进配置的 token 微批预算。
 
@@ -1010,10 +1010,10 @@ turn 2: 再次反馈 + 历史 → 模型继续改进
 
 PPO 要比较当前参数下某个已采样 token 的概率，和**采样它时旧策略**的概率：
 
-\[
+$$
 r_t(\theta)=\frac{\pi_\theta(a_t\mid s_t)}{\pi_{\text{old}}(a_t\mid s_t)}
 =\exp(\log\pi_\theta-\log\pi_{\text{old}})
-\]
+$$
 
 因此 `calculate_log_probs=True` 是关键配置。训练器可再用 actor 重算 `old_log_probs`（`kernel_trainer.py:3002–3017`）；某些 rollout correction mode 可以直接用 `rollout_log_probs` 代替，避免额外前向计算。没有旧 log-prob，标准 PPO ratio 无从计算。
 
@@ -1098,34 +1098,34 @@ HTTP worker 的 `submit_and_poll()` 做的不是一次同步评测：
 
 本 recipe 指定的是 `KernelRewardClient.calculate_reward_speedup()`（`reward_client.py:445–543`）。设：
 
-- \(c\in\{0,1\}\)：correctness；
-- \(s\)：服务返回的 speedup；
-- \(u\)：`speedup_reward_upper_bound`（此 recipe 为 3.0）；
-- \(l\)：`speedup_reward_lower_bound`（此 recipe 为 0.0）；
-- \(w_c\)、\(w_s\)：初始 correctness/performance 权重，基础 YAML 分别为 0.5、0.5；
-- \(q\)：coverage；
-- \(w_q\)：coverage weight（此 recipe 为 0.5）。
+- $c\in\{0,1\}$：correctness；
+- $s$：服务返回的 speedup；
+- $u$：`speedup_reward_upper_bound`（此 recipe 为 3.0）；
+- $l$：`speedup_reward_lower_bound`（此 recipe 为 0.0）；
+- $w_c$、$w_s$：初始 correctness/performance 权重，基础 YAML 分别为 0.5、0.5；
+- $q$：coverage；
+- $w_q$：coverage weight（此 recipe 为 0.5）。
 
 代码逻辑相当于：
 
-\[
+$$
 s' = \begin{cases}
 0 & s < l \\
 \min(s,u) & s\ge l
 \end{cases}
-\]
+$$
 
-\[
+$$
 R_{base}=w_c\cdot c+w_s\cdot s'
-\]
+$$
 
 若 `correctness=True` 且 coverage reward 开启：
 
-\[
+$$
 R=R_{base}+w_q\cdot q
-\]
+$$
 
-否则 \(R=R_{base}\)。
+否则 $R=R_{base}$。
 
 注意事项：
 
@@ -1152,15 +1152,15 @@ R=R_{base}+w_q\cdot q
 
 ### 10.1 reward、return、baseline、advantage 的区别
 
-- **reward** \(r_t\)：环境在第 \(t\) 个 turn 给的即时结果分数；本项目常为终局 score。
-- **return** \(G_t\)：从当前 turn 向后的累计回报：
+- **reward** $r_t$：环境在第 $t$ 个 turn 给的即时结果分数；本项目常为终局 score。
+- **return** $G_t$：从当前 turn 向后的累计回报：
 
-\[
+$$
 G_t=r_t+\gamma r_{t+1}+\gamma^2r_{t+2}+\cdots
-\]
+$$
 
-- **baseline** \(b_t\)：不依赖当前动作的比较值，用于降低梯度方差。
-- **advantage** \(A_t=G_t-b_t\)：这个动作/轨迹是否比“可比候选”更好。
+- **baseline** $b_t$：不依赖当前动作的比较值，用于降低梯度方差。
+- **advantage** $A_t=G_t-b_t$：这个动作/轨迹是否比“可比候选”更好。
 
 如果 `A>0`，PPO 倾向提升这条 response token 概率；若 `A<0`，倾向降低。
 
@@ -1168,9 +1168,9 @@ G_t=r_t+\gamma r_{t+1}+\gamma^2r_{t+2}+\cdots
 
 普通 RLOO（REINFORCE Leave-One-Out）对同一 prompt 的 N 条完整轨迹使用：
 
-\[
+$$
 A_i=G_i-\frac{1}{N-1}\sum_{j\ne i}G_j
-\]
+$$
 
 这避免让第 i 条样本参与自己的 baseline。若把自己也算进均值，会导致 correlated baseline，梯度估计性质不同。
 
@@ -1220,24 +1220,24 @@ advantages = advantages.unsqueeze(-1).tile([1, response_length]) * eos_mask
 
 源码写成等价的缩放形式：
 
-\[
+$$
 A_i=G_i\frac{N}{N-1}-\overline G\frac{N}{N-1}
 =G_i-\frac{\sum_{j\ne i}G_j}{N-1}
-\]
+$$
 
-其中 \(\overline G\) 是包含自身的组平均值。只有一条可用样本时，代码使用 `A_i=G_i`，因为无法构造 LOO baseline。
+其中 $\overline G$ 是包含自身的组平均值。只有一条可用样本时，代码使用 `A_i=G_i`，因为无法构造 LOO baseline。
 
 最后一行 broadcast 很重要：TRLOO 是 sequence/turn 级 advantage，但语言模型需要对每个 token 做 policy gradient。因此将同一个标量铺到该 response 的所有有效 token，再用 `eos_mask` 清除 padding。
 
 ### 10.4 gamma=1.0 对三轮回报意味着什么
 
-当前 launcher 设 `GAMMA=1.0`。若某条轨迹有三轮即时 reward \(r_0,r_1,r_2\)：
+当前 launcher 设 `GAMMA=1.0`。若某条轨迹有三轮即时 reward $r_0,r_1,r_2$：
 
-\[
+$$
 G_0=r_0+r_1+r_2,\quad G_1=r_1+r_2,\quad G_2=r_2
-\]
+$$
 
-这允许晚一轮的修正结果影响前一轮的 credit。若设置 \(\gamma<1\)，更晚的 reward 对早期 turn 的影响会衰减。注意 `USE_FINAL_REWARD=False` 与 `ADV_BY_LAST_TURN=False` 都来自公共默认值：本 recipe 不会仅因 `IS_GET_LAST_TURN=True` 就自动改成“只末轮 reward/advantage”。
+这允许晚一轮的修正结果影响前一轮的 credit。若设置 $\gamma<1$，更晚的 reward 对早期 turn 的影响会衰减。注意 `USE_FINAL_REWARD=False` 与 `ADV_BY_LAST_TURN=False` 都来自公共默认值：本 recipe 不会仅因 `IS_GET_LAST_TURN=True` 就自动改成“只末轮 reward/advantage”。
 
 ### 10.5 与 GRPO / RLOO 的比较
 
@@ -1255,17 +1255,17 @@ TRLOO 的好处是多轮状态下比较更公平、variance 更低；代价是�
 
 ### 11.1 PPO 的核心直觉
 
-给定一个已产生的 response token \(a_t\)，旧策略概率为 \(\pi_{old}\)，当前要更新的策略概率为 \(\pi_\theta\)：
+给定一个已产生的 response token $a_t$，旧策略概率为 $\pi_{old}$，当前要更新的策略概率为 $\pi_\theta$：
 
-\[
+$$
 r_t(\theta)=\exp(\log\pi_\theta(a_t|s_t)-\log\pi_{old}(a_t|s_t))
-\]
+$$
 
-不加限制的 policy gradient 会最大化 \(r_tA_t\)，可能一步把概率推得过远。PPO 将 ratio 限制在区间附近：
+不加限制的 policy gradient 会最大化 $r_tA_t$，可能一步把概率推得过远。PPO 将 ratio 限制在区间附近：
 
-\[
+$$
 L^{CLIP}=\min\left(r_tA_t,\operatorname{clip}(r_t,1-\epsilon_l,1+\epsilon_h)A_t\right)
-\]
+$$
 
 实现用的是要最小化的负 loss，并且使用 dual clipping 对负 advantage 做额外保护。
 
@@ -1341,13 +1341,13 @@ clip_pg_losses2 = torch.minimum(pg_losses3, clip_pg_losses1)
 pg_losses = torch.where(advantages < 0, clip_pg_losses2, clip_pg_losses1)
 ```
 
-本配方的 `cliprange_low=0.20`、`cliprange_high=0.28`，所以普通 ratio 约束范围是 \([0.8,1.28]\)。它是不对称的：允许正向概率增长的空间略大于下降空间。`clip_ratio_c` 默认 3.0，只在 advantage 为负时参与 dual clipping，避免特别坏样本导致过强更新。
+本配方的 `cliprange_low=0.20`、`cliprange_high=0.28`，所以普通 ratio 约束范围是 $[0.8,1.28]$。它是不对称的：允许正向概率增长的空间略大于下降空间。`clip_ratio_c` 默认 3.0，只在 advantage 为负时参与 dual clipping，避免特别坏样本导致过强更新。
 
 最终 loss 还可能加：
 
-\[
+$$
 L=L_{PG}-c_HH+c_{KL}KL
-\]
+$$
 
 不过当前 recipe `ENTROPY_COEFFIENT=0.0`、`KL_LOSS_COEF=0.0`，所以实际主要由 policy gradient loss 构成；仍会记录 entropy 等诊断指标。
 
@@ -1355,9 +1355,9 @@ L=L_{PG}-c_HH+c_{KL}KL
 
 `agg_loss()` 支持多种聚合。当前 `seq-mean-token-sum`：
 
-\[
+$$
 L=\frac{1}{B}\sum_{i=1}^{B}\sum_{t\in\text{valid}(i)}l_{i,t}
-\]
+$$
 
 即每条序列 token loss 先求和，再让每条**序列**在 batch 平均时权重相同。相较全 token mean，它减少“单纯因生成更长而在 batch 中占更多 token”的影响。长序列又用 `LOSS_SCALE_FACTOR=1000.0` 缩放最终 loss，防止梯度数值尺度失控。
 
