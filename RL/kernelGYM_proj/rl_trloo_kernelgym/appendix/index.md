@@ -37,4 +37,4 @@
 - 当前源码中重复生成的索引段只保留一份 canonical 解释；不会因为文档拆分再复制一份。
 - 如果源码发生变化，必须重新核对附录中的真实源码行号和行覆盖范围。
 
-**导航**：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md) · [总目录](../index.md) · [`01-shell-launchers.md`](01-shell-launchers.md)
+**导航**：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md) · [`../04-runtime-quickstart.md`](../04-runtime-quickstart.md) · [总目录](../index.md) · [`01-shell-launchers.md`](01-shell-launchers.md)

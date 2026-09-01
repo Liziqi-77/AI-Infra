@@ -2,7 +2,7 @@
 
 > 返回总目录：[`index.md`](index.md)
 >
-> 本页为概念教程；完整逐行源码解释见 [`appendix/index.md`](appendix/index.md)。
+> 本页为概念教程；启动脚本和调用栈速查见 [`04-runtime-quickstart.md`](04-runtime-quickstart.md)，完整逐行源码解释见 [`appendix/index.md`](appendix/index.md)。
 
 ---
 

@@ -9,7 +9,8 @@
 1. [`01-foundations-and-setup.md`](01-foundations-and-setup.md)：SFT 与 RL 的区别、术语、依赖、KernelGYM 服务和 RL 拉起步骤。
 2. [`02-launcher-hydra-runtime.md`](02-launcher-hydra-runtime.md)：`8b_trloo_mrs_pr_prs.sh`、`train_rl_common.sh`、Hydra、Ray 和训练器建立。
 3. [`03-rollout-reward-training.md`](03-rollout-reward-training.md)：async 多轮 rollout、reward、TRLOO、PPO、筛选、监控和排错。
-4. [`appendix/index.md`](appendix/index.md)：完整项目调用链的逐行源码解释索引。
+4. [`04-runtime-quickstart.md`](04-runtime-quickstart.md)：启动 RL 所需脚本、启动顺序和完整调用栈。
+5. [`appendix/index.md`](appendix/index.md)：完整项目调用链的逐行源码解释索引。
 
 ## 逐行附录路线
 
