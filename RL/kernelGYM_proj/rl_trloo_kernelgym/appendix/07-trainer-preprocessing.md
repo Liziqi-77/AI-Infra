@@ -1,0 +1,4979 @@
+# Trainer 预处理：构造、dataloader、采样器与 worker 初始化
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+源码文件：`drkernel/kernel/kernel_trainer.py`。本篇完整覆盖该文件的 901–2553 行：trainer 构造、buffer、dataloader、采样器、worker 和验证准备。
+
+#### 原始行 901–1164
+- **L901** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L902** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L903** <code>def compute_advantage(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L904** <code>    data: DataProto,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L905** <code>    adv_estimator,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L906** <code>    gamma=1.0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `gamma`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L907** <code>    lam=1.0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lam`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L908** <code>    num_repeat=1,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_repeat`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L909** <code>    batch_std=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_std`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L910** <code>    use_multi_prompt_mvu=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_multi_prompt_mvu`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L911** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L912** <code>    # Store the original estimator name for tracking</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L913** <code>    if isinstance(adv_estimator, str):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L914** <code>        data.meta_info[&quot;advantage_estimator&quot;] = adv_estimator</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["advantage_estimator"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L915** <code>    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L916** <code>        data.meta_info[&quot;advantage_estimator&quot;] = (</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["advantage_estimator"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L917** <code>            adv_estimator.value</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L918** <code>            if hasattr(adv_estimator, &quot;value&quot;)</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L919** <code>            else str(adv_estimator)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `else str`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L920** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L921** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L922** <code>    # Convert string to enum if needed</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L923** <code>    if isinstance(adv_estimator, str):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L924** <code>        if adv_estimator == &quot;optimal_baseline&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L925** <code>            adv_estimator = AdvantageEstimator.OPTIMAL_BASELINE</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `adv_estimator`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L926** <code>        elif adv_estimator == &quot;optimal_baseline_step&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L927** <code>            adv_estimator = AdvantageEstimator.OPTIMAL_BASELINE_STEP</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `adv_estimator`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L928** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L929** <code>            # Try our extended enum first, then base</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L930** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L931** <code>                adv_estimator = AdvantageEstimator(adv_estimator)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `adv_estimator`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L932** <code>            except ValueError:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L933** <code>                adv_estimator = BaseAdvantageEstimator(adv_estimator)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `adv_estimator`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L934** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L935** <code>    # Back-compatible with trainers that do not compute response mask in fit</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L936** <code>    if &quot;response_mask&quot; not in data.batch.keys():</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L937** <code>        data.batch[&quot;response_mask&quot;] = compute_response_mask(data)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["response_mask"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L938** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L939** <code>    # prepare response group</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L940** <code>    # TODO: add other ways to estimate advantages</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L941** <code>    if adv_estimator in [AdvantageEstimator.GAE, BaseAdvantageEstimator.GAE, &quot;gae&quot;]:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L942** <code>        advantages, returns = core_algos.compute_gae_advantage_return(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages, returns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L943** <code>            token_level_rewards=data.batch[&quot;token_level_rewards&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L944** <code>            values=data.batch[&quot;values&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `values`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L945** <code>            eos_mask=data.batch[&quot;response_mask&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `eos_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L946** <code>            gamma=gamma,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `gamma`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L947** <code>            lam=lam,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lam`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L948** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L949** <code>        data.batch[&quot;advantages&quot;] = advantages</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["advantages"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L950** <code>        data.batch[&quot;returns&quot;] = returns</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["returns"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L951** <code>    elif adv_estimator in [</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L952** <code>        AdvantageEstimator.GRPO,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L953** <code>        BaseAdvantageEstimator.GRPO,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L954** <code>        &quot;grpo&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L955** <code>    ]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L956** <code>        advantages, returns = core_algos.compute_grpo_outcome_advantage(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages, returns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L957** <code>            token_level_rewards=data.batch[&quot;token_level_rewards&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L958** <code>            eos_mask=data.batch[&quot;response_mask&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `eos_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L959** <code>            index=data.non_tensor_batch[&quot;uid&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `index`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L960** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L961** <code>        data.batch[&quot;advantages&quot;] = advantages</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["advantages"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L962** <code>        data.batch[&quot;returns&quot;] = returns</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["returns"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L963** <code>    elif adv_estimator in [</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L964** <code>        AdvantageEstimator.REINFORCE_PLUS_PLUS,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L965** <code>        BaseAdvantageEstimator.REINFORCE_PLUS_PLUS,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L966** <code>        &quot;reinforce_plus_plus&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L967** <code>    ]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L968** <code>        advantages, returns = core_algos.compute_reinforce_plus_plus_outcome_advantage(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages, returns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L969** <code>            token_level_rewards=data.batch[&quot;token_level_rewards&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L970** <code>            eos_mask=data.batch[&quot;response_mask&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `eos_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L971** <code>            gamma=gamma,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `gamma`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L972** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L973** <code>        data.batch[&quot;advantages&quot;] = advantages</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["advantages"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L974** <code>        data.batch[&quot;returns&quot;] = returns</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["returns"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L975** <code>    elif adv_estimator in [</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L976** <code>        AdvantageEstimator.REMAX,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L977** <code>        BaseAdvantageEstimator.REMAX,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L978** <code>        &quot;remax&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L979** <code>    ]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L980** <code>        advantages, returns = core_algos.compute_remax_outcome_advantage(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages, returns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L981** <code>            token_level_rewards=data.batch[&quot;token_level_rewards&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L982** <code>            reward_baselines=data.batch[&quot;reward_baselines&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_baselines`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L983** <code>            eos_mask=data.batch[&quot;response_mask&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `eos_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L984** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L985** <code>        data.batch[&quot;advantages&quot;] = advantages</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["advantages"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L986** <code>        data.batch[&quot;returns&quot;] = returns</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["returns"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L987** <code>    elif adv_estimator in [</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L988** <code>        AdvantageEstimator.RLOO,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L989** <code>        BaseAdvantageEstimator.RLOO,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L990** <code>        &quot;rloo&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L991** <code>    ]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L992** <code>        advantages, returns = core_algos.compute_rloo_outcome_advantage(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages, returns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L993** <code>            token_level_rewards=data.batch[&quot;token_level_rewards&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L994** <code>            eos_mask=data.batch[&quot;response_mask&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `eos_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L995** <code>            index=data.non_tensor_batch[&quot;uid&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `index`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L996** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L997** <code>        data.batch[&quot;advantages&quot;] = advantages</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["advantages"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L998** <code>        data.batch[&quot;returns&quot;] = returns</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["returns"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L999** <code>    elif adv_estimator in [AdvantageEstimator.OPTIMAL_BASELINE, &quot;optimal_baseline&quot;]:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1000** <code>        # Import optimal baseline implementation (outcome-level)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1001** <code>        from verl_patch.trainer.code.ppo.optimal_baseline import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1002** <code>            compute_optimal_baseline_outcome_advantage,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1003** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1004** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1005** <code>        # Check if sum_pi_squared is available</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1006** <code>        if &quot;sum_pi_squared&quot; not in data.batch:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1007** <code>            raise ValueError(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1008** <code>                &quot;Optimal baseline requires sum_pi_squared from actor. &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1009** <code>                &quot;Please set actor.compute_sum_pi_squared=True in config.&quot;</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `"Please set actor.compute_sum_pi_squared`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1010** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1011** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1012** <code>        optimal_baseline_kwargs = data.meta_info.get(&quot;optimal_baseline_kwargs&quot;, {})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `optimal_baseline_kwargs`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1013** <code>        uniform_weight = optimal_baseline_kwargs.get(&quot;uniform_weight&quot;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uniform_weight`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1014** <code>        uniform_cumulative = optimal_baseline_kwargs.get(&quot;uniform_cumulative&quot;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uniform_cumulative`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1015** <code>        rollout_correction = optimal_baseline_kwargs.get(&quot;rollout_correction&quot;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_correction`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1016** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1017** <code>        # Get pre-computed rollout IS weights if available</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1018** <code>        rollout_is_weights = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is_weights`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1019** <code>        if rollout_correction:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1020** <code>            rollout_is_weights = data.batch.get(&quot;rollout_is_weights&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is_weights`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1021** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1022** <code>        # Compute outcome baseline: single baseline per trajectory</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1023** <code>        advantages, returns = compute_optimal_baseline_outcome_advantage(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages, returns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1024** <code>            token_level_rewards=data.batch[&quot;token_level_rewards&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1025** <code>            response_mask=data.batch[&quot;response_mask&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1026** <code>            old_log_probs=data.batch[&quot;old_log_probs&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `old_log_probs`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1027** <code>            sum_pi_squared=data.batch[&quot;sum_pi_squared&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1028** <code>            index=data.non_tensor_batch[&quot;uid&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `index`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1029** <code>            rollout_is_weights=rollout_is_weights,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is_weights`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1030** <code>            uniform_weight=uniform_weight,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uniform_weight`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1031** <code>            uniform_cumulative=uniform_cumulative,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uniform_cumulative`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1032** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1033** <code>        data.batch[&quot;advantages&quot;] = advantages</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["advantages"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1034** <code>        data.batch[&quot;returns&quot;] = returns</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["returns"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1035** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1036** <code>    elif adv_estimator in [</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1037** <code>        AdvantageEstimator.OPTIMAL_BASELINE_STEP,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1038** <code>        &quot;optimal_baseline_step&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1039** <code>    ]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1040** <code>        # Import step-dependent optimal baseline implementation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1041** <code>        from verl_patch.trainer.code.ppo.optimal_baseline import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1042** <code>            compute_optimal_baseline_step_advantage,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1043** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1044** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1045** <code>        # Check if sum_pi_squared is available</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1046** <code>        if &quot;sum_pi_squared&quot; not in data.batch:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1047** <code>            raise ValueError(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1048** <code>                &quot;Step-dependent optimal baseline requires sum_pi_squared from actor. &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1049** <code>                &quot;Please set actor.compute_sum_pi_squared=True in config.&quot;</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `"Please set actor.compute_sum_pi_squared`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1050** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1051** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1052** <code>        optimal_baseline_kwargs = data.meta_info.get(&quot;optimal_baseline_kwargs&quot;, {})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `optimal_baseline_kwargs`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1053** <code>        uniform_weight = optimal_baseline_kwargs.get(&quot;uniform_weight&quot;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uniform_weight`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1054** <code>        uniform_cumulative = optimal_baseline_kwargs.get(&quot;uniform_cumulative&quot;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uniform_cumulative`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1055** <code>        rollout_correction = optimal_baseline_kwargs.get(&quot;rollout_correction&quot;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_correction`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1056** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1057** <code>        # Get pre-computed rollout IS weights if available</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1058** <code>        rollout_is_weights = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is_weights`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1059** <code>        if rollout_correction:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1060** <code>            rollout_is_weights = data.batch.get(&quot;rollout_is_weights&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is_weights`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1061** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1062** <code>        # Compute step-dependent baseline: unique baseline per timestep</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1063** <code>        advantages, returns = compute_optimal_baseline_step_advantage(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages, returns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1064** <code>            token_level_rewards=data.batch[&quot;token_level_rewards&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1065** <code>            response_mask=data.batch[&quot;response_mask&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1066** <code>            old_log_probs=data.batch[&quot;old_log_probs&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `old_log_probs`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1067** <code>            sum_pi_squared=data.batch[&quot;sum_pi_squared&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1068** <code>            index=data.non_tensor_batch[&quot;uid&quot;],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `index`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1069** <code>            rollout_is_weights=rollout_is_weights,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is_weights`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1070** <code>            uniform_weight=uniform_weight,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uniform_weight`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1071** <code>            uniform_cumulative=uniform_cumulative,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uniform_cumulative`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1072** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1073** <code>        data.batch[&quot;advantages&quot;] = advantages</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["advantages"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1074** <code>        data.batch[&quot;returns&quot;] = returns</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["returns"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1075** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1076** <code>    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1077** <code>        raise NotImplementedError</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1078** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1079** <code>    # Apply multi-prompt MVU weighting if enabled (works for ALL estimators)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1080** <code>    if use_multi_prompt_mvu:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1081** <code>        modified_advantages, variance_info = apply_variance_reduction(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `modified_advantages, variance_info`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1082** <code>            data=data, use_batch_reweighting=False, use_multi_prompt_mvu=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1083** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1084** <code>        data.batch[&quot;advantages&quot;] = modified_advantages</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["advantages"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1085** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1086** <code>        # Store variance reduction info for logging</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1087** <code>        if variance_info is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1088** <code>            data.meta_info[&quot;variance_reduction_info&quot;] = variance_info</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["variance_reduction_info"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1089** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1090** <code>    # Apply batch standardization if enabled</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1091** <code>    if batch_std:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1092** <code>        response_length = data.batch[&quot;advantages&quot;].shape[-1]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_length`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1093** <code>        attention_mask = data.batch[&quot;attention_mask&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attention_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1094** <code>        response_mask = attention_mask[:, -response_length:]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1095** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1096** <code>        standardized_advantages = core_algos.apply_batch_standardization(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `standardized_advantages`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1097** <code>            data.batch[&quot;advantages&quot;], response_mask</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1098** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1099** <code>        data.batch[&quot;advantages&quot;] = standardized_advantages</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["advantages"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1100** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1101** <code>    return data</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1102** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1103** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1104** <code>from verl.utils.torch_functional import masked_mean</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1105** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1106** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1107** <code>def apply_kl_penalty(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1108** <code>    data: DataProto, kl_ctrl: core_algos.AdaptiveKLController, kl_penalty=&quot;kl&quot;</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data: DataProto, kl_ctrl: core_algos.AdaptiveKLController, kl_penalty`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1109** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1110** <code>    responses = data.batch[&quot;responses&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `responses`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1111** <code>    response_length = responses.size(1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_length`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1112** <code>    token_level_scores = data.batch[&quot;token_level_scores&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_scores`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1113** <code>    batch_size = data.batch.batch_size[0]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1114** <code>    attention_mask = data.batch[&quot;attention_mask&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attention_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1115** <code>    response_mask = attention_mask[:, -response_length:]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1116** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1117** <code>    # compute kl between ref_policy and current policy</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1118** <code>    # When apply_kl_penalty, algorithm.use_kl_in_reward=True, so the reference model has been enabled.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1119** <code>    kld = core_algos.kl_penalty(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kld`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1120** <code>        data.batch[&quot;old_log_probs&quot;], data.batch[&quot;ref_log_prob&quot;], kl_penalty=kl_penalty</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["old_log_probs"], data.batch["ref_log_prob"], kl_penalty`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1121** <code>    )  # (batch_size, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `)  #`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1122** <code>    kld = kld * response_mask</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kld`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1123** <code>    beta = kl_ctrl.value</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `beta`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1124** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1125** <code>    token_level_rewards = token_level_scores - beta * kld</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1126** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1127** <code>    current_kl = masked_mean(kld, mask=response_mask, axis=-1)  # average over sequence</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `current_kl`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1128** <code>    current_kl = torch.mean(current_kl, dim=0).item()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `current_kl`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1129** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1130** <code>    # According to https://github.com/huggingface/trl/blob/951ca1841f29114b969b57b26c7d3e80a39f75a0/trl/trainer/ppo_trainer.py#L837</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1131** <code>    # Use the actual batch size for KL controller update</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1132** <code>    # For multi-turn data, use the original batch size, not the number of turns</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1133** <code>    # if &#x27;sample_indices&#x27; in data.batch and &#x27;turn_indices&#x27; in data.batch:</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1134** <code>    if &quot;uid&quot; in data.non_tensor_batch:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1135** <code>        # Count unique samples (original batch size) instead of total turns</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1136** <code>        uids = data.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uids`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1137** <code>        unique_samples = torch.unique(uids).numel()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `unique_samples`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1138** <code>        print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1139** <code>            f&quot;[DEBUG] KL using unique samples count: {unique_samples} instead of {batch_size}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1140** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1141** <code>        kl_ctrl.update(current_kl=current_kl, n_steps=unique_samples)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `kl_ctrl.update(current_kl`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1142** <code>    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1143** <code>        logger.warning(&quot;uids is not found in the data.non_tensor_batch&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1144** <code>        kl_ctrl.update(current_kl=current_kl, n_steps=batch_size)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `kl_ctrl.update(current_kl`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1145** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1146** <code>    data.batch[&quot;token_level_rewards&quot;] = token_level_rewards</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.batch["token_level_rewards"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1147** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1148** <code>    metrics = {</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metrics`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1149** <code>        &quot;actor/reward_kl_penalty&quot;: current_kl,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1150** <code>        &quot;actor/reward_kl_penalty_coeff&quot;: beta,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1151** <code>    }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1152** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1153** <code>    return data, metrics</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1154** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1155** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1156** <code># Define a decorator to dynamically add functions to a specified class</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1157** <code>def bind_to_class(target_class):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1158** <code>    def decorator(func):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1159** <code>        setattr(target_class, func.__name__, func)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `setattr`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1160** <code>        return func</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1161** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1162** <code>    return decorator</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1163** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1164** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+#### 原始行 1165–1345
+- **L1165** 源码：<code>class RayKernelTrainer(RayPPOTrainer):</code>
+  - 语法与作用：类定义语法；声明 `RayKernelTrainer`，类体在定义阶段执行一次并创建类型对象。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1166** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1167** 源码：<code>    Note that this trainer runs on the driver process on a single CPU/GPU node.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1168** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1169** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1170** 源码：<code>    def __init__(</code>
+  - 语法与作用：函数定义语法；声明 `__init__` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1171** 源码：<code>        self,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1172** 源码：<code>        config,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1173** 源码：<code>        tokenizer,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1174** 源码：<code>        role_worker_mapping: dict[Role, WorkerType],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1175** 源码：<code>        resource_pool_manager: ResourcePoolManager,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1176** 源码：<code>        ray_worker_group_cls: RayWorkerGroup = RayWorkerGroup,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1177** 源码：<code>        processor=None,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `processor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1178** 源码：<code>        reward_fn=None,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1179** 源码：<code>        val_reward_fn=None,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `val_reward_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1180** 源码：<code>    ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1181** 源码：<code>        # Keep PPO updates on policy by scaling mini-batch size when multi-turn rollouts are used.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1182** 源码：<code>        multi_turn_cfg = config.actor_rollout_ref.rollout.get(&quot;multi_turn&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_cfg`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1183** 源码：<code>        if multi_turn_cfg and multi_turn_cfg.enable:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1184** 源码：<code>            max_turns = multi_turn_cfg.max_user_turns</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1185** 源码：<code>            original_ppo_mini_batch_size = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `original_ppo_mini_batch_size`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1186** 源码：<code>                config.actor_rollout_ref.actor.ppo_mini_batch_size</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1187** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1188** 源码：<code>            config.actor_rollout_ref.actor.ppo_mini_batch_size *= max_turns</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `config.actor_rollout_ref.actor.ppo_mini_batch_size *`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1189** 源码：<code>            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1190** 源码：<code>                f&quot;[multi_turn] actor.ppo_mini_batch_size scaled from {original_ppo_mini_batch_size} &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1191** 源码：<code>                f&quot;to {config.actor_rollout_ref.actor.ppo_mini_batch_size} (max_turns={max_turns}) to ensure that&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1192** 源码：<code>                &quot; multi-turn training is on-policy when specifying the same batch_size and ppo_mini_batch_size.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1193** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1194** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1195** 源码：<code>        # Ensure sum_pi_squared is enabled for optimal baseline (required for this estimator)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1196** 源码：<code>        # Note: compute_sum_pi_squared is now enabled by default for all algorithms to support variance proxy metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1197** 源码：<code>        if &quot;optimal_baseline&quot; in config.algorithm.adv_estimator:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1198** 源码：<code>            if not config.actor_rollout_ref.actor.get(&quot;compute_sum_pi_squared&quot;, True):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1199** 源码：<code>                OmegaConf.set_struct(config.actor_rollout_ref.actor, False)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `OmegaConf.set_struct`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1200** 源码：<code>                config.actor_rollout_ref.actor.compute_sum_pi_squared = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `config.actor_rollout_ref.actor.compute_sum_pi_squared`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1201** 源码：<code>                OmegaConf.set_struct(config.actor_rollout_ref.actor, True)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `OmegaConf.set_struct`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1202** 源码：<code>                print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1203** 源码：<code>                    &quot;Warning: Forcing compute_sum_pi_squared=True for optimal_baseline (required)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1204** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1205** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1206** 源码：<code>        # Temporarily change adv_estimator to bypass parent class check</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1207** 源码：<code>        # This is necessary because open_verl&#x27;s RayPPOTrainer only recognize BaseAdvantageEstimator</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1208** 源码：<code>        use_external_adv_estimator = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_external_adv_estimator`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1209** 源码：<code>        if config.algorithm.adv_estimator not in list(BaseAdvantageEstimator):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1210** 源码：<code>            use_external_adv_estimator = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_external_adv_estimator`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1211** 源码：<code>            external_external_adv_estimator = config.algorithm.adv_estimator</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `external_external_adv_estimator`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1212** 源码：<code>            if &quot;gae&quot; in external_external_adv_estimator:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1213** 源码：<code>                config.algorithm.adv_estimator = &quot;gae&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `config.algorithm.adv_estimator`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1214** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1215** 源码：<code>                config.algorithm.adv_estimator = &quot;grpo&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `config.algorithm.adv_estimator`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1216** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1217** 源码：<code>        super().__init__(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `super`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1218** 源码：<code>            config,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1219** 源码：<code>            tokenizer,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1220** 源码：<code>            role_worker_mapping,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1221** 源码：<code>            resource_pool_manager,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1222** 源码：<code>            ray_worker_group_cls,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1223** 源码：<code>            processor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1224** 源码：<code>            reward_fn,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1225** 源码：<code>            val_reward_fn,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1226** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1227** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1228** 源码：<code>        if use_external_adv_estimator:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1229** 源码：<code>            self.config.algorithm.adv_estimator = external_external_adv_estimator</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.config.algorithm.adv_estimator`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1230** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1231** 源码：<code>        # Convert algorithm config to dataclass to validate it</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1232** 源码：<code>        self.algorithm_cfg = omega_conf_to_dataclass(self.config.algorithm)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.algorithm_cfg`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1233** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1234** 源码：<code>        # Initialize batch filter after super().__init__</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1235** 源码：<code>        self._initialize_batch_filter()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._initialize_batch_filter`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1236** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1237** 源码：<code>    def _initialize_batch_filter(self):</code>
+  - 语法与作用：函数定义语法；声明 `_initialize_batch_filter` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1238** 源码：<code>        &quot;&quot;&quot;Initialize the unified batch filter with appropriate configuration.&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1239** 源码：<code>        self.batch_filter = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.batch_filter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1240** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1241** 源码：<code>        # Check if we need the filter</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1242** 源码：<code>        needs_filter = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `needs_filter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1243** 源码：<code>            self.config.data.get(&quot;prompt_oversampling_factor&quot;, 1.0) &gt; 1.0</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.config.data.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1244** 源码：<code>            or self.config.data.get(&quot;sample_oversampling_factor&quot;, 1.0) &gt; 1.0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1245** 源码：<code>            or self.config.get(&quot;rejection_sampling&quot;, {}).get(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1246** 源码：<code>                &quot;enable_two_gate_filter&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1247** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1248** 源码：<code>            or self.config.trainer.rejection_sample</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1249** 源码：<code>            or self.config.trainer.get(&quot;remove_clip&quot;, False)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1250** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1251** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1252** 源码：<code>        if needs_filter:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1253** 源码：<code>            # Derive target number of groups; for multi-turn with turn-level advantages, we need groups per turn</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1254** 源码：<code>            target_num_groups = self.config.data.train_batch_size</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `target_num_groups`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1255** 源码：<code>            multi_turn_cfg = self.config.actor_rollout_ref.rollout.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_cfg`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1256** 源码：<code>                &quot;multi_turn&quot;, None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1257** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1258** 源码：<code>            if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1259** 源码：<code>                multi_turn_cfg</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1260** 源码：<code>                and multi_turn_cfg.enable</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1261** 源码：<code>                and not self.config.algorithm.is_get_last_turn</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1262** 源码：<code>            ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1263** 源码：<code>                target_num_groups *= multi_turn_cfg.max_user_turns</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `target_num_groups *`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1264** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1265** 源码：<code>            # Create unified filter config</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1266** 源码：<code>            filter_config = PPOFilterConfig(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `filter_config`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1267** 源码：<code>                # Sample selection (filter doesn&#x27;t handle oversampling - that&#x27;s done at DataLoader/generation)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1268** 源码：<code>                sample_selection_strategy=self.config.data.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sample_selection_strategy`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1269** 源码：<code>                    &quot;sample_selection_strategy&quot;, &quot;efficiency_stochastic&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1270** 源码：<code>                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1271** 源码：<code>                # Group management</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1272** 源码：<code>                target_group_size=self.config.actor_rollout_ref.rollout.n,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `target_group_size`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1273** 源码：<code>                min_group_size=self.config.data.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `min_group_size`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1274** 源码：<code>                    &quot;min_group_size&quot;, None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1275** 源码：<code>                ),  # None = auto-set to target_group_size // 2 + 1</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1276** 源码：<code>                target_num_groups=target_num_groups,  # Number of groups (prompts or turns) to select after filtering</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `target_num_groups`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1277** 源码：<code>                # Rejection sampling</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1278** 源码：<code>                reward_threshold=None,  # Not currently configured via command line</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1279** 源码：<code>                max_response_length=(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1280** 源码：<code>                    self.config.data.get(&quot;max_response_length&quot;, None)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.config.data.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1281** 源码：<code>                    if self.config.trainer.rejection_sample</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1282** 源码：<code>                    or self.config.trainer.get(&quot;remove_clip&quot;, False)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1283** 源码：<code>                    else None</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1284** 源码：<code>                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1285** 源码：<code>                reject_low_variance_groups=self.config.trainer.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reject_low_variance_groups`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1286** 源码：<code>                    &quot;rejection_sample&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1287** 源码：<code>                ),  # Only reject low variance when rejection_sample is True</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1288** 源码：<code>                remove_clip=self.config.trainer.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `remove_clip`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1289** 源码：<code>                    &quot;remove_clip&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1290** 源码：<code>                ),  # Whether to use remove_clip logic</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1291** 源码：<code>                min_rollout_n=(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `min_rollout_n`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1292** 源码：<code>                    self.config.actor_rollout_ref.rollout.get(&quot;min_n&quot;, None)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.config.actor_rollout_ref.rollout.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1293** 源码：<code>                    if self.config.trainer.get(&quot;remove_clip&quot;, False)</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1294** 源码：<code>                    else None</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1295** 源码：<code>                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1296** 源码：<code>                # Two-gate filter</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1297** 源码：<code>                enable_two_gate_filter=self.config.get(&quot;rejection_sampling&quot;, {}).get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `enable_two_gate_filter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1298** 源码：<code>                    &quot;enable_two_gate_filter&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1299** 源码：<code>                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1300** 源码：<code>                gate1_enabled=self.config.get(&quot;rejection_sampling&quot;, {})</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gate1_enabled`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1301** 源码：<code>                .get(&quot;gate1&quot;, {})</code>
+  - 语法与作用：函数/构造器调用语法；调用 `.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1302** 源码：<code>                .get(&quot;enabled&quot;, True),</code>
+  - 语法与作用：函数/构造器调用语法；调用 `.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1303** 源码：<code>                gate1_bias_epsilon=self.config.get(&quot;rejection_sampling&quot;, {})</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gate1_bias_epsilon`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1304** 源码：<code>                .get(&quot;gate1&quot;, {})</code>
+  - 语法与作用：函数/构造器调用语法；调用 `.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1305** 源码：<code>                .get(&quot;bias_epsilon&quot;, 0.01),</code>
+  - 语法与作用：函数/构造器调用语法；调用 `.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1306** 源码：<code>                gate2_enabled=self.config.get(&quot;rejection_sampling&quot;, {})</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gate2_enabled`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1307** 源码：<code>                .get(&quot;gate2&quot;, {})</code>
+  - 语法与作用：函数/构造器调用语法；调用 `.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1308** 源码：<code>                .get(&quot;enabled&quot;, True),</code>
+  - 语法与作用：函数/构造器调用语法；调用 `.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1309** 源码：<code>                gate2_instability_threshold=self.config.get(&quot;rejection_sampling&quot;, {})</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gate2_instability_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1310** 源码：<code>                .get(&quot;gate2&quot;, {})</code>
+  - 语法与作用：函数/构造器调用语法；调用 `.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1311** 源码：<code>                .get(&quot;instability_threshold&quot;, -15.0),</code>
+  - 语法与作用：函数/构造器调用语法；调用 `.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1312** 源码：<code>                # Metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1313** 源码：<code>                save_metrics=True,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `save_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1314** 源码：<code>                log_rejection_reasons=self.config.get(&quot;rejection_sampling&quot;, {}).get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `log_rejection_reasons`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1315** 源码：<code>                    &quot;log_rejected_samples&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1316** 源码：<code>                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1317** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1318** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1319** 源码：<code>            self.batch_filter = PPOBatchFilter(filter_config)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.batch_filter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1320** 源码：<code>            print(f&quot;PPO Batch Filter initialized:&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1321** 源码：<code>            print(f&quot;  Selection strategy: {filter_config.sample_selection_strategy}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1322** 源码：<code>            print(f&quot;  Min group size: {filter_config.min_group_size}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1323** 源码：<code>            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1324** 源码：<code>                f&quot;  Two-gate filter: {&#x27;Enabled&#x27; if filter_config.enable_two_gate_filter else &#x27;Disabled&#x27;}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1325** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1326** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1327** 源码：<code>        # Keep backward compatibility alias</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1328** 源码：<code>        self.oversampling_filter = self.batch_filter</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.oversampling_filter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1329** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1330** 源码：<code>    def _compute_suggested_sample_factor(</code>
+  - 语法与作用：函数定义语法；声明 `_compute_suggested_sample_factor` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1331** 源码：<code>        self, expected_samples: int, selected_samples: int</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1332** 源码：<code>    ) -&gt; Optional[float]:</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1333** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1334** 源码：<code>        Compute the minimum prompt_oversampling_factor required to reach the expected</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1335** 源码：<code>        number of samples, based on the currently selected sample count.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1336** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1337** 源码：<code>        if selected_samples &lt;= 0 or expected_samples &lt;= 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1338** 源码：<code>            return None</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1339** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1340** 源码：<code>        current_factor = float(self.config.data.get(&quot;prompt_oversampling_factor&quot;, 1.0))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1341** 源码：<code>        ratio = expected_samples / selected_samples</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ratio`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1342** 源码：<code>        if ratio &lt;= 1.0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1343** 源码：<code>            return current_factor</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1344** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L1345** 源码：<code>        return max(current_factor, current_factor * ratio)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+
+#### 原始行 1346–2553
+- **L1346** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1347** <code>    def _save_to_buffer(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1348** <code>        self,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1349** <code>        buffer_batch: Optional[DataProto],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1350** <code>        batch: DataProto,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1351** <code>        disable_buffer: bool,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1352** <code>        multi_turn_batch: Optional[DataProto],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1353** <code>        use_multi_turn: bool,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1354** <code>    ) -&gt; Optional[DataProto]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1355** <code>        &quot;&quot;&quot;Store skipped samples so we can reuse them once enough accumulate.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1356** <code>        if disable_buffer:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1357** <code>            return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1358** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1359** <code>        avaiable_keys = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `avaiable_keys`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1360** <code>            multi_turn_batch.batch.keys() if use_multi_turn else batch.batch.keys()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `multi_turn_batch.batch.keys`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1361** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1362** <code>        select_keys = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `select_keys`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1363** <code>            &quot;input_ids&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1364** <code>            &quot;rollout_log_probs&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1365** <code>            &quot;position_ids&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1366** <code>            &quot;loss_mask&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1367** <code>            &quot;turn_indices&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1368** <code>            &quot;attention_mask&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1369** <code>            &quot;sample_indices&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1370** <code>            &quot;prompts&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1371** <code>            &quot;responses&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1372** <code>            &quot;response_mask&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1373** <code>            &quot;top_log_probs&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1374** <code>            &quot;token_level_scores&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1375** <code>            &quot;uid&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1376** <code>        ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1377** <code>        select_keys = [key for key in select_keys if key in avaiable_keys]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `select_keys`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1378** <code>        if use_multi_turn:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1379** <code>            saved_batch = multi_turn_batch.select(batch_keys=select_keys)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `saved_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1380** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1381** <code>            saved_batch = batch.select(batch_keys=select_keys)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `saved_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1382** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1383** <code>        if buffer_batch is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1384** <code>            buffer_batch = saved_batch</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `buffer_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1385** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1386** <code>            buffer_batch = DataProto.concat([buffer_batch, saved_batch])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `buffer_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1387** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1388** <code>        per_prompt = max(self.config.actor_rollout_ref.rollout.n, 1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `per_prompt`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1389** <code>        current_size = batch.batch[&quot;input_ids&quot;].shape[0] // per_prompt</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `current_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1390** <code>        print(f&quot;[Buffer] Save to buffer, current buffer size: {current_size}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1391** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1392** <code>        return buffer_batch</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1393** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1394** <code>    def _load_from_buffer(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1395** <code>        self, batch: DataProto, buffer_batch: Optional[DataProto], disable_buffer: bool,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1396** <code>    ) -&gt; Tuple[DataProto, Optional[DataProto]]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1397** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1398** <code>        Load buffered samples back into the working batch if buffering is enabled.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1399** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1400** <code>        Returns the updated batch and the new buffer state (None when buffer is consumed).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Returns the updated batch and the new buffer state`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1401** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1402** <code>        if buffer_batch is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1403** <code>            return batch, buffer_batch</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1404** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1405** <code>        if disable_buffer:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1406** <code>            print(&quot;Buffer is disabled, discarding buffered batch&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1407** <code>            return batch, None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1408** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1409** <code>        # (Qian): make sure that the buffered batch and current batch have the same keys</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1410** <code>        keys_to_remove = set(buffer_batch.batch.keys()) - set(batch.batch.keys())</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `keys_to_remove`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1411** <code>        if keys_to_remove:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1412** <code>            buffer_batch = buffer_batch.select(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `buffer_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1413** <code>                batch_keys=[</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_keys`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1414** <code>                    key</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1415** <code>                    for key in buffer_batch.batch.keys()</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1416** <code>                    if key not in keys_to_remove</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1417** <code>                ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1418** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1419** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1420** <code>        combined_batch = DataProto.concat([buffer_batch, batch])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `combined_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1421** <code>        per_prompt = max(self.config.actor_rollout_ref.rollout.n, 1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `per_prompt`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1422** <code>        print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1423** <code>            &quot;[Buffer] Using buffered batch to form a new batch. The new batch size is:&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1424** <code>            combined_batch.batch[&quot;input_ids&quot;].shape[0] // per_prompt,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1425** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1426** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1427** <code>        return combined_batch, None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1428** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1429** <code>    def _get_max_world_size(self) -&gt; int:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1430** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1431** <code>        Calculate the maximum world size across all worker groups.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1432** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1433** <code>        Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1434** <code>            Maximum world size needed for batch padding to ensure proper distributed chunking.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1435** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1436** <code>        max_world_size = self.actor_rollout_wg.world_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1437** <code>        if self.use_critic:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1438** <code>            max_world_size = max(max_world_size, self.critic_wg.world_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1439** <code>        if self.use_reference_policy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1440** <code>            max_world_size = max(max_world_size, self.ref_policy_wg.world_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1441** <code>        if self.use_rm:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1442** <code>            max_world_size = max(max_world_size, self.rm_wg.world_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1443** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1444** <code>        # if we use multi_turn, the max_world_size must be multiple of max_turns</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1445** <code>        if self.config.actor_rollout_ref.rollout.multi_turn.enable:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1446** <code>            max_turns = self.config.actor_rollout_ref.rollout.multi_turn.max_user_turns</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_turns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1447** <code>            if max_world_size % max_turns != 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1448** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1449** <code>                    f&quot;Warning: max_world_size {max_world_size} is not multiple of max_turns {max_turns}, adjusting it to be multiple of max_turns&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1450** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1451** <code>                max_world_size = max_world_size * max_turns</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1452** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1453** <code>        return max_world_size</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1454** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1455** <code>    def _create_dataloader(self, train_dataset, val_dataset, collate_fn, train_sampler):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1456** <code>        if collate_fn is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1457** <code>            from verl.utils.dataset.rl_dataset import collate_fn as default_collate_fn</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1458** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1459** <code>            collate_fn = default_collate_fn</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `collate_fn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1460** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1461** <code>        if self.config.data.get(&quot;use_moderate_sampling&quot;, False) or self.config.data.get(</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1462** <code>            &quot;use_refresh_sampling&quot;, False</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1463** <code>        ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1464** <code>            self.train_dataset = SolveRateDynamicRLHFDataset(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.train_dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1465** <code>                parquet_files=self.config.data.train_files,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `parquet_files`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1466** <code>                tokenizer=self.tokenizer,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tokenizer`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1467** <code>                processor=self.processor,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `processor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1468** <code>                prompt_key=self.config.data.prompt_key,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt_key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1469** <code>                image_key=self.config.data.get(&quot;image_key&quot;, &quot;images&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `image_key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1470** <code>                max_prompt_length=self.config.data.max_prompt_length,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_prompt_length`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1471** <code>                filter_prompts=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `filter_prompts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1472** <code>                apply_chat_template=self.config.data.apply_chat_template,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `apply_chat_template`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1473** <code>                return_raw_chat=self.config.data.get(&quot;return_raw_chat&quot;, False),</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1474** <code>                truncation=self.config.data.get(&quot;truncation&quot;, &quot;error&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `truncation`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1475** <code>                filter_overlong_prompts=self.config.data.filter_overlong_prompts,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `filter_overlong_prompts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1476** <code>                system_prompt_config=self.config.data.get(&quot;system_prompt_config&quot;, None),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `system_prompt_config`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1477** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1478** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1479** <code>            self.train_dataset = RLHFDataset(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.train_dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1480** <code>                parquet_files=self.config.data.train_files,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `parquet_files`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1481** <code>                tokenizer=self.tokenizer,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tokenizer`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1482** <code>                processor=self.processor,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `processor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1483** <code>                prompt_key=self.config.data.prompt_key,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt_key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1484** <code>                image_key=self.config.data.get(&quot;image_key&quot;, &quot;images&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `image_key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1485** <code>                max_prompt_length=self.config.data.max_prompt_length,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_prompt_length`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1486** <code>                filter_prompts=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `filter_prompts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1487** <code>                apply_chat_template=self.config.data.apply_chat_template,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `apply_chat_template`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1488** <code>                return_raw_chat=self.config.data.get(&quot;return_raw_chat&quot;, False),</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1489** <code>                truncation=self.config.data.get(&quot;truncation&quot;, &quot;error&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `truncation`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1490** <code>                filter_overlong_prompts=self.config.data.filter_overlong_prompts,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `filter_overlong_prompts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1491** <code>                system_prompt_config=self.config.data.get(&quot;system_prompt_config&quot;, None),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `system_prompt_config`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1492** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1493** <code>        assert self.train_dataset.truncation == self.config.data.get(</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1494** <code>            &quot;truncation&quot;, &quot;error&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1495** <code>        ), f&#x27;dataset truncation {self.train_dataset.truncation} must be the same as config {self.config.data.get(&quot;truncation&quot;, &quot;error&quot;)}&#x27;</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `), f'dataset truncation {self.train_dataset.truncation} must be the same as config {self.config.data.get`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1496** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1497** <code>        # use basic sampler for train dataloader</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1498** <code>        if self.config.data.shuffle:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1499** <code>            train_dataloader_generator = torch.Generator()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `train_dataloader_generator`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1500** <code>            train_dataloader_generator.manual_seed(self.config.data.get(&quot;seed&quot;, 1))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `train_dataloader_generator.manual_seed`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1501** <code>            base_sampler = RandomSampler(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `base_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1502** <code>                data_source=self.train_dataset, generator=train_dataloader_generator</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data_source`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1503** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1504** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1505** <code>            base_sampler = SequentialSampler(data_source=self.train_dataset)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `base_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1506** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1507** <code>        train_batch_size = self.config.data.train_batch_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `train_batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1508** <code>        world_size = self.config.trainer.nnodes * self.config.trainer.n_gpus_per_node</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1509** <code>        rollout_n = getattr(self.config.actor_rollout_ref.rollout, &quot;n&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_n`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1510** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1511** <code>        # check if we use prioritized sampling</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1512** <code>        if self.config.data.get(&quot;use_prioritized_sampling&quot;, False):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1513** <code>            # create a prioritized batch sampler</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1514** <code>            batch_sampler = PrioritizedBatchSampler(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1515** <code>                sampler=base_sampler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1516** <code>                target_batch_size=train_batch_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `target_batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1517** <code>                oversampling_factor=self.config.data.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `oversampling_factor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1518** <code>                    &quot;prompt_oversampling_factor&quot;, 1.2</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1519** <code>                ),</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1520** <code>                default_filter_rate=self.config.data.get(&quot;default_filter_rate&quot;, 0.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `default_filter_rate`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1521** <code>                ema_alpha=self.config.data.get(&quot;ema_alpha&quot;, 1.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ema_alpha`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1522** <code>                shuffle=self.config.data.get(&quot;prompt_sampler_shuffle&quot;, True),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `shuffle`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1523** <code>                seed=self.config.data.get(&quot;seed&quot;, 42),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seed`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1524** <code>                world_size=world_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1525** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1526** <code>            self.prioritized_batch_sampler = batch_sampler</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.prioritized_batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1527** <code>            self.dynamic_batch_sampler = batch_sampler</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.dynamic_batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1528** <code>            self.train_dataloader = StatefulDataLoader(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.train_dataloader`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1529** <code>                dataset=self.train_dataset,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1530** <code>                batch_sampler=batch_sampler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1531** <code>                collate_fn=collate_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `collate_fn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1532** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1533** <code>        elif self.config.data.get(&quot;use_moderate_sampling&quot;, False):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1534** <code>            batch_sampler = DynamicSolveRateSampler(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1535** <code>                dataset=self.train_dataset,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1536** <code>                sampler=base_sampler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1537** <code>                target_batch_size=train_batch_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `target_batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1538** <code>                oversampling_factor=self.config.data.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `oversampling_factor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1539** <code>                    &quot;prompt_oversampling_factor&quot;, 1.2</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1540** <code>                ),</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1541** <code>                default_filter_rate=self.config.data.get(&quot;default_filter_rate&quot;, 0.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `default_filter_rate`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1542** <code>                ema_alpha=self.config.data.get(&quot;ema_alpha&quot;, 1.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ema_alpha`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1543** <code>                shuffle=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `shuffle`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1544** <code>                seed=self.config.data.get(&quot;seed&quot;, 42),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seed`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1545** <code>                world_size=world_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1546** <code>                solverate_low=self.config.data.get(&quot;solverate_low&quot;, 0.1),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `solverate_low`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1547** <code>                solverate_high=self.config.data.get(&quot;solverate_high&quot;, 0.9),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `solverate_high`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1548** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1549** <code>            self.moderate_batch_sampler = batch_sampler</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.moderate_batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1550** <code>            self.dynamic_batch_sampler = batch_sampler</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.dynamic_batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1551** <code>            self.train_dataloader = StatefulDataLoader(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.train_dataloader`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1552** <code>                dataset=self.train_dataset,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1553** <code>                batch_sampler=batch_sampler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1554** <code>                collate_fn=collate_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `collate_fn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1555** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1556** <code>        elif self.config.data.get(&quot;use_refresh_sampling&quot;, False):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1557** <code>            # Early configuration check with helpful context</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1558** <code>            oversampling_factor = self.config.data.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `oversampling_factor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1559** <code>                &quot;prompt_oversampling_factor&quot;, 1.2</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1560** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1561** <code>            num_prompts = train_batch_size * oversampling_factor</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_prompts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1562** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1563** <code>            # Provide informative warning if configuration might be problematic</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1564** <code>            if num_prompts &lt; world_size:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1565** <code>                min_oversampling = world_size / train_batch_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `min_oversampling`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1566** <code>                rollout_n = self.config.actor_rollout_ref.rollout.n</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_n`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1567** <code>                total_trajectories = num_prompts * rollout_n</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_trajectories`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1568** <code>                # Note: The sampler will validate and raise its own error, but we provide</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1569** <code>                # additional context here about rollout_n that the sampler doesn&#x27;t have</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1570** <code>                print(f&quot;\n{&#x27;=&#x27;*60}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1571** <code>                print(f&quot;Configuration Warning for RefreshSolveRateSampler:&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1572** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1573** <code>                    f&quot;  Number of prompts = {train_batch_size} * {oversampling_factor} = {num_prompts}&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `f"  Number of prompts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1574** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1575** <code>                print(f&quot;  World size = {world_size} GPUs&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1576** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1577** <code>                    f&quot;  After rollout (n={rollout_n}): {total_trajectories} total trajectories&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `f"  After rollout (n`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1578** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1579** <code>                print(f&quot;  ({total_trajectories/world_size:.1f} trajectories per GPU)&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1580** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1581** <code>                    f&quot;\nThe sampler requires num_prompts &gt;= world_size, so it will fail.&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1582** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1583** <code>                print(f&quot;Suggested oversampling_factor &gt;= {min_oversampling:.1f}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1584** <code>                print(f&quot;{&#x27;=&#x27;*60}\n&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1585** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1586** <code>            batch_sampler = RefreshSolveRateSampler(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1587** <code>                dataset=self.train_dataset,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1588** <code>                sampler=base_sampler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1589** <code>                target_batch_size=train_batch_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `target_batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1590** <code>                default_filter_rate=0.0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `default_filter_rate`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1591** <code>                oversampling_factor=oversampling_factor,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `oversampling_factor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1592** <code>                ema_alpha=self.config.data.get(&quot;ema_alpha&quot;, 1.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ema_alpha`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1593** <code>                shuffle=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `shuffle`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1594** <code>                seed=self.config.data.get(&quot;seed&quot;, 42),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seed`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1595** <code>                solverate_high=self.config.data.get(&quot;solverate_high&quot;, 1.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `solverate_high`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1596** <code>                solverate_low=self.config.data.get(&quot;solverate_low&quot;, 0.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `solverate_low`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1597** <code>                solverate_mean=self.config.data.get(&quot;solverate_mean&quot;, 0.5),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `solverate_mean`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1598** <code>                solverate_std=self.config.data.get(&quot;solverate_std&quot;, 0.1),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `solverate_std`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1599** <code>                freshness_balance=0.1,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `freshness_balance`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1600** <code>                current_step=0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `current_step`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1601** <code>                world_size=world_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1602** <code>                propagation_threshold=5,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `propagation_threshold`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1603** <code>                propagation_confidence=0.8,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `propagation_confidence`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1604** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1605** <code>            self.refresh_batch_sampler = batch_sampler</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.refresh_batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1606** <code>            self.dynamic_batch_sampler = batch_sampler</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.dynamic_batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1607** <code>            self.train_dataloader = StatefulDataLoader(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.train_dataloader`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1608** <code>                dataset=self.train_dataset,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1609** <code>                batch_sampler=batch_sampler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1610** <code>                collate_fn=collate_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `collate_fn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1611** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1612** <code>        # Check if dynamic batch sampling is enabled</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1613** <code>        elif self.config.data.get(&quot;automatic_oversampling&quot;, False):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1614** <code>            # Create dynamic batch sampler</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1615** <code>            batch_sampler = DynamicBatchSampler(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1616** <code>                sampler=base_sampler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1617** <code>                target_batch_size=train_batch_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `target_batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1618** <code>                oversampling_factor=self.config.data.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `oversampling_factor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1619** <code>                    &quot;prompt_oversampling_factor&quot;, 1.2</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1620** <code>                ),</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1621** <code>                default_filter_rate=self.config.data.get(&quot;default_filter_rate&quot;, 0.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `default_filter_rate`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1622** <code>                ema_alpha=self.config.data.get(&quot;ema_alpha&quot;, 1.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ema_alpha`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1623** <code>                shuffle=self.config.data.get(&quot;prompt_sampler_shuffle&quot;, True),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `shuffle`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1624** <code>                seed=self.config.data.get(&quot;seed&quot;, 42),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seed`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1625** <code>                world_size=world_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1626** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1627** <code>            self.dynamic_batch_sampler = batch_sampler</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.dynamic_batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1628** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1629** <code>            self.train_dataloader = StatefulDataLoader(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.train_dataloader`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1630** <code>                dataset=self.train_dataset,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1631** <code>                batch_sampler=batch_sampler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1632** <code>                collate_fn=collate_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `collate_fn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1633** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1634** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1635** <code>            # Apply prompt-level oversampling when rejection sampling is enabled</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1636** <code>            if self.config.trainer.rejection_sample or self.config.trainer.remove_clip:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1637** <code>                # Use prompt_oversampling_factor from config (default 1.0 means no oversampling)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1638** <code>                prompt_oversample = self.config.data.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt_oversample`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1639** <code>                    &quot;prompt_oversampling_factor&quot;, 1.0</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1640** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1641** <code>                if prompt_oversample &gt; 1.0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1642** <code>                    train_batch_size = int(train_batch_size * prompt_oversample)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `train_batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1643** <code>                    # Round batch size to world size multiple</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1644** <code>                    train_batch_size = int(train_batch_size // world_size * world_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `train_batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1645** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1646** <code>            self.train_dataloader = StatefulDataLoader(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.train_dataloader`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1647** <code>                dataset=self.train_dataset,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1648** <code>                batch_size=train_batch_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1649** <code>                drop_last=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `drop_last`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1650** <code>                collate_fn=collate_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `collate_fn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1651** <code>                sampler=base_sampler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1652** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1653** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1654** <code>        self.val_dataset = RLHFDataset(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.val_dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1655** <code>            parquet_files=self.config.data.val_files,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `parquet_files`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1656** <code>            tokenizer=self.tokenizer,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tokenizer`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1657** <code>            processor=self.processor,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `processor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1658** <code>            prompt_key=self.config.data.prompt_key,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt_key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1659** <code>            image_key=self.config.data.get(&quot;image_key&quot;, &quot;images&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `image_key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1660** <code>            max_prompt_length=self.config.data.max_prompt_length,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_prompt_length`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1661** <code>            filter_prompts=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `filter_prompts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1662** <code>            sample_size=self.config.data.val_sample_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1663** <code>            apply_chat_template=self.config.data.apply_chat_template,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `apply_chat_template`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1664** <code>            return_raw_chat=self.config.data.get(&quot;return_raw_chat&quot;, False),</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1665** <code>            truncation=&quot;error&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `truncation`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1666** <code>            system_prompt_config=self.config.data.get(&quot;system_prompt_config&quot;, None),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `system_prompt_config`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1667** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1668** <code>        self.val_dataloader = StatefulDataLoader(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.val_dataloader`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1669** <code>            dataset=self.val_dataset,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dataset`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1670** <code>            # Validation uses whole batch for memory scheduling</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1671** <code>            batch_size=len(self.val_dataset),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1672** <code>            num_workers=8,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_workers`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1673** <code>            shuffle=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `shuffle`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1674** <code>            drop_last=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `drop_last`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1675** <code>            collate_fn=collate_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `collate_fn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1676** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1677** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1678** <code>        assert len(self.train_dataloader) &gt;= 1</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1679** <code>        assert (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1680** <code>            len(self.val_dataloader) == 1</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `len(self.val_dataloader)`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1681** <code>        ), &quot;Validation dataloader must have a single batch, which inference engines will schedule the memory themselves.&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1682** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1683** <code>        print(f&quot;Size of train dataloader: {len(self.train_dataloader)}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1684** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1685** <code>        # Inject total_training_steps to optimizer configs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1686** <code>        total_training_steps = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_training_steps`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1687** <code>            len(self.train_dataloader) * self.config.trainer.total_epochs</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `len`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1688** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1689** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1690** <code>        if self.config.trainer.total_training_steps is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1691** <code>            total_training_steps = self.config.trainer.total_training_steps</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_training_steps`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1692** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1693** <code>        self.total_training_steps = total_training_steps</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.total_training_steps`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1694** <code>        print(f&quot;Total training steps: {self.total_training_steps}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1695** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1696** <code>        OmegaConf.set_struct(self.config, True)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `OmegaConf.set_struct`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1697** <code>        with open_dict(self.config):</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1698** <code>            self.config.actor_rollout_ref.actor.optim.total_training_steps = (</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.actor_rollout_ref.actor.optim.total_training_steps`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1699** <code>                total_training_steps</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1700** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1701** <code>            self.config.critic.optim.total_training_steps = total_training_steps</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.critic.optim.total_training_steps`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1702** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1703** <code>    def _update_sampler_states(self, batch: DataProto, metrics: Dict[str, Any]) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1704** <code>        &quot;&quot;&quot;Update sampler statistics and success rates after reward computation.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1705** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1706** <code>        update_every = self.config.data.get(&quot;update_success_rates_every&quot;, 1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `update_every`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1707** <code>        should_update_success = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `should_update_success`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1708** <code>            update_every &gt; 0 and self.global_steps % update_every == 0</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `update_every > 0 and self.global_steps % update_every`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1709** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1710** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1711** <code>        if not should_update_success:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1712** <code>            return</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1713** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1714** <code>        prioritized_sampler = getattr(self, &quot;prioritized_batch_sampler&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prioritized_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1715** <code>        moderate_sampler = getattr(self, &quot;moderate_batch_sampler&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `moderate_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1716** <code>        refresh_sampler = getattr(self, &quot;refresh_batch_sampler&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `refresh_sampler`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1717** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1718** <code>        if not any((prioritized_sampler, moderate_sampler, refresh_sampler)):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1719** <code>            return</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1720** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1721** <code>        problem_ids = np.asarray(batch.non_tensor_batch[&quot;prompt_index&quot;])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `problem_ids`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1722** <code>        rewards_tensor = batch.batch[&quot;token_level_scores&quot;].sum(-1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rewards_tensor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1723** <code>        rewards = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1724** <code>            rewards_tensor.detach().cpu().numpy()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rewards_tensor.detach`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1725** <code>            if isinstance(rewards_tensor, torch.Tensor)</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1726** <code>            else np.asarray(rewards_tensor)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `else np.asarray`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1727** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1728** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1729** <code>        success_threshold = self.config.data.get(&quot;success_threshold&quot;, 1.0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `success_threshold`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1730** <code>        success_rates = self._compute_success_rates(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `success_rates`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1731** <code>            problem_ids, rewards, success_threshold</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1732** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1733** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1734** <code>        if prioritized_sampler:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1735** <code>            prioritized_sampler.update_success_rates(success_rates)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `prioritized_sampler.update_success_rates`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1736** <code>            metrics.update(prioritized_sampler.get_metrics())</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `metrics.update`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1737** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1738** <code>        if moderate_sampler:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1739** <code>            moderate_sampler.update_success_rates(success_rates)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `moderate_sampler.update_success_rates`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1740** <code>            metrics.update(moderate_sampler.get_metrics())</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `metrics.update`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1741** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1742** <code>        if refresh_sampler:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1743** <code>            refresh_sampler.set_current_step(self.global_steps)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `refresh_sampler.set_current_step`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1744** <code>            refresh_sampler.update_success_rates(success_rates)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `refresh_sampler.update_success_rates`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1745** <code>            refresh_sampler.print_solve_rate_bin_distribution()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `refresh_sampler.print_solve_rate_bin_distribution`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1746** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1747** <code>    @staticmethod</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1748** <code>    def _compute_success_rates(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1749** <code>        problem_ids, rewards, success_threshold: float</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1750** <code>    ) -&gt; dict[int, float]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1751** <code>        problem_ids = np.asarray(problem_ids)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `problem_ids`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1752** <code>        rewards = np.asarray(rewards)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1753** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1754** <code>        success_rates: dict[int, float] = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `success_rates: dict[int, float]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1755** <code>        unique_problem_ids = np.unique(problem_ids)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `unique_problem_ids`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1756** <code>        for problem_id in unique_problem_ids:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1757** <code>            mask = problem_ids == problem_id</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1758** <code>            success_count = np.sum(rewards[mask] &gt;= success_threshold)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `success_count`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1759** <code>            total_count = np.sum(mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_count`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1760** <code>            key = int(problem_id) if isinstance(problem_id, np.integer) else problem_id</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1761** <code>            success_rates[key] = success_count / total_count if total_count &gt; 0 else 0.0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `success_rates[key]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1762** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1763** <code>        return success_rates</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1764** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1765** <code>    def init_workers(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1766** <code>        &quot;&quot;&quot;Init resource pool and worker group&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1767** <code>        self.resource_pool_manager.create_resource_pool()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.resource_pool_manager.create_resource_pool`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1768** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1769** <code>        self.resource_pool_to_cls = {</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.resource_pool_to_cls`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1770** <code>            pool: {} for pool in self.resource_pool_manager.resource_pool_dict.values()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `pool: {} for pool in self.resource_pool_manager.resource_pool_dict.values`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1771** <code>        }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1772** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1773** <code>        if self.hybrid_engine:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1774** <code>            resource_pool = self.resource_pool_manager.get_resource_pool(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `resource_pool`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1775** <code>                Role.ActorRollout</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1776** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1777** <code>            actor_rollout_cls = RayClassWithInitArgs(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_rollout_cls`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1778** <code>                cls=self.role_worker_mapping[Role.ActorRollout],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cls`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1779** <code>                config=self.config.actor_rollout_ref,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1780** <code>                role=&quot;actor_rollout&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `role`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1781** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1782** <code>            self.resource_pool_to_cls[resource_pool][</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1783** <code>                &quot;actor_rollout&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1784** <code>            ] = actor_rollout_cls</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1785** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1786** <code>            raise NotImplementedError</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1787** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1788** <code>        if self.use_critic:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1789** <code>            resource_pool = self.resource_pool_manager.get_resource_pool(Role.Critic)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `resource_pool`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1790** <code>            critic_cls = RayClassWithInitArgs(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `critic_cls`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1791** <code>                cls=self.role_worker_mapping[Role.Critic], config=self.config.critic</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cls`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1792** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1793** <code>            self.resource_pool_to_cls[resource_pool][&quot;critic&quot;] = critic_cls</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.resource_pool_to_cls[resource_pool]["critic"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1794** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1795** <code>        if self.use_reference_policy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1796** <code>            resource_pool = self.resource_pool_manager.get_resource_pool(Role.RefPolicy)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `resource_pool`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1797** <code>            ref_policy_cls = RayClassWithInitArgs(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ref_policy_cls`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1798** <code>                self.role_worker_mapping[Role.RefPolicy],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1799** <code>                config=self.config.actor_rollout_ref,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1800** <code>                role=&quot;ref&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `role`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1801** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1802** <code>            self.resource_pool_to_cls[resource_pool][&quot;ref&quot;] = ref_policy_cls</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.resource_pool_to_cls[resource_pool]["ref"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1803** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1804** <code>        if self.use_rm:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1805** <code>            resource_pool = self.resource_pool_manager.get_resource_pool(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `resource_pool`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1806** <code>                Role.RewardModel</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1807** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1808** <code>            rm_cls = RayClassWithInitArgs(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_cls`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1809** <code>                self.role_worker_mapping[Role.RewardModel],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1810** <code>                config=self.config.reward_model,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1811** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1812** <code>            self.resource_pool_to_cls[resource_pool][&quot;rm&quot;] = rm_cls</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.resource_pool_to_cls[resource_pool]["rm"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1813** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1814** <code>        # Initialize WorkerGroup</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1815** <code>        # NOTE: For different parallel sizes per role, use separate resource pools instead of create_colocated_worker_cls</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1816** <code>        # See: https://github.com/volcengine/verl/blob/master/examples/ray/tutorial.ipynb</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1817** <code>        all_wg = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `all_wg`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1818** <code>        self.wg_dicts = []</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.wg_dicts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1819** <code>        for resource_pool, class_dict in self.resource_pool_to_cls.items():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1820** <code>            worker_dict_cls = create_colocated_worker_cls_patch(class_dict=class_dict)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `worker_dict_cls`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1821** <code>            wg_dict = self.ray_worker_group_cls(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `wg_dict`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1822** <code>                resource_pool=resource_pool, ray_cls_with_init=worker_dict_cls</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `resource_pool`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1823** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1824** <code>            spawn_wg = wg_dict.spawn(prefix_set=class_dict.keys())</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `spawn_wg`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1825** <code>            all_wg.update(spawn_wg)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `all_wg.update`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1826** <code>            # Keep WorkerDict reference for Ray &gt;= 2.31 compatibility</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1827** <code>            self.wg_dicts.append(wg_dict)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.wg_dicts.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1828** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1829** <code>        if self.use_critic:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1830** <code>            self.critic_wg = all_wg[&quot;critic&quot;]</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.critic_wg`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1831** <code>            self.critic_wg.init_model()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.critic_wg.init_model`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1832** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1833** <code>        if self.use_reference_policy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1834** <code>            self.ref_policy_wg = all_wg[&quot;ref&quot;]</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ref_policy_wg`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1835** <code>            self.ref_policy_wg.init_model()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.ref_policy_wg.init_model`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1836** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1837** <code>        if self.use_rm:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1838** <code>            self.rm_wg = all_wg[&quot;rm&quot;]</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.rm_wg`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1839** <code>            self.rm_wg.init_model()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.rm_wg.init_model`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1840** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1841** <code>        # Create rollout last for better vLLM KV cache memory estimation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1842** <code>        self.actor_rollout_wg = all_wg[&quot;actor_rollout&quot;]</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.actor_rollout_wg`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1843** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1844** <code>        self.actor_rollout_wg.init_model()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.actor_rollout_wg.init_model`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1845** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1846** <code>        self.async_rollout_mode = False</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.async_rollout_mode`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1847** <code>        if self.config.actor_rollout_ref.rollout.mode == &quot;async_vllm&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1848** <code>            self.async_rollout_mode = True</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.async_rollout_mode`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1849** <code>            from kernel.workers.rollout.async_server import AsyncLLMEngineManager</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1850** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1851** <code>            self.async_rollout_manager = AsyncLLMEngineManager(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.async_rollout_manager`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1852** <code>                config=self.config.actor_rollout_ref,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1853** <code>                worker_group=self.actor_rollout_wg,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `worker_group`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1854** <code>                tokenizer=self.tokenizer,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tokenizer`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1855** <code>                reward_fn=self.reward_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_fn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1856** <code>                val_reward_fn=self.val_reward_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `val_reward_fn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1857** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1858** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1859** <code>        # IMPORTANT: This happens ONLY for sufficient batches (after buffering)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1860** <code>        # We find the maximum world_size across all worker groups to ensure compatibility</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1861** <code>        # Why max()? If batch is divisible by 128, it&#x27;s also divisible by 64, 32, 16, etc.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1862** <code>        max_world_size = self.actor_rollout_wg.world_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1863** <code>        if self.use_critic:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1864** <code>            max_world_size = max(max_world_size, self.critic_wg.world_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1865** <code>        if self.use_reference_policy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1866** <code>            max_world_size = max(max_world_size, self.ref_policy_wg.world_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1867** <code>        if self.use_rm:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1868** <code>            max_world_size = max(max_world_size, self.rm_wg.world_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1869** <code>        # if we use multi_turn, the max_world_size must be multiple of max_turns</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1870** <code>        if self.config.actor_rollout_ref.rollout.multi_turn.enable:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1871** <code>            max_turns = self.config.actor_rollout_ref.rollout.multi_turn.max_user_turns</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_turns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1872** <code>            if max_world_size % max_turns != 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1873** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1874** <code>                    f&quot;Warning: max_world_size {max_world_size} is not multiple of max_turns {max_turns}, adjusting it to be multiple of max_turns&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1875** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1876** <code>                max_world_size = max_world_size * max_turns</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1877** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1878** <code>        self.max_world_size = max_world_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1879** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1880** <code>    def _save_checkpoint(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1881** <code>        super()._save_checkpoint()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `super`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1882** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1883** <code>        local_global_step_folder = os.path.join(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_global_step_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1884** <code>            self.config.trainer.default_local_dir, f&quot;global_step_{self.global_steps}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1885** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1886** <code>        # save sampler state if using RefreshSolveRateSampler</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1887** <code>        if hasattr(self.train_dataloader, &quot;batch_sampler&quot;) and hasattr(</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1888** <code>            self.train_dataloader.batch_sampler, &quot;save_state&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1889** <code>        ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1890** <code>            sampler_local_path = os.path.join(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampler_local_path`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1891** <code>                local_global_step_folder, &quot;sampler_state.pkl&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1892** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1893** <code>            self.train_dataloader.batch_sampler.save_state(sampler_local_path)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.train_dataloader.batch_sampler.save_state`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1894** <code>            print(f&quot;Sampler state saved to {sampler_local_path}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1895** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1896** <code>    def _load_checkpoint(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1897** <code>        super()._load_checkpoint()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `super`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1898** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1899** <code>        # load from hdfs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1900** <code>        if self.config.trainer.default_hdfs_dir is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1901** <code>            NotImplementedError(&quot;load from hdfs is not implemented yet&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `NotImplementedError`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1902** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1903** <code>            checkpoint_folder = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `checkpoint_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1904** <code>                self.config.trainer.default_local_dir</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1905** <code>            )  # TODO: check path</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1906** <code>            if not os.path.isabs(checkpoint_folder):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1907** <code>                working_dir = os.getcwd()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `working_dir`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1908** <code>                checkpoint_folder = os.path.join(working_dir, checkpoint_folder)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `checkpoint_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1909** <code>            global_step_folder = find_latest_ckpt_path(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `global_step_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1910** <code>                checkpoint_folder</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1911** <code>            )  # None if no latest</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1912** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1913** <code>        # find global_step_folder</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1914** <code>        if self.config.trainer.resume_mode == &quot;auto&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1915** <code>            if global_step_folder is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1916** <code>                print(&quot;Training from scratch&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1917** <code>                return 0</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1918** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1919** <code>            if not (</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1920** <code>                self.config.trainer.resume_from_path and global_step_folder is not None</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1921** <code>            ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1922** <code>                assert isinstance(</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1923** <code>                    self.config.trainer.resume_from_path, str</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1924** <code>                ), &quot;resume ckpt must be str type&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1925** <code>                assert (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1926** <code>                    &quot;global_step_&quot; in self.config.trainer.resume_from_path</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1927** <code>                ), &quot;resume ckpt must specify the global_steps&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1928** <code>                global_step_folder = self.config.trainer.resume_from_path</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `global_step_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1929** <code>                if not os.path.isabs(global_step_folder):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1930** <code>                    working_dir = os.getcwd()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `working_dir`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1931** <code>                    global_step_folder = os.path.join(working_dir, global_step_folder)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `global_step_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1932** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1933** <code>        # load sampler state if using RefreshSolveRateSampler</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1934** <code>        if hasattr(self.train_dataloader, &quot;batch_sampler&quot;) and hasattr(</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1935** <code>            self.train_dataloader.batch_sampler, &quot;load_state&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1936** <code>        ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1937** <code>            sampler_local_path = os.path.join(global_step_folder, &quot;sampler_state.pkl&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampler_local_path`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1938** <code>            if os.path.exists(sampler_local_path):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1939** <code>                self.train_dataloader.batch_sampler.load_state(sampler_local_path)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.train_dataloader.batch_sampler.load_state`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1940** <code>                print(f&quot;Sampler state loaded from {sampler_local_path}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1941** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1942** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1943** <code>                    f&quot;Warning: No sampler state found at {sampler_local_path}, sampler will start from initial state&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1944** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1945** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1946** <code>        # IMPORTANT: This happens ONLY for sufficient batches (after buffering)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1947** <code>        # We find the maximum world_size across all worker groups to ensure compatibility</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1948** <code>        # Why max()? If batch is divisible by 128, it&#x27;s also divisible by 64, 32, 16, etc.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1949** <code>        self.max_world_size = self._get_max_world_size()</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.max_world_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1950** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1951** <code>    def _save_checkpoint(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1952** <code>        super()._save_checkpoint()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `super`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1953** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1954** <code>        local_global_step_folder = os.path.join(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_global_step_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1955** <code>            self.config.trainer.default_local_dir, f&quot;global_step_{self.global_steps}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1956** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1957** <code>        # save sampler state if using RefreshSolveRateSampler</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1958** <code>        if hasattr(self.train_dataloader, &quot;batch_sampler&quot;) and hasattr(</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1959** <code>            self.train_dataloader.batch_sampler, &quot;save_state&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1960** <code>        ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1961** <code>            sampler_local_path = os.path.join(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampler_local_path`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1962** <code>                local_global_step_folder, &quot;sampler_state.pkl&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1963** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1964** <code>            self.train_dataloader.batch_sampler.save_state(sampler_local_path)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.train_dataloader.batch_sampler.save_state`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1965** <code>            print(f&quot;Sampler state saved to {sampler_local_path}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1966** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1967** <code>    def _load_checkpoint(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1968** <code>        super()._load_checkpoint()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `super`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1969** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1970** <code>        # load from hdfs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1971** <code>        if self.config.trainer.default_hdfs_dir is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1972** <code>            NotImplementedError(&quot;load from hdfs is not implemented yet&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `NotImplementedError`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1973** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1974** <code>            checkpoint_folder = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `checkpoint_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1975** <code>                self.config.trainer.default_local_dir</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1976** <code>            )  # TODO: check path</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1977** <code>            if not os.path.isabs(checkpoint_folder):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1978** <code>                working_dir = os.getcwd()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `working_dir`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1979** <code>                checkpoint_folder = os.path.join(working_dir, checkpoint_folder)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `checkpoint_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1980** <code>            global_step_folder = find_latest_ckpt_path(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `global_step_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1981** <code>                checkpoint_folder</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1982** <code>            )  # None if no latest</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1983** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1984** <code>        # find global_step_folder</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1985** <code>        if self.config.trainer.resume_mode == &quot;auto&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1986** <code>            if global_step_folder is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1987** <code>                print(&quot;Training from scratch&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1988** <code>                return 0</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1989** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1990** <code>            if not (</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1991** <code>                self.config.trainer.resume_from_path and global_step_folder is not None</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1992** <code>            ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1993** <code>                assert isinstance(</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1994** <code>                    self.config.trainer.resume_from_path, str</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1995** <code>                ), &quot;resume ckpt must be str type&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1996** <code>                assert (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1997** <code>                    &quot;global_step_&quot; in self.config.trainer.resume_from_path</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1998** <code>                ), &quot;resume ckpt must specify the global_steps&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L1999** <code>                global_step_folder = self.config.trainer.resume_from_path</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `global_step_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2000** <code>                if not os.path.isabs(global_step_folder):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2001** <code>                    working_dir = os.getcwd()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `working_dir`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2002** <code>                    global_step_folder = os.path.join(working_dir, global_step_folder)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `global_step_folder`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2003** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2004** <code>        # load sampler state if using RefreshSolveRateSampler</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2005** <code>        if hasattr(self.train_dataloader, &quot;batch_sampler&quot;) and hasattr(</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2006** <code>            self.train_dataloader.batch_sampler, &quot;load_state&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2007** <code>        ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2008** <code>            sampler_local_path = os.path.join(global_step_folder, &quot;sampler_state.pkl&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampler_local_path`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2009** <code>            if os.path.exists(sampler_local_path):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2010** <code>                self.train_dataloader.batch_sampler.load_state(sampler_local_path)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.train_dataloader.batch_sampler.load_state`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2011** <code>                print(f&quot;Sampler state loaded from {sampler_local_path}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2012** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2013** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2014** <code>                    f&quot;Warning: No sampler state found at {sampler_local_path}, sampler will start from initial state&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2015** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2016** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2017** <code>        if self.config.actor_rollout_ref.rollout.mode == &quot;async_agent&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2018** <code>            self.async_rollout_mode = True</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.async_rollout_mode`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2019** <code>            from verl_patch.experimental.agent_loop.agent_loop import AgentLoopManager</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2020** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2021** <code>            self.async_rollout_manager = AgentLoopManager(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.async_rollout_manager`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2022** <code>                config=self.config, worker_group=self.actor_rollout_wg,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2023** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2024** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2025** <code>    def compute_pass_at_k(self, results: list[list[bool]], k: int):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2026** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2027** <code>        Compute the average pass@k metric for a list of problem results.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2028** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2029** <code>        Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2030** <code>            results: A list of lists of booleans, where each sublist represents the success of samples for a problem.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2031** <code>            k: The number of samples to consider (k in pass@k).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `k: The number of samples to consider`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2032** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2033** <code>        Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2034** <code>            The average pass@k score across all problems.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2035** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2036** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2037** <code>        if k &lt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2038** <code>            raise ValueError(&quot;k must be at least 1&quot;)</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2039** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2040** <code>        pass_rates = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pass_rates`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2041** <code>        for problem in results:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2042** <code>            n = len(problem)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `n`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2043** <code>            if n &lt; k:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2044** <code>                raise ValueError(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2045** <code>                    f&quot;Each problem must have at least {k} samples, found {n}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2046** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2047** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2048** <code>            correct = sum(problem)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `correct`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2049** <code>            if correct == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2050** <code>                pass_rates.append(0.0)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `pass_rates.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2051** <code>                continue</code>
+  - 语法与作用：循环控制；跳出当前循环或开始下一次迭代。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2052** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2053** <code>            fail_prob = 1.0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fail_prob`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2054** <code>            for i in range(k):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2055** <code>                fail_prob *= (n - correct - i) / (n - i)</code>
+  - 语法与作用：变量/容器赋值（`*=`）；计算右侧表达式并绑定或更新 `fail_prob`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2056** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2057** <code>            pass_rates.append(1 - fail_prob)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `pass_rates.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2058** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2059** <code>        return sum(pass_rates) / len(pass_rates)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2060** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2061** <code>    def _maybe_log_val_generations(self, inputs, outputs, scores):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2062** <code>        &quot;&quot;&quot;Log a table of validation samples to the configured logger (wandb or swanlab)&quot;&quot;&quot;</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `"""Log a table of validation samples to the configured logger`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2063** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2064** <code>        generations_to_log = self.config.trainer.log_val_generations</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `generations_to_log`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2065** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2066** <code>        if generations_to_log == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2067** <code>            return</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2068** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2069** <code>        samples = list(zip(inputs, outputs, scores))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `samples`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2070** <code>        samples.sort(key=lambda x: x[0])  # Sort by input text</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `samples.sort(key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2071** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2072** <code>        rng = np.random.RandomState(42)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rng`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2073** <code>        rng.shuffle(samples)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rng.shuffle`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2074** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2075** <code>        samples = samples[:generations_to_log]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `samples`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2076** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2077** <code>        self.validation_generations_logger.log(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.validation_generations_logger.log`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2078** <code>            self.config.trainer.logger, samples, self.global_steps</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2079** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2080** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2081** <code>    def _validate(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2082** <code>        reward_tensor_lst = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor_lst`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2083** <code>        reward_extra_info_dict: Optional[Dict[str, list[list[float]]]] = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_dict: Optional[Dict[str, list[list[float]]]]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2084** <code>            None  # the values are of shape (num_of_batch, batch_size)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `None  # the values are of shape`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2085** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2086** <code>        data_source_lst = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data_source_lst`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2087** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2088** <code>        sample_inputs = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_inputs`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2089** <code>        sample_outputs = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_outputs`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2090** <code>        sample_scores = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_scores`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2091** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2092** <code>        async_rollout_diffs = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `async_rollout_diffs`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2093** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2094** <code>        # For multi-turn metrics: accumulate all test_batches</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2095** <code>        all_test_batches = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `all_test_batches`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2096** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2097** <code>        def _coerce_extra_metric_value(value: Any) -&gt; Optional[float]:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2098** <code>            &quot;&quot;&quot;Convert heterogeneous reward extra info entries into scalars when possible.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2099** <code>            if value is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2100** <code>                return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2101** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2102** <code>            if isinstance(value, (int, float, np.integer, np.floating, bool, np.bool_)):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2103** <code>                return float(value)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2104** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2105** <code>            if isinstance(value, torch.Tensor):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2106** <code>                if value.numel() == 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2107** <code>                    return float(value.detach().cpu().item())</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2108** <code>                return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2109** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2110** <code>            if isinstance(value, np.ndarray):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2111** <code>                if value.size == 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2112** <code>                    return float(value.reshape(-1)[0])</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2113** <code>                return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2114** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2115** <code>            if isinstance(value, (list, tuple)):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2116** <code>                if len(value) == 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2117** <code>                    return _coerce_extra_metric_value(value[0])</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2118** <code>                return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2119** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2120** <code>            return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2121** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2122** <code>        for test_data in self.val_dataloader:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2123** <code>            test_batch = DataProto.from_single_dict(test_data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2124** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2125** <code>            # For multi-turn, repeat by n * max_turns to match flattened output shape</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2126** <code>            # if self.config.actor_rollout_ref.rollout.multi_turn.enable:</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2127** <code>            #     max_turns = self.config.actor_rollout_ref.rollout.multi_turn.max_user_turns</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2128** <code>            #     repeat_times = self.config.actor_rollout_ref.rollout.val_kwargs.n * max_turns</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2129** <code>            # else:</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2130** <code>            #     repeat_times = self.config.actor_rollout_ref.rollout.val_kwargs.n</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2131** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2132** <code>            test_batch = test_batch.repeat(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2133** <code>                repeat_times=self.config.actor_rollout_ref.rollout.val_kwargs.n,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `repeat_times`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2134** <code>                interleave=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `interleave`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2135** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2136** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2137** <code>            test_batch.non_tensor_batch[&quot;uid&quot;] = np.array(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `test_batch.non_tensor_batch["uid"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2138** <code>                [</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2139** <code>                    f&quot;test_batch_{self.global_steps}_example_{uuid4().hex}&quot;</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `f"test_batch_{self.global_steps}_example_{uuid4`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2140** <code>                    for i in range(len(test_batch.batch))</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2141** <code>                ],</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2142** <code>                dtype=object,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dtype`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2143** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2144** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2145** <code>            if (</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2146** <code>                self.config.reward_model.enable</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2147** <code>                and test_batch[0].non_tensor_batch[&quot;reward_model&quot;][&quot;style&quot;] == &quot;model&quot;</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `and test_batch[0].non_tensor_batch["reward_model"]["style"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2148** <code>            ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2149** <code>                return {}</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2150** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2151** <code>            # Store original input for later use (before repeat)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2152** <code>            # For multi-turn, we&#x27;ll build complete conversations after generation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2153** <code>            if not self.config.actor_rollout_ref.rollout.multi_turn.enable:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2154** <code>                input_ids = test_batch.batch[&quot;input_ids&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2155** <code>                input_texts = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_texts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2156** <code>                    self.tokenizer.decode(ids, skip_special_tokens=True)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer.decode(ids, skip_special_tokens`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2157** <code>                    for ids in input_ids</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2158** <code>                ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2159** <code>                sample_inputs.extend(input_texts)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `sample_inputs.extend`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2160** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2161** <code>            batch_keys_to_pop = [&quot;input_ids&quot;, &quot;attention_mask&quot;, &quot;position_ids&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_keys_to_pop`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2162** <code>            non_tensor_batch_keys_to_pop = [&quot;raw_prompt_ids&quot;, &quot;uid&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `non_tensor_batch_keys_to_pop`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2163** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2164** <code>            if &quot;multi_modal_data&quot; in test_batch.non_tensor_batch:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2165** <code>                non_tensor_batch_keys_to_pop.append(&quot;multi_modal_data&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `non_tensor_batch_keys_to_pop.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2166** <code>            if &quot;raw_prompt&quot; in test_batch.non_tensor_batch:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2167** <code>                non_tensor_batch_keys_to_pop.append(&quot;raw_prompt&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `non_tensor_batch_keys_to_pop.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2168** <code>            if &quot;tools_kwargs&quot; in test_batch.non_tensor_batch:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2169** <code>                non_tensor_batch_keys_to_pop.append(&quot;tools_kwargs&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `non_tensor_batch_keys_to_pop.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2170** <code>            test_gen_batch = test_batch.pop(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_gen_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2171** <code>                batch_keys=batch_keys_to_pop,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_keys`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2172** <code>                non_tensor_batch_keys=non_tensor_batch_keys_to_pop,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `non_tensor_batch_keys`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2173** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2174** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2175** <code>            # for uid, we assign it back from gen_batch to batch</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2176** <code>            test_batch.non_tensor_batch[&quot;uid&quot;] = test_gen_batch.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `test_batch.non_tensor_batch["uid"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2177** <code>            test_gen_batch.meta_info = {</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `test_gen_batch.meta_info`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2178** <code>                &quot;eos_token_id&quot;: self.tokenizer.eos_token_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2179** <code>                &quot;pad_token_id&quot;: self.tokenizer.pad_token_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2180** <code>                &quot;recompute_log_prob&quot;: False,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2181** <code>                &quot;do_sample&quot;: self.config.actor_rollout_ref.rollout.val_kwargs.do_sample,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2182** <code>                &quot;validate&quot;: True,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2183** <code>                &quot;global_step&quot;: self.global_steps,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2184** <code>                &quot;actual_max_turns&quot;: self.config.actor_rollout_ref.rollout.val_kwargs.max_user_turns,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2185** <code>            }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2186** <code>            print(f&quot;test_gen_batch meta info: {test_gen_batch.meta_info}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2187** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2188** <code>            # Add reward_model to gen_batch if it exists in batch, but keep it in original batch</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2189** <code>            # Only add for multi_turn async mode to avoid batch size mismatch</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2190** <code>            if (</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2191** <code>                &quot;reward_model&quot; in test_batch.non_tensor_batch</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2192** <code>                and self.async_rollout_mode</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2193** <code>            ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2194** <code>                test_gen_batch.non_tensor_batch[</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2195** <code>                    &quot;reward_model&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2196** <code>                ] = test_batch.non_tensor_batch[&quot;reward_model&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2197** <code>                test_gen_batch.non_tensor_batch[</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2198** <code>                    &quot;data_source&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2199** <code>                ] = test_batch.non_tensor_batch[&quot;data_source&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2200** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2201** <code>            test_gen_batch_padded, pad_size = pad_dataproto_to_divisor(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_gen_batch_padded, pad_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2202** <code>                test_gen_batch, self.actor_rollout_wg.world_size</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2203** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2204** <code>            if not self.async_rollout_mode:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2205** <code>                test_output_gen_batch_padded = self.actor_rollout_wg.generate_sequences(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_output_gen_batch_padded`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2206** <code>                    test_gen_batch_padded</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2207** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2208** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2209** <code>                self.async_rollout_manager.wake_up()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.async_rollout_manager.wake_up`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2210** <code>                test_output_gen_batch_padded = self.async_rollout_manager.generate_sequences(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_output_gen_batch_padded`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2211** <code>                    test_gen_batch_padded</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2212** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2213** <code>                self.async_rollout_manager.sleep()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.async_rollout_manager.sleep`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2214** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2215** <code>            test_output_gen_batch = unpad_dataproto(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_output_gen_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2216** <code>                test_output_gen_batch_padded, pad_size=pad_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_output_gen_batch_padded, pad_size`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2217** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2218** <code>            print(&quot;validation generation end&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2219** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2220** <code>            # test_batch has already been repeated to match test_output_gen_batch shape</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2221** <code>            # (by n * max_turns for multi-turn, or just n for single-turn)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2222** <code>            async_rollout_diffs.append(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `async_rollout_diffs.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2223** <code>                len(test_batch.batch) - len(test_output_gen_batch.batch)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `len`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2224** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2225** <code>            # if batch is larger than gen_batch_output, which means that some prompts have been filtered out because of async timeout</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2226** <code>            if len(test_batch.batch) &gt; len(test_output_gen_batch.batch):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2227** <code>                # use uid to filter</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2228** <code>                gen_uids = set(test_output_gen_batch.non_tensor_batch[&quot;uid&quot;])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `gen_uids`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2229** <code>                batch_mask = np.array(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_mask`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2230** <code>                    [uid in gen_uids for uid in test_batch.non_tensor_batch[&quot;uid&quot;]]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2231** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2232** <code>                test_batch = test_batch[batch_mask]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2233** <code>                # guarantee uid alignment with generated outputs as in training</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2234** <code>                assert False not in (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2235** <code>                    test_batch.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2236** <code>                    == test_output_gen_batch.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `=`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2237** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2238** <code>                test_batch.non_tensor_batch[</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2239** <code>                    &quot;uid&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2240** <code>                ] = test_output_gen_batch.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2241** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2242** <code>            # Build sample_inputs and sample_outputs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2243** <code>            if self.config.actor_rollout_ref.rollout.multi_turn.enable:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2244** <code>                # For multi-turn, use multiturn_messages to build complete conversations</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2245** <code>                sample_indices = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_indices`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2246** <code>                    test_output_gen_batch.batch[&quot;sample_indices&quot;].cpu().numpy()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `test_output_gen_batch.batch["sample_indices"].cpu`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2247** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2248** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2249** <code>                # print(f&quot;sample_indices before metrics: {sample_indices}&quot;)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2250** <code>                turn_indices = test_output_gen_batch.batch[&quot;turn_indices&quot;].cpu().numpy()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `turn_indices`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2251** <code>                multiturn_messages = test_output_gen_batch.non_tensor_batch.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `multiturn_messages`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2252** <code>                    &quot;multiturn_messages&quot;, None</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2253** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2254** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2255** <code>                # Find first turn (with messages) for each sample</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2256** <code>                sample_first_turn = {}  # sample_id -&gt; row_idx of first turn</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_first_turn`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2257** <code>                for i in range(len(test_output_gen_batch.batch)):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2258** <code>                    # s_idx = int(sample_indices[i])</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2259** <code>                    s_idx = test_output_gen_batch.non_tensor_batch[&quot;uid&quot;][i]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `s_idx`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2260** <code>                    t_idx = int(turn_indices[i])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `t_idx`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2261** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2262** <code>                    if t_idx == -1:  # Skip padding turns</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2263** <code>                        continue</code>
+  - 语法与作用：循环控制；跳出当前循环或开始下一次迭代。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2264** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2265** <code>                    # First turn has the messages</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2266** <code>                    if s_idx not in sample_first_turn:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2267** <code>                        sample_first_turn[s_idx] = i</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_first_turn[s_idx]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2268** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2269** <code>                # Build input/output for each sample using multiturn_messages</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2270** <code>                for s_idx in sorted(sample_first_turn.keys()):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2271** <code>                    first_idx = sample_first_turn[s_idx]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `first_idx`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2272** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2273** <code>                    if (</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2274** <code>                        multiturn_messages is not None</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2275** <code>                        and multiturn_messages[first_idx] is not None</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2276** <code>                    ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2277** <code>                        messages = multiturn_messages[first_idx]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `messages`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2278** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2279** <code>                        # Input: extract first user message</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2280** <code>                        first_user_msg = &quot;&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `first_user_msg`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2281** <code>                        for msg in messages:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2282** <code>                            if msg.get(&quot;role&quot;) == &quot;user&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2283** <code>                                first_user_msg = msg.get(&quot;content&quot;, &quot;&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `first_user_msg`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2284** <code>                                break</code>
+  - 语法与作用：循环控制；跳出当前循环或开始下一次迭代。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2285** <code>                        sample_inputs.append(first_user_msg)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `sample_inputs.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2286** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2287** <code>                        # Output: build complete conversation string</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2288** <code>                        full_output = &quot;&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `full_output`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2289** <code>                        for msg in messages:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2290** <code>                            role = msg.get(&quot;role&quot;, &quot;unknown&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `role`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2291** <code>                            content = msg.get(&quot;content&quot;, &quot;&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `content`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2292** <code>                            full_output += f&quot;[{role}]\n{content}\n\n&quot;</code>
+  - 语法与作用：变量/容器赋值（`+=`）；计算右侧表达式并绑定或更新 `full_output`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2293** <code>                        sample_outputs.append(full_output)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `sample_outputs.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2294** <code>                    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2295** <code>                        # Fallback to prompt/response decoding</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2296** <code>                        first_prompt = self.tokenizer.decode(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `first_prompt`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2297** <code>                            test_output_gen_batch.batch[&quot;prompts&quot;][first_idx],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2298** <code>                            skip_special_tokens=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `skip_special_tokens`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2299** <code>                        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2300** <code>                        sample_inputs.append(first_prompt)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `sample_inputs.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2301** <code>                        sample_outputs.append(&quot;[No messages available]&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `sample_outputs.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2302** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2303** <code>                # Original logic for single-turn</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2304** <code>                output_ids = test_output_gen_batch.batch[&quot;responses&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output_ids`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2305** <code>                output_texts = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output_texts`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2306** <code>                    self.tokenizer.decode(ids, skip_special_tokens=True)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer.decode(ids, skip_special_tokens`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2307** <code>                    for ids in output_ids</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2308** <code>                ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2309** <code>                sample_outputs.extend(output_texts)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `sample_outputs.extend`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2310** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2311** <code>            if self.config.actor_rollout_ref.rollout.multi_turn.enable:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2312** <code>                # max_turns = (</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2313** <code>                #     self.config.actor_rollout_ref.rollout.multi_turn.max_user_turns</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2314** <code>                # )</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2315** <code>                max_turns = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_turns`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2316** <code>                    self.config.actor_rollout_ref.rollout.val_kwargs.max_user_turns</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2317** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2318** <code>                test_batch = test_batch.repeat(repeat_times=max_turns, interleave=True)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2319** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2320** <code>            test_batch = test_batch.union(test_output_gen_batch)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_batch`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2321** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2322** <code>            if &quot;token_level_scores&quot; not in test_batch.batch:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2323** <code>                reward_result = self.val_reward_fn(test_batch)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_result`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2324** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2325** <code>                if isinstance(reward_result, dict):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2326** <code>                    reward_tensor = reward_result[&quot;reward_tensor&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2327** <code>                    cur_data_source = test_batch.non_tensor_batch.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cur_data_source`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2328** <code>                        &quot;data_source&quot;, [&quot;unknown&quot;] * reward_tensor.shape[0]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2329** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2330** <code>                    if &quot;extra_info&quot; in reward_result:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2331** <code>                        if reward_extra_info_dict is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2332** <code>                            reward_extra_info_dict = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_dict`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2333** <code>                        for key, extra_reward in reward_result[&quot;extra_info&quot;].items():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2334** <code>                            for i, data_source in enumerate(cur_data_source):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2335** <code>                                composed_key = f&quot;{key}_{data_source}&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `composed_key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2336** <code>                                if composed_key not in reward_extra_info_dict:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2337** <code>                                    reward_extra_info_dict[composed_key] = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_dict[composed_key]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2338** <code>                                reward_extra_info_dict[composed_key].append(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `reward_extra_info_dict[composed_key].append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2339** <code>                                    extra_reward[i]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2340** <code>                                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2341** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2342** <code>                    reward_tensor = reward_result</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2343** <code>                    cur_data_source = test_batch.non_tensor_batch.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cur_data_source`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2344** <code>                        &quot;data_source&quot;, [&quot;unknown&quot;] * reward_tensor.shape[0]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2345** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2346** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2347** <code>                reward_tensor = test_batch.batch.pop(&quot;token_level_scores&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2348** <code>                cur_data_source = test_batch.non_tensor_batch.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cur_data_source`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2349** <code>                    &quot;data_source&quot;, [&quot;unknown&quot;] * reward_tensor.shape[0]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2350** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2351** <code>                reward_extra_info_raw = test_batch.non_tensor_batch.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_raw`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2352** <code>                    &quot;reward_extra_info&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2353** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2354** <code>                if reward_extra_info_raw is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2355** <code>                    reward_extra_info_list = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_list`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2356** <code>                elif hasattr(reward_extra_info_raw, &quot;tolist&quot;):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2357** <code>                    reward_extra_info_list = reward_extra_info_raw.tolist()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_list`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2358** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2359** <code>                    reward_extra_info_list = list(reward_extra_info_raw)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_list`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2360** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2361** <code>                # Filter out empty dicts and error-only dicts (those without kernel metrics)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2362** <code>                # Keep only dicts that have kernel-specific fields like &#x27;correctness&#x27;, &#x27;performance&#x27;, etc.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2363** <code>                valid_indices = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_indices`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2364** <code>                for i, d in enumerate(reward_extra_info_list):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2365** <code>                    if len(d) &gt; 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2366** <code>                        # Check if dict has kernel-specific metrics (not just error info)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2367** <code>                        has_kernel_metrics = any(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `has_kernel_metrics`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2368** <code>                            key in d</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2369** <code>                            for key in [</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2370** <code>                                &quot;correctness&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2371** <code>                                &quot;performance&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2372** <code>                                &quot;compiled&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2373** <code>                                &quot;success&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2374** <code>                            ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2375** <code>                        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2376** <code>                        if has_kernel_metrics:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2377** <code>                            valid_indices.append(i)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `valid_indices.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2378** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2379** <code>                valid_reward_extra_info_list = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_reward_extra_info_list`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2380** <code>                    reward_extra_info_list[i] for i in valid_indices</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2381** <code>                ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2382** <code>                valid_data_sources = [cur_data_source[i] for i in valid_indices]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_data_sources`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2383** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2384** <code>                # convert list of dict to dict of list (only for valid entries with kernel metrics)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2385** <code>                if len(valid_reward_extra_info_list) &gt; 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2386** <code>                    raw_reward_extra_info_dict = {</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `raw_reward_extra_info_dict`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2387** <code>                        k: [d[k] for d in valid_reward_extra_info_list]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2388** <code>                        for k in valid_reward_extra_info_list[0].keys()</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2389** <code>                    }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2390** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2391** <code>                    if reward_extra_info_dict is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2392** <code>                        reward_extra_info_dict = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_dict`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2393** <code>                    for key, extra_reward in raw_reward_extra_info_dict.items():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2394** <code>                        for i, data_source in enumerate(valid_data_sources):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2395** <code>                            composed_key = f&quot;{key}_{data_source}&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `composed_key`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2396** <code>                            if composed_key not in reward_extra_info_dict:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2397** <code>                                reward_extra_info_dict[composed_key] = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_dict[composed_key]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2398** <code>                            reward_extra_info_dict[composed_key].append(extra_reward[i])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `reward_extra_info_dict[composed_key].append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2399** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2400** <code>            scores = reward_tensor.sum(-1).cpu().tolist()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `scores`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2401** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2402** <code>            # For multi-turn, aggregate scores per sample</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2403** <code>            if self.config.actor_rollout_ref.rollout.multi_turn.enable:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2404** <code>                # sample_indices = test_batch.batch[&#x27;sample_indices&#x27;].cpu().numpy()</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2405** <code>                sample_indices = test_batch.non_tensor_batch.get(&quot;uid&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_indices`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2406** <code>                turn_indices = test_batch.batch[&quot;turn_indices&quot;].cpu().numpy()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `turn_indices`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2407** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2408** <code>                # Aggregate scores by sample (sum of all turns)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2409** <code>                sample_score_map = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_score_map`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2410** <code>                for i in range(len(scores)):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2411** <code>                    s_idx = sample_indices[i]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `s_idx`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2412** <code>                    t_idx = int(turn_indices[i])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `t_idx`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2413** <code>                    if t_idx == -1:  # Skip padding turns</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2414** <code>                        continue</code>
+  - 语法与作用：循环控制；跳出当前循环或开始下一次迭代。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2415** <code>                    if s_idx not in sample_score_map:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2416** <code>                        sample_score_map[s_idx] = 0.0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sample_score_map[s_idx]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2417** <code>                    sample_score_map[s_idx] += scores[i]</code>
+  - 语法与作用：变量/容器赋值（`+=`）；计算右侧表达式并绑定或更新 `sample_score_map[s_idx]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2418** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2419** <code>                # Add aggregated scores in the same UID order used for sample inputs/outputs above</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2420** <code>                for s_idx in sorted(sample_score_map.keys()):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2421** <code>                    sample_scores.append(sample_score_map[s_idx])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `sample_scores.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2422** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2423** <code>                sample_scores.extend(scores)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `sample_scores.extend`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2424** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2425** <code>            # Log multi-turn conversations to JSONL during validation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2426** <code>            if (</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2427** <code>                self.config.actor_rollout_ref.rollout.multi_turn.enable</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2428** <code>                and self.config.actor_rollout_ref.rollout.multi_turn.rollout_save_jsonl</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2429** <code>                is not None</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2430** <code>            ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2431** <code>                self._log_multiturn_to_jsonl(test_output_gen_batch, scores)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._log_multiturn_to_jsonl`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2432** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2433** <code>            reward_tensor_lst.append(reward_tensor)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `reward_tensor_lst.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2434** <code>            data_source_lst.append(cur_data_source)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `data_source_lst.append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2435** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2436** <code>        self._maybe_log_val_generations(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._maybe_log_val_generations`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2437** <code>            inputs=sample_inputs, outputs=sample_outputs, scores=sample_scores</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `inputs`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2438** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2439** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2440** <code>        reward_tensor = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2441** <code>            torch.cat(reward_tensor_lst, dim=0).sum(-1).cpu()</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `torch.cat(reward_tensor_lst, dim`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2442** <code>        )  # (batch_size,)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `)  #`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2443** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2444** <code>        data_sources = np.concatenate(data_source_lst, axis=0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data_sources`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2445** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2446** <code>        # evaluate test_score based on data source</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2447** <code>        data_source_reward = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data_source_reward`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2448** <code>        for i in range(reward_tensor.shape[0]):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2449** <code>            data_source = data_sources[i]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data_source`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2450** <code>            if data_source not in data_source_reward:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2451** <code>                data_source_reward[data_source] = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data_source_reward[data_source]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2452** <code>            data_source_reward[data_source].append(reward_tensor[i].item())</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `data_source_reward[data_source].append`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2453** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2454** <code>        metric_dict = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metric_dict`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2455** <code>        for data_source, rewards in data_source_reward.items():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2456** <code>            # (WARNING) we cannot guarantee len(rewards) is multiple of n when we use async rollout</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2457** <code>            if len(rewards) % self.config.actor_rollout_ref.rollout.val_kwargs.n != 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2458** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2459** <code>                    &quot;Warning: validation samples not divisible by n, padding with 0.0 rewards&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2460** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2461** <code>                # Add some padding rewards with 0.0</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2462** <code>                n_missing = self.config.actor_rollout_ref.rollout.val_kwargs.n - (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `n_missing`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2463** <code>                    len(rewards) % self.config.actor_rollout_ref.rollout.val_kwargs.n</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `len`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2464** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2465** <code>                rewards.extend([0.0] * n_missing)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rewards.extend`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2466** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2467** <code>            assert (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2468** <code>                len(rewards) % self.config.actor_rollout_ref.rollout.val_kwargs.n == 0</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `len(rewards) % self.config.actor_rollout_ref.rollout.val_kwargs.n`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2469** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2470** <code>            metric_dict[f&quot;val/test_score/{data_source}&quot;] = np.mean(rewards)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metric_dict[f"val/test_score/{data_source}"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2471** <code>            print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2472** <code>                f&quot;&quot;&quot;Calculating pass@k rate for {data_source} with k={self.config.actor_rollout_ref.rollout.val_kwargs.k}&quot;&quot;&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `f"""Calculating pass@k rate for {data_source} with k`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2473** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2474** <code>            reward_per_test_sample = np.reshape(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_per_test_sample`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2475** <code>                rewards, (-1, self.config.actor_rollout_ref.rollout.val_kwargs.n)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rewards,`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2476** <code>            )  # [N, n_val]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2477** <code>            pass_at_k_rate = self.compute_pass_at_k(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pass_at_k_rate`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2478** <code>                reward_per_test_sample,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2479** <code>                k=self.config.actor_rollout_ref.rollout.val_kwargs.k,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `k`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2480** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2481** <code>            print(f&quot;[{data_source}]pass_at_k_rate:&quot;, pass_at_k_rate)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2482** <code>            metric_dict[</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2483** <code>                f&quot;val/test_score/{data_source}_pass@{self.config.actor_rollout_ref.rollout.val_kwargs.k}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2484** <code>            ] = pass_at_k_rate</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2485** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2486** <code>        if reward_extra_info_dict is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2487** <code>            for key, extra_info_list in reward_extra_info_dict.items():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2488** <code>                # Normalize heterogeneous entries (dicts, tensors, scalars, etc.) to floats when possible</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2489** <code>                coerced_values = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `coerced_values`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2490** <code>                    _coerce_extra_metric_value(v) for v in extra_info_list</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `_coerce_extra_metric_value`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2491** <code>                ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2492** <code>                valid_values = [v for v in coerced_values if v is not None]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_values`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2493** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2494** <code>                if valid_values:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2495** <code>                    metric_dict[f&quot;val/test_score_extra/{key}&quot;] = float(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metric_dict[f"val/test_score_extra/{key}"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2496** <code>                        np.mean(valid_values)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `np.mean`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2497** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2498** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2499** <code>                    metric_dict[f&quot;val/test_score_extra/{key}&quot;] = 0.0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metric_dict[f"val/test_score_extra/{key}"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2500** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2501** <code>                if not key.startswith(&quot;score_&quot;):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2502** <code>                    continue</code>
+  - 语法与作用：循环控制；跳出当前循环或开始下一次迭代。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2503** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2504** <code>                if not coerced_values or any(v is None for v in coerced_values):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2505** <code>                    print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2506** <code>                        f&quot;Skipping pass@k computation for extra metric {key} due to missing/non-numeric values &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2507** <code>                        f&quot;(total={len(coerced_values)})&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `f"(total`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2508** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2509** <code>                    continue</code>
+  - 语法与作用：循环控制；跳出当前循环或开始下一次迭代。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2510** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2511** <code>                extra_rewards = list(coerced_values)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_rewards`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2512** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2513** <code>                n_val = self.config.actor_rollout_ref.rollout.val_kwargs.n</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `n_val`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2514** <code>                k_val = self.config.actor_rollout_ref.rollout.val_kwargs.k</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `k_val`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2515** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2516** <code>                if len(extra_rewards) % n_val != 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2517** <code>                    print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2518** <code>                        f&quot;Warning: extra validation samples for {key} not divisible by n, padding with 0.0 rewards&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2519** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2520** <code>                    n_missing = n_val - (len(extra_rewards) % n_val)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `n_missing`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2521** <code>                    extra_rewards.extend([0.0] * n_missing)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `extra_rewards.extend`，产生返回值或副作用。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2522** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2523** <code>                assert len(extra_rewards) % n_val == 0</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2524** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2525** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2526** <code>                    f&quot;&quot;&quot;Calculating pass@k rate for extra metric {key} with k={k_val}&quot;&quot;&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `f"""Calculating pass@k rate for extra metric {key} with k`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2527** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2528** <code>                extra_rewards_per_sample = np.reshape(extra_rewards, (-1, n_val))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_rewards_per_sample`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2529** <code>                extra_pass_at_k_rate = self.compute_pass_at_k(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_pass_at_k_rate`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2530** <code>                    extra_rewards_per_sample, k=k_val</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_rewards_per_sample, k`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2531** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2532** <code>                print(f&quot;[extra:{key}]pass_at_k_rate:&quot;, extra_pass_at_k_rate)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2533** <code>                metric_dict[</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2534** <code>                    f&quot;val/test_score_extra/{key}_pass@{k_val}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2535** <code>                ] = extra_pass_at_k_rate</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2536** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2537** <code>        metric_dict[&quot;val/batch/rollout_timeout_samples&quot;] = sum(async_rollout_diffs)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metric_dict["val/batch/rollout_timeout_samples"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2538** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2539** <code>        if self.config.actor_rollout_ref.rollout.multi_turn.enable:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2540** <code>            # Add multi-turn metrics using the compute_multi_turn_metrics function</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2541** <code>            multi_turn_metrics = compute_multi_turn_metrics(test_batch)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `multi_turn_metrics`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2542** <code>            for key, val in multi_turn_metrics.items():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2543** <code>                metric_dict[f&quot;val/{key}&quot;] = val</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metric_dict[f"val/{key}"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2544** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2545** <code>            # Add kernel-specific multi-turn metrics (per-turn and best-by-turn)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2546** <code>            kernel_multi_turn_metrics = compute_kernel_multi_turn_metrics(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kernel_multi_turn_metrics`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2547** <code>                test_batch, prefix=&quot;kernel&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `test_batch, prefix`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2548** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2549** <code>            for key, val in kernel_multi_turn_metrics.items():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2550** <code>                metric_dict[f&quot;val/{key}&quot;] = val</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metric_dict[f"val/{key}"]`。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2551** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2552** <code>        return metric_dict</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+- **L2553** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：模块导入、单轮 advantage/ KL helper、buffer/dataloader/sampler/validation 初始化按当前训练器条件执行；未选 estimator 分支只定义不执行。
+
+
+
+---
+
+**导航**：[Trainer 基础](06-trainer-foundation.md) · [附录目录](index.md) · [Trainer fit](08-trainer-fit-update.md)

@@ -1,0 +1,2911 @@
+# Shell 入口：setup_env、8B launcher 与公共启动器
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+### 15.1 `setup_env.sh`：训练环境变量
+源码文件：`drkernel/setup_env.sh`。以下保留指定范围内的每一行；`空行` 和 `注释` 也列出，分别标记为无运行时效果和不执行。该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+
+#### 原始行 1–20
+- **L1** 源码：<code>#!/usr/bin/env bash</code>
+  - 语法与作用：Shebang 行；告诉操作系统用指定解释器执行该脚本。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L2** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L3** 源码：<code># Shared environment defaults for DR.Kernel scripts.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L4** 源码：<code># This file is sourced by training/evaluation scripts.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L5** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L6** 源码：<code>DRKERNEL_ROOT=&quot;$(cd &quot;$(dirname &quot;${BASH_SOURCE[0]}&quot;)&quot; &amp;&amp; pwd)&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `DRKERNEL_ROOT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L7** 源码：<code>REPO_ROOT=&quot;$(cd &quot;${DRKERNEL_ROOT}/..&quot; &amp;&amp; pwd)&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REPO_ROOT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L8** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L9** 源码：<code>export DRKERNEL_ROOT</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L10** 源码：<code>export REPO_ROOT</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L11** 源码：<code>export PYTHONPATH=&quot;${DRKERNEL_ROOT}:${REPO_ROOT}:${PYTHONPATH:-}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L12** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L13** 源码：<code># Common runtime defaults</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L14** 源码：<code>export PROJECT_NAME=&quot;${PROJECT_NAME:-drkernel}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L15** 源码：<code>export VLLM_USE_V1=&quot;${VLLM_USE_V1:-1}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L16** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L17** 源码：<code># Local-friendly defaults (can be overridden by environment)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L18** 源码：<code>export HDFS_DATA_PATH=&quot;${HDFS_DATA_PATH:-${DRKERNEL_ROOT}/data}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L19** 源码：<code>export HDFS_MODEL_PATH=&quot;${HDFS_MODEL_PATH:-}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+- **L20** 源码：<code>export HDFS_CHECKPOINT_PATH=&quot;${HDFS_CHECKPOINT_PATH:-${DRKERNEL_ROOT}/checkpoints}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `train_rl_common.sh` source，因此顶层每行在 source 时立即执行。
+
+### 15.2 `8b_trloo_mrs_pr_prs.sh`：RL recipe 入口
+源码文件：`drkernel/kernel/scripts/rl/8b_trloo_mrs_pr_prs.sh`。以下保留指定范围内的每一行；`空行` 和 `注释` 也列出，分别标记为无运行时效果和不执行。该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+
+#### 原始行 1–101
+- **L1** 源码：<code>#!/bin/bash</code>
+  - 语法与作用：Shebang 行；告诉操作系统用指定解释器执行该脚本。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L2** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L3** 源码：<code>TRAIN_DATASET=(&quot;hkust-nlp/drkernel-rl-data&quot;)    # you need to set your own training dataset</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TRAIN_DATASET`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L4** 源码：<code>VALID_DATASET=(&quot;hkust-nlp/drkernel-validation-data&quot;)    # you need to set your own validation dataset</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VALID_DATASET`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L5** 源码：<code>KERNELGYM_SERVER_URL=&quot;${KERNELGYM_SERVER_URL:-&quot;&quot;}&quot;   # set directly or via env</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `KERNELGYM_SERVER_URL`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L6** 源码：<code>MODEL_NAME=hkust-nlp/drkernel-8b</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MODEL_NAME`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L7** 源码：<code>MODEL_PATH=${MODEL_NAME}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MODEL_PATH`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L8** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L9** 源码：<code>RUN_NAME=&quot;drkernel-8b&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `RUN_NAME`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L10** 源码：<code>REWARD_MANAGER=kernel_async</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_MANAGER`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L11** 源码：<code>REWARD_FUNC_NAME=&quot;calculate_reward_speedup&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_FUNC_NAME`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L12** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L13** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L14** 源码：<code>ALGORITHM=&quot;trloo&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ALGORITHM`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L15** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L16** 源码：<code>SPEEDUP_REWARD_UPPER_BOUND=3.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SPEEDUP_REWARD_UPPER_BOUND`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L17** 源码：<code>SPEEDUP_REWARD_LOWER_BOUND=0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SPEEDUP_REWARD_LOWER_BOUND`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L18** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L19** 源码：<code>ROLLOUT_RS=&quot;geometric&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_RS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L20** 源码：<code>ROLLOUT_TOKEN_VETO_THRESHOLD=1e-4</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_TOKEN_VETO_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L21** 源码：<code>ROLLOUT_RS_KWARGS=&quot;{lower:0.999,upper:1.001}&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_RS_KWARGS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L22** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L23** 源码：<code>COVERAGE_RS=&quot;turn&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_RS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L24** 源码：<code>COVERAGE_RS_THRESHOLD=0.3</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_RS_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L25** 源码：<code>COVERAGE_RS_FACTOR=0.1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_RS_FACTOR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L26** 源码：<code>COVERAGE_RS_KEY=&quot;time_coverage&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_RS_KEY`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L27** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L28** 源码：<code>COVERAGE_REWARD_TYPE=&quot;time_coverage&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_REWARD_TYPE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L29** 源码：<code>COVERAGE_REWARD_WEIGHT=0.5</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_REWARD_WEIGHT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L30** 源码：<code>COVERAGE_REWARD_ENABLE=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_REWARD_ENABLE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L31** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L32** 源码：<code>REWARD_TASK_TIMEOUT=300</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_TASK_TIMEOUT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L33** 源码：<code>REWARD_TIMEOUT=1800</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_TIMEOUT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L34** 源码：<code>REWARD_ACQUIRE_TIMEOUT=2400</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_ACQUIRE_TIMEOUT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L35** 源码：<code>REWARD_MAX_CONCURRENT=32</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_MAX_CONCURRENT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L36** 源码：<code>REWARD_MAX_RETRIES=3</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_MAX_RETRIES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L37** 源码：<code>REWARD_PRINT_STATUS=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_PRINT_STATUS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L38** 源码：<code>NUM_PERF_TRIALS=100</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `NUM_PERF_TRIALS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L39** 源码：<code>REWARD_TASK_TIMEOUT_CLIENT=2400</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_TASK_TIMEOUT_CLIENT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L40** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L41** 源码：<code>VAL_BEFORE_TRAIN=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAL_BEFORE_TRAIN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L42** 源码：<code>IS_GET_LAST_TURN=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `IS_GET_LAST_TURN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L43** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L44** 源码：<code># SWE-Agent-specific parameter overrides</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L45** 源码：<code>ENABLE_MULTI_TURN=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ENABLE_MULTI_TURN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L46** 源码：<code>MAX_TURN=3</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MAX_TURN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L47** 源码：<code>N_VAL=8</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `N_VAL`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L48** 源码：<code>ACTOR_OPTIMIZER_OFFLOAD=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ACTOR_OPTIMIZER_OFFLOAD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L49** 源码：<code>ACTOR_PARAMETER_OFFLOAD=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ACTOR_PARAMETER_OFFLOAD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L50** 源码：<code>LEARNING_RATE=1e-6</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `LEARNING_RATE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L51** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L52** 源码：<code>TRAIN_BATCH_SIZE=16</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TRAIN_BATCH_SIZE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L53** 源码：<code>PPO_MINI_BATCH_SIZE=16</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `PPO_MINI_BATCH_SIZE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L54** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L55** 源码：<code>AUTOMATIC_OVERSAMPLING=False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `AUTOMATIC_OVERSAMPLING`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L56** 源码：<code>REJECTION_SAMPLE=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REJECTION_SAMPLE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L57** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L58** 源码：<code>PPO_MICRO_TOKEN=null</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `PPO_MICRO_TOKEN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L59** 源码：<code>CLIP_RATIO=0.2_0.28</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `CLIP_RATIO`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L60** 源码：<code>ENTROPY_CLIP_RATE=0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ENTROPY_CLIP_RATE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L61** 源码：<code>GRAD_CLIP=1.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `GRAD_CLIP`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L62** 源码：<code>VLLM_IS_THRESHOLD=2.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VLLM_IS_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L63** 源码：<code>EXTREME_RISK_PROB_THRESHOLD=null</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `EXTREME_RISK_PROB_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L64** 源码：<code>KL_LOSS_COEF=0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `KL_LOSS_COEF`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L65** 源码：<code>ENTROPY_COEFFIENT=0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ENTROPY_COEFFIENT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L66** 源码：<code>KL_LOSS_TYPE=&quot;low_var_kl&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `KL_LOSS_TYPE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L67** 源码：<code>TEMPERATURE=1.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TEMPERATURE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L68** 源码：<code>MIN_P=0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MIN_P`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L69** 源码：<code>TOP_P=1.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TOP_P`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L70** 源码：<code>TOP_K=-1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TOP_K`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L71** 源码：<code>ROLLOUT_N=16</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_N`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L72** 源码：<code>KL_COEF=0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `KL_COEF`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L73** 源码：<code>TOTAL_EPOCHS=1000</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TOTAL_EPOCHS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L74** 源码：<code>ROLLOUT_GPU_MEMORY_UTIL=0.75</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_GPU_MEMORY_UTIL`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L75** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L76** 源码：<code>SAVE_FREQ=10</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SAVE_FREQ`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L77** 源码：<code>TEST_FREQ=10</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TEST_FREQ`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L78** 源码：<code>ROLLOUT_TENSOR_MODEL_PARALLEL_SIZE=1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_TENSOR_MODEL_PARALLEL_SIZE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L79** 源码：<code>SP_SIZE=4</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SP_SIZE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L80** 源码：<code>NUM_PERF_TRIALS=100</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `NUM_PERF_TRIALS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L81** 源码：<code>APPLY_CHAT_TEMPLATE=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `APPLY_CHAT_TEMPLATE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L82** 源码：<code>FREE_CACHE_ENGINE=False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `FREE_CACHE_ENGINE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L83** 源码：<code>ENFORCE_EAGER=False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ENFORCE_EAGER`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L84** 源码：<code>NNODES=$ARNOLD_WORKER_NUM</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `NNODES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L85** 源码：<code>GPUS_PER_NODE=$ARNOLD_WORKER_GPU</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `GPUS_PER_NODE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L86** 源码：<code>if [ -z &quot;$ARNOLD_WORKER_GPU&quot; ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L87** 源码：<code>    GPUS_PER_NODE=8</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `GPUS_PER_NODE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L88** 源码：<code>fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L89** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L90** 源码：<code>MAX_PROMPT_LENGTH=10240</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MAX_PROMPT_LENGTH`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L91** 源码：<code>MAX_RESPONSE_LENGTH=8192</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MAX_RESPONSE_LENGTH`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L92** 源码：<code>PROMPT_OVERSAMPLING_FACTOR=1.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `PROMPT_OVERSAMPLING_FACTOR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L93** 源码：<code>SAMPLE_OVERSAMPLING_FACTOR=1.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SAMPLE_OVERSAMPLING_FACTOR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L94** 源码：<code>SAMPLE_SELECTION_STRATEGY=efficiency_stochastic</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SAMPLE_SELECTION_STRATEGY`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L95** 源码：<code>MAX_SKIP_STEPS=5</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MAX_SKIP_STEPS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L96** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L97** 源码：<code># Load and execute common script</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L98** 源码：<code>source &quot;$(dirname &quot;$0&quot;)/train_rl_common.sh&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L99** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L100** 源码：<code># Call main function with all arguments</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+- **L101** 源码：<code>main &quot;$@&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由用户直接执行；变量定义、source 和最后的 `main "$@"` 按顺序发生。
+
+### 15.3 `train_rl_common.sh`：公共启动器
+源码文件：`drkernel/kernel/scripts/rl/train_rl_common.sh`。以下保留指定范围内的每一行；`空行` 和 `注释` 也列出，分别标记为无运行时效果和不执行。该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+
+#### 原始行 1–840
+- **L1** 源码：<code>#!/bin/bash</code>
+  - 语法与作用：Shebang 行；告诉操作系统用指定解释器执行该脚本。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L2** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L3** 源码：<code># Common RL training script for GRPO and RLOO</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L4** 源码：<code># This script contains shared logic for training RL models with GRPO/RLOO algorithms</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L5** 源码：<code># Task-specific scripts should source this and override specific parameters</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L6** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L7** 源码：<code># BEST PRACTICE DEFAULTS:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L8** 源码：<code># - LOSS_AGG_MODE=&quot;seq-mean-token-sum&quot; (REINFORCE-aligned, recommended over token-mean)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L9** 源码：<code># - LOSS_SCALE_FACTOR=1000.0 (prevents gradient underflow for long sequences)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L10** 源码：<code># - ALGORITHM=&quot;grpo&quot; (default algorithm, can be overridden to &quot;rloo&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L11** 源码：<code># - BATCH_STD=False (for GRPO), True (for RLOO) - prevents length bias</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L12** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L13** 源码：<code># USAGE:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L14** 源码：<code># 1. Source this script from your task-specific script</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L15** 源码：<code># 2. Set your datasets, reward manager, and any overrides</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L16** 源码：<code># 3. Call main &quot;$@&quot; to run training with command-line argument support</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L17** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L18** 源码：<code>SCRIPT_DIR=&quot;$(cd &quot;$(dirname &quot;${BASH_SOURCE[0]}&quot;)&quot; &amp;&amp; pwd)&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SCRIPT_DIR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L19** 源码：<code>source &quot;${SCRIPT_DIR}/../../../setup_env.sh&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L20** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L21** 源码：<code># server</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L22** 源码：<code>VAR_SERVER_WITH_TRAINING=False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAR_SERVER_WITH_TRAINING`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L23** 源码：<code>if [ -n &quot;$SERVER_WITH_TRAINING&quot; ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L24** 源码：<code>    VAR_SERVER_WITH_TRAINING=$SERVER_WITH_TRAINING</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAR_SERVER_WITH_TRAINING`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L25** 源码：<code>    echo &quot;SERVER_WITH_TRAINING: $VAR_SERVER_WITH_TRAINING&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L26** 源码：<code>fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L27** 源码：<code>echo &quot;SERVER_WITH_TRAINING: $VAR_SERVER_WITH_TRAINING&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L28** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L29** 源码：<code>VAR_SERVER_WITH_TRAINING_NODES=0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAR_SERVER_WITH_TRAINING_NODES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L30** 源码：<code>if [ -n &quot;$SERVER_WITH_TRAINING_NODES&quot; ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L31** 源码：<code>    VAR_SERVER_WITH_TRAINING_NODES=$SERVER_WITH_TRAINING_NODES</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAR_SERVER_WITH_TRAINING_NODES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L32** 源码：<code>    echo &quot;SERVER_WITH_TRAINING_NODES: $VAR_SERVER_WITH_TRAINING_NODES&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L33** 源码：<code>fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L34** 源码：<code>echo &quot;SERVER_WITH_TRAINING_NODES: $VAR_SERVER_WITH_TRAINING_NODES&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L35** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L36** 源码：<code>NNODES=${NNODES:-${ARNOLD_WORKER_NUM:-1}}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `NNODES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L37** 源码：<code>if [ &quot;$VAR_SERVER_WITH_TRAINING&quot; = &quot;true&quot; ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L38** 源码：<code>    # Respect caller-provided server node count (defaults to 0 if unset/invalid)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L39** 源码：<code>    RESERVED_NODES=$VAR_SERVER_WITH_TRAINING_NODES</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `RESERVED_NODES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L40** 源码：<code>    if ! [[ &quot;$RESERVED_NODES&quot; =~ ^[0-9]+$ ]] || [ &quot;$RESERVED_NODES&quot; -le 0 ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L41** 源码：<code>        RESERVED_NODES=0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `RESERVED_NODES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L42** 源码：<code>    fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L43** 源码：<code>    NNODES=$((NNODES - RESERVED_NODES))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `NNODES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L44** 源码：<code>    if [ &quot;$NNODES&quot; -lt 0 ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L45** 源码：<code>        NNODES=0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `NNODES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L46** 源码：<code>    fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L47** 源码：<code>    echo &quot;Server-with-training enabled; reserving $RESERVED_NODES node(s). NNODES: $NNODES&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L48** 源码：<code>fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L49** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L50** 源码：<code>VAL_BEFORE_TRAIN=${VAL_BEFORE_TRAIN:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAL_BEFORE_TRAIN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L51** 源码：<code>if [ &quot;$VAL_BEFORE_TRAIN&quot; = &quot;true&quot; ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L52** 源码：<code>    echo &quot;VAL_BEFORE_TRAIN: $VAL_BEFORE_TRAIN&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L53** 源码：<code>fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L54** 源码：<code>echo &quot;VAL_BEFORE_TRAIN: $VAL_BEFORE_TRAIN&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L55** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L56** 源码：<code>COVERAGE_REWARD_TYPE=${COVERAGE_REWARD_TYPE:-&quot;time_coverage&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_REWARD_TYPE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L57** 源码：<code>COVERAGE_REWARD_WEIGHT=${COVERAGE_REWARD_WEIGHT:-0.25}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_REWARD_WEIGHT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L58** 源码：<code>COVERAGE_REWARD_ENABLE=${COVERAGE_REWARD_ENABLE:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_REWARD_ENABLE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L59** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L60** 源码：<code>ENABLE_TWO_GATE_FILTER=${ENABLE_TWO_GATE_FILTER:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ENABLE_TWO_GATE_FILTER`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L61** 源码：<code>GATE1_BIAS_EPSILON=${GATE1_BIAS_EPSILON:-0.01}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `GATE1_BIAS_EPSILON`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L62** 源码：<code>GATE2_INSTABILITY_THRESHOLD=${GATE2_INSTABILITY_THRESHOLD:--15.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `GATE2_INSTABILITY_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L63** 源码：<code>LOG_REJECTED_SAMPLES=${LOG_REJECTED_SAMPLES:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `LOG_REJECTED_SAMPLES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L64** 源码：<code>SAVE_REJECTION_STATS=${SAVE_REJECTION_STATS:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SAVE_REJECTION_STATS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L65** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L66** 源码：<code>ENABLE_MULTI_TURN=${ENABLE_MULTI_TURN:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ENABLE_MULTI_TURN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L67** 源码：<code>MAX_TURN=${MAX_TURN:-3}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MAX_TURN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L68** 源码：<code>VAL_MAX_TURN=${VAL_MAX_TURN:-$MAX_TURN}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAL_MAX_TURN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L69** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L70** 源码：<code>GAMMA=${GAMMA:-1.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `GAMMA`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L71** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L72** 源码：<code>DETECT_DECOY_KERNEL=${DETECT_DECOY_KERNEL:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `DETECT_DECOY_KERNEL`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L73** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L74** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L75** 源码：<code>IS_GET_LAST_TURN=${IS_GET_LAST_TURN:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `IS_GET_LAST_TURN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L76** 源码：<code>if [ &quot;$IS_GET_LAST_TURN&quot; = &quot;true&quot; ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L77** 源码：<code>    echo &quot;IS_GET_LAST_TURN: $IS_GET_LAST_TURN&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L78** 源码：<code>fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L79** 源码：<code>echo &quot;IS_GET_LAST_TURN: $IS_GET_LAST_TURN&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L80** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L81** 源码：<code>ADV_BY_LAST_TURN=${ADV_BY_LAST_TURN:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ADV_BY_LAST_TURN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L82** 源码：<code>USE_FINAL_REWARD=${USE_FINAL_REWARD:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `USE_FINAL_REWARD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L83** 源码：<code># Default values - can be overridden by sourcing scripts or command-line args</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L84** 源码：<code># Batch and validation settings</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L85** 源码：<code>TRAIN_BATCH_SIZE=${TRAIN_BATCH_SIZE:-512}  # Number of samples per training batch</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TRAIN_BATCH_SIZE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L86** 源码：<code>VAL_SAMPLE_SIZE=${VAL_SAMPLE_SIZE:-100}    # Number of validation samples to evaluate</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAL_SAMPLE_SIZE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L87** 源码：<code>N_VAL=${N_VAL:-16}                         # Number of generations per validation prompt</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `N_VAL`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L88** 源码：<code>VAL_TEMPERATURE=${VAL_TEMPERATURE:-1.0}     # Temperature for validation sampling</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAL_TEMPERATURE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L89** 源码：<code>VAL_DO_SAMPLE=${VAL_DO_SAMPLE:-True}       # Whether to sample during validation</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAL_DO_SAMPLE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L90** 源码：<code>REWARD_SHAPING=${REWARD_SHAPING:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_SHAPING`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L91** 源码：<code>UNBIASED_SHAPING=${UNBIASED_SHAPING:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `UNBIASED_SHAPING`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L92** 源码：<code># Loss aggregation configuration (critical for training dynamics)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L93** 源码：<code># seq-mean-token-sum: Sum loss per sequence, then average across sequences (recommended)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L94** 源码：<code># token-mean: Average across all tokens (can be length-biased)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L95** 源码：<code># seq-mean-token-mean: Mean per sequence, then average (length-normalized)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L96** 源码：<code># seq-mean-token-sum-norm: Sum per sequence, normalize by max_seq_length</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L97** 源码：<code># seq-sum-no-norm: Raw sum across all tokens (no normalization)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L98** 源码：<code>LOSS_AGG_MODE=${LOSS_AGG_MODE:-&quot;seq-mean-token-sum&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `LOSS_AGG_MODE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L99** 源码：<code># Scale factor to prevent gradient underflow in long sequences</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L100** 源码：<code># Default 1000.0 is calibrated for ~10k mean response length (16k max)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L101** 源码：<code># Adjust based on your sequence lengths:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L102** 源码：<code>#   - 1.0-100.0: Short sequences (&lt;1k tokens)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L103** 源码：<code>#   - 1000.0: Medium sequences (~10k tokens) [DEFAULT]</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L104** 源码：<code>#   - 10000.0+: Very long sequences (&gt;20k tokens)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L105** 源码：<code># Rule of thumb: loss_scale_factor ≈ mean_response_length / 10</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L106** 源码：<code>LOSS_SCALE_FACTOR=${LOSS_SCALE_FACTOR:-1000.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `LOSS_SCALE_FACTOR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L107** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L108** 源码：<code>REWARD_FUNC_NAME=${REWARD_FUNC_NAME:-&quot;calculate_reward_weighted&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_FUNC_NAME`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L109** 源码：<code>SPEEDUP_REWARD_UPPER_BOUND=${SPEEDUP_REWARD_UPPER_BOUND:-3.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SPEEDUP_REWARD_UPPER_BOUND`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L110** 源码：<code>SPEEDUP_REWARD_LOWER_BOUND=${SPEEDUP_REWARD_LOWER_BOUND:-1.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SPEEDUP_REWARD_LOWER_BOUND`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L111** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L112** 源码：<code>ROLLOUT_RS=${ROLLOUT_RS:-null}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_RS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L113** 源码：<code>ROLLOUT_IS=${ROLLOUT_IS:-null}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_IS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L114** 源码：<code>ROLLOUT_TOKEN_VETO_THRESHOLD=${ROLLOUT_TOKEN_VETO_THRESHOLD:-null}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_TOKEN_VETO_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L115** 源码：<code>ROLLOUT_IS_KWARGS=${ROLLOUT_IS_KWARGS:-&quot;{upper:2.0}&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_IS_KWARGS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L116** 源码：<code>ROLLOUT_RS_KWARGS=${ROLLOUT_RS_KWARGS:-&quot;{lower:0.5,upper:2.0}&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_RS_KWARGS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L117** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L118** 源码：<code># Coverage-based rejection sampling configuration</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L119** 源码：<code># - COVERAGE_RS: Aggregation level (&quot;turn&quot; or &quot;geometric&quot;, null to disable)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L120** 源码：<code># - COVERAGE_RS_THRESHOLD: Lower threshold for coverage ratio (default: 0.3)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L121** 源码：<code># - COVERAGE_RS_FACTOR: Factor for probability calculation (default: 0.1)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L122** 源码：<code># - COVERAGE_RS_KEY: Which coverage metric to use (&quot;time_coverage&quot; or &quot;num_coverage&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L123** 源码：<code># - SPEEDUP_THRESHOLD: Optional speedup threshold for OR logic (null to disable)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L124** 源码：<code>#   If set, samples are kept if EITHER coverage OR speedup meets threshold</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L125** 源码：<code>#   Example: 1.5 means keep samples with &gt;=1.5x speedup regardless of coverage</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L126** 源码：<code>COVERAGE_RS=${COVERAGE_RS:-null}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_RS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L127** 源码：<code>COVERAGE_RS_THRESHOLD=${COVERAGE_RS_THRESHOLD:-0.3}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_RS_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L128** 源码：<code>COVERAGE_RS_FACTOR=${COVERAGE_RS_FACTOR:-0.1}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_RS_FACTOR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L129** 源码：<code>COVERAGE_RS_KEY=${COVERAGE_RS_KEY:-&quot;time_coverage&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `COVERAGE_RS_KEY`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L130** 源码：<code>SPEEDUP_THRESHOLD=${SPEEDUP_THRESHOLD:-null}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SPEEDUP_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L131** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L132** 源码：<code>MAX_PROMPT_LENGTH=${MAX_PROMPT_LENGTH:-1024}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MAX_PROMPT_LENGTH`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L133** 源码：<code>MAX_RESPONSE_LENGTH=${MAX_RESPONSE_LENGTH:-4096}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MAX_RESPONSE_LENGTH`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L134** 源码：<code>LEARNING_RATE=${LEARNING_RATE:-1e-6}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `LEARNING_RATE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L135** 源码：<code>PPO_MINI_BATCH_SIZE=${PPO_MINI_BATCH_SIZE:-32}     # Mini-batch size for PPO updates</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `PPO_MINI_BATCH_SIZE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L136** 源码：<code>PPO_MICRO_TOKEN=${PPO_MICRO_TOKEN:-null}           # Auto-calculated based on model size</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `PPO_MICRO_TOKEN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L137** 源码：<code># Dual-clip PPO parameters (low_high format)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L138** 源码：<code># Standard PPO uses symmetric clipping (e.g., 0.2_0.2)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L139** 源码：<code># Dual-clip uses asymmetric clipping to handle negative advantages better</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L140** 源码：<code>CLIP_RATIO=${CLIP_RATIO:-0.2_0.28}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `CLIP_RATIO`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L141** 源码：<code># Entropy clipping: 0.0 = disabled, 0.8 = skip training on 80% lowest entropy tokens</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L142** 源码：<code>ENTROPY_CLIP_RATE=${ENTROPY_CLIP_RATE:-0.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ENTROPY_CLIP_RATE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L143** 源码：<code># Gradient clipping by norm (critical for training stability)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L144** 源码：<code>GRAD_CLIP=${GRAD_CLIP:-1.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `GRAD_CLIP`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L145** 源码：<code># vLLM Importance Sampling Correction</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L146** 源码：<code># Threshold for truncating importance weights when using vLLM rollouts</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L147** 源码：<code># Default 2.0 = conservative, null = disabled, 3.0 = balanced, 5.0 = moderate, 10.0 = aggressive</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L148** 源码：<code>VLLM_IS_THRESHOLD=${VLLM_IS_THRESHOLD:-2.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VLLM_IS_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L149** 源码：<code># Extreme Risk Token Masking (for negative advantage trajectories)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L150** 源码：<code># Masks tokens with π &lt; threshold AND negative advantages to prevent gradient explosion</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L151** 源码：<code># Default null = disabled, 1e-5 = aggressive, 1e-6 = balanced, 1e-7 = conservative</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L152** 源码：<code>EXTREME_RISK_PROB_THRESHOLD=${EXTREME_RISK_PROB_THRESHOLD:-null}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `EXTREME_RISK_PROB_THRESHOLD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L153** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L154** 源码：<code>KL_LOSS_COEF=${KL_LOSS_COEF:-0.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `KL_LOSS_COEF`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L155** 源码：<code>ENTROPY_COEFFIENT=${ENTROPY_COEFFIENT:-0.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ENTROPY_COEFFIENT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L156** 源码：<code>KL_LOSS_TYPE=${KL_LOSS_TYPE:-&quot;low_var_kl&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `KL_LOSS_TYPE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L157** 源码：<code>TEMPERATURE=${TEMPERATURE:-1.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TEMPERATURE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L158** 源码：<code>MIN_P=${MIN_P:-0.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MIN_P`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L159** 源码：<code>TOP_P=${TOP_P:-1.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TOP_P`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L160** 源码：<code>TOP_K=${TOP_K:--1}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TOP_K`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L161** 源码：<code>ROLLOUT_N=${ROLLOUT_N:-16}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_N`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L162** 源码：<code>KL_COEF=${KL_COEF:-0.0}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `KL_COEF`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L163** 源码：<code>TOTAL_EPOCHS=${TOTAL_EPOCHS:-1000}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TOTAL_EPOCHS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L164** 源码：<code>ROLLOUT_GPU_MEMORY_UTIL=${ROLLOUT_GPU_MEMORY_UTIL:-0.75}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_GPU_MEMORY_UTIL`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L165** 源码：<code>ACTOR_OPTIMIZER_OFFLOAD=${ACTOR_OPTIMIZER_OFFLOAD:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ACTOR_OPTIMIZER_OFFLOAD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L166** 源码：<code>ACTOR_PARAMETER_OFFLOAD=${ACTOR_PARAMETER_OFFLOAD:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ACTOR_PARAMETER_OFFLOAD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L167** 源码：<code>MODEL_NAME=${MODEL_NAME:-Qwen3-8B-Base}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MODEL_NAME`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L168** 源码：<code>SAVE_FREQ=${SAVE_FREQ:-10}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SAVE_FREQ`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L169** 源码：<code>TEST_FREQ=${TEST_FREQ:-10}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TEST_FREQ`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L170** 源码：<code>REMOVE_CLIP=${REMOVE_CLIP:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REMOVE_CLIP`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L171** 源码：<code>ROLLOUT_TENSOR_MODEL_PARALLEL_SIZE=${ROLLOUT_TENSOR_MODEL_PARALLEL_SIZE:-1}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_TENSOR_MODEL_PARALLEL_SIZE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L172** 源码：<code>FREE_CACHE_ENGINE=${FREE_CACHE_ENGINE:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `FREE_CACHE_ENGINE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L173** 源码：<code>ENFORCE_EAGER=${ENFORCE_EAGER:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ENFORCE_EAGER`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L174** 源码：<code>APPLY_CHAT_TEMPLATE=${APPLY_CHAT_TEMPLATE:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `APPLY_CHAT_TEMPLATE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L175** 源码：<code>REJECTION_SAMPLE=${REJECTION_SAMPLE:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REJECTION_SAMPLE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L176** 源码：<code>SP_SIZE=${SP_SIZE:-1}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SP_SIZE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L177** 源码：<code>OVERSAMPLE_M=${OVERSAMPLE_M:-2}              # Oversampling multiplier for rejection sampling</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `OVERSAMPLE_M`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L178** 源码：<code># Algorithm selection: &quot;grpo&quot; (Group Relative Policy Optimization) or &quot;rloo&quot; (REINFORCE Leave-One-Out)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L179** 源码：<code>ALGORITHM=${ALGORITHM:-grpo}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ALGORITHM`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L180** 源码：<code># Batch standardization: Prevents length bias by standardizing advantages</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L181** 源码：<code># - False for both GRPO and RLOO (default)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L182** 源码：<code># - Can be set to True if needed for specific use cases</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L183** 源码：<code>BATCH_STD=${BATCH_STD:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `BATCH_STD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L184** 源码：<code>VAL_ONLY=${VAL_ONLY:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VAL_ONLY`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L185** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L186** 源码：<code># These MUST be set by task-specific scripts</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L187** 源码：<code>TRAIN_DATASET=${TRAIN_DATASET:-()}          # Array of training dataset paths</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TRAIN_DATASET`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L188** 源码：<code>VALID_DATASET=${VALID_DATASET:-()}          # Array of validation dataset paths</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VALID_DATASET`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L189** 源码：<code>REWARD_MANAGER=${REWARD_MANAGER:-&quot;kernel_async&quot;}        # Reward manager (e.g., &quot;math&quot;, &quot;code&quot;, &quot;swe&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_MANAGER`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L190** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L191** 源码：<code># Kernel reward-related defaults (can be overridden by task scripts or CLI)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L192** 源码：<code>REWARD_SERVER_URL=${KERNELGYM_SERVER_URL:-&quot;&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_SERVER_URL`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L193** 源码：<code>REWARD_ENHANCED=${REWARD_ENHANCED:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_ENHANCED`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L194** 源码：<code>REWARD_USE_SANDBOX_RATE_LIMIT=${REWARD_USE_SANDBOX_RATE_LIMIT:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_USE_SANDBOX_RATE_LIMIT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L195** 源码：<code>REWARD_RATE_LIMIT=${REWARD_RATE_LIMIT:-64}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_RATE_LIMIT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L196** 源码：<code>REWARD_ACQUIRE_TIMEOUT=${REWARD_ACQUIRE_TIMEOUT:-2400}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_ACQUIRE_TIMEOUT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L197** 源码：<code>REWARD_MAX_CONCURRENT=${REWARD_MAX_CONCURRENT:-32}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_MAX_CONCURRENT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L198** 源码：<code>REWARD_TIMEOUT=${REWARD_TIMEOUT:-1800}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_TIMEOUT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L199** 源码：<code>REWARD_MAX_RETRIES=${REWARD_MAX_RETRIES:-3}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_MAX_RETRIES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L200** 源码：<code>REWARD_TASK_TIMEOUT=${REWARD_TASK_TIMEOUT:-600}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_TASK_TIMEOUT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L201** 源码：<code>REWARD_TASK_TIMEOUT_CLIENT=${REWARD_TASK_TIMEOUT_CLIENT:-2400}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_TASK_TIMEOUT_CLIENT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L202** 源码：<code>REWARD_PRINT_STATUS=${REWARD_PRINT_STATUS:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `REWARD_PRINT_STATUS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L203** 源码：<code>NUM_PERF_TRIALS=${NUM_PERF_TRIALS:-100}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `NUM_PERF_TRIALS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L204** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L205** 源码：<code># Optional dump directories</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L206** 源码：<code>ROLLOUT_DATA_DIR=${ROLLOUT_DATA_DIR:-&quot;&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_DATA_DIR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L207** 源码：<code>VALIDATION_DATA_DIR=${VALIDATION_DATA_DIR:-&quot;&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VALIDATION_DATA_DIR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L208** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L209** 源码：<code># advanced sampling settings, but it requires the dataset has &quot;solve_rate&quot; column</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L210** 源码：<code>USE_PRIORITIZED_SAMPLING=${USE_PRIORITIZED_SAMPLING:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `USE_PRIORITIZED_SAMPLING`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L211** 源码：<code>AUTOMATIC_OVERSAMPLING=${AUTOMATIC_OVERSAMPLING:-False} # close the automatic oversampling for now</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `AUTOMATIC_OVERSAMPLING`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L212** 源码：<code>USE_MODERATE_SAMPLING=${USE_MODERATE_SAMPLING:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `USE_MODERATE_SAMPLING`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L213** 源码：<code>USE_REFRESH_SAMPLING=${USE_REFRESH_SAMPLING:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `USE_REFRESH_SAMPLING`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L214** 源码：<code>SOLVERATE_RATIO=${SOLVERATE_RATIO:-0.1_0.9}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SOLVERATE_RATIO`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L215** 源码：<code>SOLVERATE_MEAN_STD=${SOLVERATE_MEAN_STD:-0.5_0.2}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SOLVERATE_MEAN_STD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L216** 源码：<code># Oversampling configuration (compensate for rejection)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L217** 源码：<code>PROMPT_OVERSAMPLING_FACTOR=${PROMPT_OVERSAMPLING_FACTOR:-2.0}  # 2.0 recommended with two-gate</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `PROMPT_OVERSAMPLING_FACTOR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L218** 源码：<code>SAMPLE_OVERSAMPLING_FACTOR=${SAMPLE_OVERSAMPLING_FACTOR:-1.5}  # 1.5 recommended with two-gate</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SAMPLE_OVERSAMPLING_FACTOR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L219** 源码：<code>MAX_SKIP_STEPS=${MAX_SKIP_STEPS:-10}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MAX_SKIP_STEPS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L220** 源码：<code>FIX_QWEN3_CHAT_TEMPLATE=${FIX_QWEN3_CHAT_TEMPLATE:-False}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `FIX_QWEN3_CHAT_TEMPLATE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L221** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L222** 源码：<code># Sample selection and group management</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L223** 源码：<code>SAMPLE_SELECTION_STRATEGY=${SAMPLE_SELECTION_STRATEGY:-efficiency_stochastic}  # Better exploration</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SAMPLE_SELECTION_STRATEGY`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L224** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L225** 源码：<code># setup rollout mode</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L226** 源码：<code>ROLLOUT_MODE=${ROLLOUT_MODE:-&quot;async_vllm&quot;}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ROLLOUT_MODE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L227** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L228** 源码：<code>CALCULATE_LOG_PROBS=${CALCULATE_LOG_PROBS:-True}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `CALCULATE_LOG_PROBS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L229** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L230** 源码：<code>generate_model_micro_token() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `generate_model_micro_token`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L231** 源码：<code>  local model_name=$1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L232** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L233** 源码：<code>  if [ &quot;$PPO_MICRO_TOKEN&quot; = &quot;null&quot; ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L234** 源码：<code>    # Extract the model size (e.g., 7B, 14B, 32B) using regex</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L235** 源码：<code>    if [[ $model_name =~ ([0-9]+)B ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L236** 源码：<code>      local model_size=&quot;${BASH_REMATCH[1]}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L237** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L238** 源码：<code>      # Set the basic config based on model size</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L239** 源码：<code>      local micro_token_config</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L240** 源码：<code>      case $model_size in</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L241** 源码：<code>        3)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L242** 源码：<code>          micro_token_config=16384</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_token_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L243** 源码：<code>          ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L244** 源码：<code>        7)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L245** 源码：<code>          micro_token_config=8192</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_token_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L246** 源码：<code>          ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L247** 源码：<code>        14)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L248** 源码：<code>          micro_token_config=4096</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_token_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L249** 源码：<code>          ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L250** 源码：<code>        24)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L251** 源码：<code>          micro_token_config=3072</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_token_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L252** 源码：<code>          ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L253** 源码：<code>        32)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L254** 源码：<code>          micro_token_config=2048</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_token_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L255** 源码：<code>          ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L256** 源码：<code>        *)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L257** 源码：<code>          micro_token_config=16384</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_token_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L258** 源码：<code>          ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L259** 源码：<code>      esac</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L260** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L261** 源码：<code>      # if you use tensor parallel, you can increase the micro token number</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L262** 源码：<code>      if [ &quot;$ROLLOUT_TENSOR_MODEL_PARALLEL_SIZE&quot; -gt 1 ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L263** 源码：<code>          micro_token_config=$((micro_token_config * ROLLOUT_TENSOR_MODEL_PARALLEL_SIZE))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_token_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L264** 源码：<code>      fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L265** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L266** 源码：<code>      echo $micro_token_config</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L267** 源码：<code>    else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L268** 源码：<code>      echo 16384</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L269** 源码：<code>    fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L270** 源码：<code>  else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L271** 源码：<code>    echo $PPO_MICRO_TOKEN</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L272** 源码：<code>  fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L273** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L274** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L275** 源码：<code>generate_short_hash() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `generate_short_hash`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L276** 源码：<code>  local input_string=&quot;$1&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L277** 源码：<code>  local hash=$(echo -n &quot;$input_string&quot; | sha256sum | cut -c1-8)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L278** 源码：<code>  echo &quot;$hash&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L279** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L280** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L281** 源码：<code>generate_suffix() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `generate_suffix`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L282** 源码：<code>  local suffix=&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L283** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L284** 源码：<code>  while [[ &quot;$#&quot; -gt 0 ]]; do</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L285** 源码：<code>    case $1 in</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L286** 源码：<code>      --train_batch_size) suffix+=&quot;_batch$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L287** 源码：<code>      --max_prompt_length) suffix+=&quot;_maxprom$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L288** 源码：<code>      --max_response_length) suffix+=&quot;_maxresp$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L289** 源码：<code>      --learning_rate) suffix+=&quot;_lr$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L290** 源码：<code>      --ppo_mini_batch_size) suffix+=&quot;_ppomini$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L291** 源码：<code>      --kl_loss_coef) suffix+=&quot;_klloss$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L292** 源码：<code>      --entropy_coeffient) suffix+=&quot;_entropy$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L293** 源码：<code>      --clip_ratio) suffix+=&quot;_clip$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L294** 源码：<code>      --remove_clip) suffix+=&quot;_rmclip$2&quot;; shift 1 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L295** 源码：<code>      --kl_loss_type) suffix+=&quot;_kltype$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L296** 源码：<code>      --temperature) suffix+=&quot;_temp$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L297** 源码：<code>      --top_p) suffix+=&quot;_topp$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L298** 源码：<code>      --top_k) suffix+=&quot;_topk$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L299** 源码：<code>      --min_p) suffix+=&quot;_minp$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L300** 源码：<code>      --rollout_n) suffix+=&quot;_rolln$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L301** 源码：<code>      --rollout_mode) suffix+=&quot;_rollmode$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L302** 源码：<code>      --oversample_multiplier) suffix+=&quot;_oversamp$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L303** 源码：<code>      --kl_coef) suffix+=&quot;_klcoef$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L304** 源码：<code>      --use_prioritized_sampling) suffix+=&quot;_prior$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L305** 源码：<code>      --automatic_oversampling) suffix+=&quot;_autoover$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L306** 源码：<code>      --use_moderate_sampling) suffix+=&quot;_moderate$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L307** 源码：<code>      --use_refresh_sampling) suffix+=&quot;_refresh$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L308** 源码：<code>      --solverate_ratio) suffix+=&quot;_solveratio$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L309** 源码：<code>      --solverate_mean_std) suffix+=&quot;_solvemean$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L310** 源码：<code>      --entropy_clip_rate) suffix+=&quot;_entclip$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L311** 源码：<code>      --loss_agg_mode) suffix+=&quot;_lossagg$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L312** 源码：<code>      --loss_scale_factor) suffix+=&quot;_scale$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L313** 源码：<code>      --grad_clip) suffix+=&quot;_gradclip$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L314** 源码：<code>      --batch_std) suffix+=&quot;_batchstd$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L315** 源码：<code>      --val_only) suffix+=&quot;_val_only$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L316** 源码：<code>      --enable_multi_turn) suffix+=&quot;_multiturn$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L317** 源码：<code>      --max_turn) suffix+=&quot;_maxturn$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L318** 源码：<code>      --val_before_train) suffix+=&quot;_valbefore$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L319** 源码：<code>      --is_get_last_turn) suffix+=&quot;_isgetlastturn$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L320** 源码：<code>            *) shift ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L321** 源码：<code>    esac</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L322** 源码：<code>  done</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L323** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L324** 源码：<code>  local suffix_hash=$(generate_short_hash &quot;$suffix&quot;)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L325** 源码：<code>  echo &quot;_$suffix_hash&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L326** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L327** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L328** 源码：<code>show_help() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `show_help`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L329** 源码：<code>  echo &quot;RL Training Script (GRPO/RLOO)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L330** 源码：<code>  echo &quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L331** 源码：<code>  echo &quot;Usage: $0 [OPTIONS]&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L332** 源码：<code>  echo &quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L333** 源码：<code>  echo &quot;Loss Aggregation Options:&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L334** 源码：<code>  echo &quot;  --loss_agg_mode MODE          Loss aggregation mode (default: seq-mean-token-sum)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L335** 源码：<code>  echo &quot;                                Modes: token-mean, seq-mean-token-sum, seq-mean-token-mean,&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L336** 源码：<code>  echo &quot;                                       seq-mean-token-sum-norm, seq-sum-no-norm&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L337** 源码：<code>  echo &quot;  --loss_scale_factor FACTOR    Loss scaling factor (default: 1.0)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L338** 源码：<code>  echo &quot;                                Use 100.0 for 10k+ token sequences&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L339** 源码：<code>  echo &quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L340** 源码：<code>  echo &quot;Training Options:&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L341** 源码：<code>  echo &quot;  --learning_rate RATE          Learning rate (default: 1e-6)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L342** 源码：<code>  echo &quot;  --train_batch_size SIZE       Training batch size (default: 512)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L343** 源码：<code>  echo &quot;  --max_response_length LENGTH  Max response length (default: 4096)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L344** 源码：<code>  echo &quot;  --entropy_clip_rate RATE      Entropy clipping rate (default: 0.0)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L345** 源码：<code>  echo &quot;  --grad_clip VALUE             Gradient clipping value (default: 1.0)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L346** 源码：<code>  echo &quot;  --extreme_risk_prob_threshold Extreme risk token masking threshold (default: null)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L347** 源码：<code>  echo &quot;                                null=disabled, 1e-5=aggressive, 1e-6=balanced, 1e-7=conservative&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L348** 源码：<code>  echo &quot;  --batch_std TRUE/FALSE        Batch standardization (default: False, True for RLOO)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L349** 源码：<code>  echo &quot;  --model_name NAME             Model name (default: Qwen3-8B-Base)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L350** 源码：<code>  echo &quot;  --rollout_is_kwargs KEY=VALUE Additional IS kwargs (default: {})&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L351** 源码：<code>  echo &quot;  --rollout_rs_kwargs KEY=VALUE Additional RS kwargs (default: {})&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L352** 源码：<code>  echo &quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L353** 源码：<code>  echo &quot;Examples:&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L354** 源码：<code>  echo &quot;  $0                                    # Standard training&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L355** 源码：<code>  echo &quot;  $0 --loss_scale_factor 100.0         # Long sequence training&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L356** 源码：<code>  echo &quot;  $0 --loss_agg_mode token-mean        # Token-level aggregation&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L357** 源码：<code>  echo &quot;  $0 --enable_multi_turn True         # Enable multi-turn training&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L358** 源码：<code>  echo &quot;  $0 --max_turn 3                      # Maximum number of turns&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L359** 源码：<code>  echo &quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L360** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L361** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L362** 源码：<code>parse_arguments() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `parse_arguments`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L363** 源码：<code>  echo &quot;Arguments received: $@&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L364** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L365** 源码：<code>  # Check for help request</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L366** 源码：<code>  for arg in &quot;$@&quot;; do</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L367** 源码：<code>    if [[ &quot;$arg&quot; == &quot;--help&quot; || &quot;$arg&quot; == &quot;-h&quot; ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L368** 源码：<code>      show_help</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L369** 源码：<code>      exit 0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L370** 源码：<code>    fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L371** 源码：<code>  done</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L372** 源码：<code>  # Generate a unique suffix based on the input arguments</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L373** 源码：<code>  SUFFIX=$(generate_suffix &quot;$@&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SUFFIX`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L374** 源码：<code>  RUN_NAME=&quot;$RUN_NAME$SUFFIX&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `RUN_NAME`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L375** 源码：<code>  echo &quot;RUN_NAME: $RUN_NAME&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L376** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L377** 源码：<code>  # Parse named arguments</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L378** 源码：<code>  while [[ &quot;$#&quot; -gt 0 ]]; do</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L379** 源码：<code>    echo &quot;Processing: $1&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L380** 源码：<code>    case &quot;$1&quot; in</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L381** 源码：<code>      --train_batch_size) TRAIN_BATCH_SIZE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L382** 源码：<code>      --val_sample_size) VAL_SAMPLE_SIZE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L383** 源码：<code>      --max_prompt_length) MAX_PROMPT_LENGTH=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L384** 源码：<code>      --max_response_length) MAX_RESPONSE_LENGTH=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L385** 源码：<code>      --learning_rate) LEARNING_RATE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L386** 源码：<code>      --ppo_mini_batch_size) PPO_MINI_BATCH_SIZE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L387** 源码：<code>      --ppo_micro_token) PPO_MICRO_TOKEN=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L388** 源码：<code>      --kl_loss_coef) KL_LOSS_COEF=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L389** 源码：<code>      --entropy_coeffient) ENTROPY_COEFFIENT=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L390** 源码：<code>      --clip_ratio) CLIP_RATIO=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L391** 源码：<code>      --kl_loss_type) KL_LOSS_TYPE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L392** 源码：<code>      --vllm_is_threshold) VLLM_IS_THRESHOLD=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L393** 源码：<code>      --extreme_risk_prob_threshold) EXTREME_RISK_PROB_THRESHOLD=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L394** 源码：<code>      --temperature) TEMPERATURE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L395** 源码：<code>      --oversample_multiplier) OVERSAMPLE_M=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L396** 源码：<code>      --top_p) TOP_P=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L397** 源码：<code>      --top_k) TOP_K=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L398** 源码：<code>      --min_p) MIN_P=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L399** 源码：<code>      --rollout_n) ROLLOUT_N=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L400** 源码：<code>      --rollout_mode) ROLLOUT_MODE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L401** 源码：<code>      --n_val) N_VAL=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L402** 源码：<code>      --val_temperature) VAL_TEMPERATURE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L403** 源码：<code>      --val_do_sample) VAL_DO_SAMPLE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L404** 源码：<code>      --rollout_gpu_memory_util) ROLLOUT_GPU_MEMORY_UTIL=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L405** 源码：<code>      --rollout_tp) ROLLOUT_TENSOR_MODEL_PARALLEL_SIZE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L406** 源码：<code>      --kl_coef) KL_COEF=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L407** 源码：<code>      --actor_optimizer_offload) ACTOR_OPTIMIZER_OFFLOAD=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L408** 源码：<code>      --actor_parameter_offload) ACTOR_PARAMETER_OFFLOAD=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L409** 源码：<code>      --total_epochs) TOTAL_EPOCHS=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L410** 源码：<code>      --save_freq) SAVE_FREQ=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L411** 源码：<code>      --test_freq) TEST_FREQ=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L412** 源码：<code>      --remove_clip) REMOVE_CLIP=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L413** 源码：<code>      --apply_chat_template) APPLY_CHAT_TEMPLATE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L414** 源码：<code>      --rejection_sample) REJECTION_SAMPLE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L415** 源码：<code>      --sp_size) SP_SIZE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L416** 源码：<code>      --train_dataset) TRAIN_DATASET=($2); shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L417** 源码：<code>      --valid_dataset) VALID_DATASET=($2); shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L418** 源码：<code>      --model_name) MODEL_NAME=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L419** 源码：<code>      --use_prioritized_sampling) USE_PRIORITIZED_SAMPLING=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L420** 源码：<code>      --automatic_oversampling) AUTOMATIC_OVERSAMPLING=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L421** 源码：<code>      --use_moderate_sampling) USE_MODERATE_SAMPLING=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L422** 源码：<code>      --use_refresh_sampling) USE_REFRESH_SAMPLING=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L423** 源码：<code>      --solverate_ratio) SOLVERATE_RATIO=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L424** 源码：<code>      --solverate_mean_std) SOLVERATE_MEAN_STD=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L425** 源码：<code>      --reward_manager) REWARD_MANAGER=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L426** 源码：<code>      --reward_server_url) REWARD_SERVER_URL=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L427** 源码：<code>      --reward_enhanced) REWARD_ENHANCED=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L428** 源码：<code>      --reward_use_sandbox_rate_limit) REWARD_USE_SANDBOX_RATE_LIMIT=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L429** 源码：<code>      --reward_rate_limit) REWARD_RATE_LIMIT=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L430** 源码：<code>      --reward_acquire_timeout) REWARD_ACQUIRE_TIMEOUT=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L431** 源码：<code>      --reward_max_concurrent) REWARD_MAX_CONCURRENT=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L432** 源码：<code>      --reward_timeout) REWARD_TIMEOUT=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L433** 源码：<code>      --reward_max_retries) REWARD_MAX_RETRIES=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L434** 源码：<code>      --reward_task_timeout) REWARD_TASK_TIMEOUT=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L435** 源码：<code>      --reward_print_status) REWARD_PRINT_STATUS=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L436** 源码：<code>      --reward_weights) REWARD_WEIGHTS=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L437** 源码：<code>      --reward_policy) REWARD_POLICY=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L438** 源码：<code>      --rollout_data_dir) ROLLOUT_DATA_DIR=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L439** 源码：<code>      --validation_data_dir) VALIDATION_DATA_DIR=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L440** 源码：<code>      --entropy_clip_rate) ENTROPY_CLIP_RATE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L441** 源码：<code>      --loss_agg_mode) LOSS_AGG_MODE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L442** 源码：<code>      --loss_scale_factor) LOSS_SCALE_FACTOR=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L443** 源码：<code>      --grad_clip) GRAD_CLIP=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L444** 源码：<code>      --batch_std) BATCH_STD=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L445** 源码：<code>      --val_only) VAL_ONLY=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L446** 源码：<code>      --cal_log_probs) CALCULATE_LOG_PROBS=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L447** 源码：<code>      --max_skip_steps) MAX_SKIP_STEPS=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L448** 源码：<code>      --fix_qwen3_chat_template) FIX_QWEN3_CHAT_TEMPLATE=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L449** 源码：<code>      --adv_by_last_turn) ADV_BY_LAST_TURN=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L450** 源码：<code>      --use_final_reward) USE_FINAL_REWARD=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L451** 源码：<code>      --rollout_is) ROLLOUT_IS=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L452** 源码：<code>      --rollout_rs) ROLLOUT_RS=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L453** 源码：<code>      --rollout_is_kwargs) ROLLOUT_IS_KWARGS=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L454** 源码：<code>      --rollout_rs_kwargs) ROLLOUT_RS_KWARGS=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L455** 源码：<code>      --rollout_token_veto_threshold) ROLLOUT_TOKEN_VETO_THRESHOLD=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L456** 源码：<code>      --enable_multi_turn) ENABLE_MULTI_TURN=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L457** 源码：<code>      --max_turn) MAX_TURN=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L458** 源码：<code>      --val_before_train) VAL_BEFORE_TRAIN=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L459** 源码：<code>      --is_get_last_turn) IS_GET_LAST_TURN=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L460** 源码：<code>      --speedup_reward_upper_bound) SPEEDUP_REWARD_UPPER_BOUND=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L461** 源码：<code>      --speedup_reward_lower_bound) SPEEDUP_REWARD_LOWER_BOUND=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L462** 源码：<code>      --reward_shaping) REWARD_SHAPING=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L463** 源码：<code>      --unbiased_shaping) UNBIASED_SHAPING=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L464** 源码：<code>      --gamma) GAMMA=&quot;$2&quot;; shift 2 ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L465** 源码：<code>      *)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L466** 源码：<code>        echo &quot;Unknown option: $1&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L467** 源码：<code>        exit 1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L468** 源码：<code>        ;;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L469** 源码：<code>    esac</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L470** 源码：<code>  done</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L471** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L472** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L473** 源码：<code>parse_clip_ratio() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `parse_clip_ratio`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L474** 源码：<code>    local clip_ratio=&quot;$1&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L475** 源码：<code>    local low</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L476** 源码：<code>    local high</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L477** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L478** 源码：<code>    # Check if the clip_ratio is a single number (e.g., &quot;0.2&quot;) or in the format &quot;number_number&quot; (e.g., &quot;0.2_0.3&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L479** 源码：<code>    if [[ $clip_ratio =~ ^[0-9]+(\.[0-9]+)?$ ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L480** 源码：<code>        low=$clip_ratio</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `low`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L481** 源码：<code>        high=$clip_ratio</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `high`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L482** 源码：<code>    elif [[ $clip_ratio =~ ^[0-9]+(\.[0-9]+)?_[0-9]+(\.[0-9]+)?$ ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L483** 源码：<code>        # If it&#x27;s in the &quot;number_number&quot; format, split by underscore</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L484** 源码：<code>        low=$(echo $clip_ratio | cut -d&#x27;_&#x27; -f1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `low`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L485** 源码：<code>        high=$(echo $clip_ratio | cut -d&#x27;_&#x27; -f2)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `high`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L486** 源码：<code>    else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L487** 源码：<code>        # Print a warning if the format is incorrect</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L488** 源码：<code>        echo &quot;Warning: clip_ratio &#x27;$clip_ratio&#x27; is not in the correct format (e.g., &#x27;0.2_0.3&#x27; or &#x27;0.2&#x27;).&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L489** 源码：<code>        return 1</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L490** 源码：<code>    fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L491** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L492** 源码：<code>    CLIP_RATIO_LOW=$low</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `CLIP_RATIO_LOW`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L493** 源码：<code>    CLIP_RATIO_HIGH=$high</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `CLIP_RATIO_HIGH`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L494** 源码：<code>    echo &quot;CLIP_RATIO_LOW: $CLIP_RATIO_LOW&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L495** 源码：<code>    echo &quot;CLIP_RATIO_HIGH: $CLIP_RATIO_HIGH&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L496** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L497** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L498** 源码：<code>parse_solve_ratio() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `parse_solve_ratio`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L499** 源码：<code>    local solve_ratio=&quot;$1&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L500** 源码：<code>    local low</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L501** 源码：<code>    local high</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L502** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L503** 源码：<code>    # Check if the solve_ratio is a single number (e.g., &quot;0.1&quot;) or in the format &quot;number_number&quot; (e.g., &quot;0.1_0.9&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L504** 源码：<code>    if [[ $solve_ratio =~ ^[0-9]+(\.[0-9]+)?_[0-9]+(\.[0-9]+)?$ ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L505** 源码：<code>        # If it&#x27;s in the &quot;number_number&quot; format, split by underscore</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L506** 源码：<code>        low=$(echo $solve_ratio | cut -d&#x27;_&#x27; -f1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `low`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L507** 源码：<code>        high=$(echo $solve_ratio | cut -d&#x27;_&#x27; -f2)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `high`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L508** 源码：<code>    else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L509** 源码：<code>        # Print a warning if the format is incorrect</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L510** 源码：<code>        echo &quot;Warning: solve_ratio &#x27;$solve_ratio&#x27; is not in the correct format (e.g., &#x27;0.1_0.9&#x27;).&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L511** 源码：<code>        return 1</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L512** 源码：<code>    fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L513** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L514** 源码：<code>    SOLVERATE_LOW=$low</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SOLVERATE_LOW`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L515** 源码：<code>    SOLVERATE_HIGH=$high</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SOLVERATE_HIGH`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L516** 源码：<code>    echo &quot;SOLVERATE_LOW: $SOLVERATE_LOW&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L517** 源码：<code>    echo &quot;SOLVERATE_HIGH: $SOLVERATE_HIGH&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L518** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L519** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L520** 源码：<code>parse_solve_mean_std() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `parse_solve_mean_std`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L521** 源码：<code>    local solve_mean_std=&quot;$1&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L522** 源码：<code>    local mean</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L523** 源码：<code>    local std</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L524** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L525** 源码：<code>    # Check if the solve_mean_std is in the format &quot;mean_std&quot; (e.g., &quot;0.5_0.1&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L526** 源码：<code>    if [[ $solve_mean_std =~ ^[0-9]+(\.[0-9]+)?_[0-9]+(\.[0-9]+)?$ ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L527** 源码：<code>        # If it&#x27;s in the &quot;mean_std&quot; format, split by underscore</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L528** 源码：<code>        mean=$(echo $solve_mean_std | cut -d&#x27;_&#x27; -f1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `mean`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L529** 源码：<code>        std=$(echo $solve_mean_std | cut -d&#x27;_&#x27; -f2)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `std`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L530** 源码：<code>    else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L531** 源码：<code>        # Print a warning if the format is incorrect</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L532** 源码：<code>        echo &quot;Warning: solve_mean_std &#x27;$solve_mean_std&#x27; is not in the correct format (e.g., &#x27;0.5_0.1&#x27;).&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L533** 源码：<code>        return 1</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L534** 源码：<code>    fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L535** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L536** 源码：<code>    SOLVERATE_MEAN=$mean</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SOLVERATE_MEAN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L537** 源码：<code>    SOLVERATE_STD=$std</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `SOLVERATE_STD`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L538** 源码：<code>    echo &quot;SOLVERATE_MEAN: $SOLVERATE_MEAN&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L539** 源码：<code>    echo &quot;SOLVERATE_STD: $SOLVERATE_STD&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L540** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L541** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L542** 源码：<code>parse_chat_scheduler() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `parse_chat_scheduler`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L543** 源码：<code>  local rollout_mode=&quot;$1&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L544** 源码：<code>  local chat_scheduler=null</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L545** 源码：<code>  local return_raw_chat=False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L546** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L547** 源码：<code>  case &quot;$rollout_mode&quot; in</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L548** 源码：<code>    &quot;async_vllm&quot;)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L549** 源码：<code>      return_raw_chat=True ;;</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L550** 源码：<code>  esac</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L551** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L552** 源码：<code>  case &quot;$rollout_mode&quot; in</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L553** 源码：<code>    &quot;async_agent&quot;)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L554** 源码：<code>      return_raw_chat=True ;;</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L555** 源码：<code>  esac</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L556** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L557** 源码：<code>  RETURN_RAW_CHAT=$return_raw_chat</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `RETURN_RAW_CHAT`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L558** 源码：<code>  echo &quot;RETURN_RAW_CHAT: $RETURN_RAW_CHAT&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L559** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L560** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L561** 源码：<code>format_dataset_paths() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `format_dataset_paths`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L562** 源码：<code>  local dataset=(&quot;$@&quot;)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L563** 源码：<code>  local formatted_paths=&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L564** 源码：<code>  local resolved_path=&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L565** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L566** 源码：<code>  for dataset_path in &quot;${dataset[@]}&quot;; do</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L567** 源码：<code>    if [[ &quot;$dataset_path&quot; == /* || &quot;$dataset_path&quot; == ./* || &quot;$dataset_path&quot; == ../* || &quot;$dataset_path&quot; == *.parquet || &quot;$dataset_path&quot; == *.jsonl ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L568** 源码：<code>      resolved_path=&quot;$dataset_path&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `resolved_path`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L569** 源码：<code>    elif [[ -n &quot;${HDFS_DATA_PATH}&quot; ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L570** 源码：<code>      resolved_path=&quot;${HDFS_DATA_PATH}/${dataset_path}.parquet&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `resolved_path`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L571** 源码：<code>    else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L572** 源码：<code>      resolved_path=&quot;${dataset_path}.parquet&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `resolved_path`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L573** 源码：<code>    fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L574** 源码：<code>    formatted_paths+=&quot;\&quot;${resolved_path}\&quot;,&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `formatted_paths+`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L575** 源码：<code>  done</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L576** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L577** 源码：<code>  # Remove the last comma</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L578** 源码：<code>  formatted_paths=&quot;${formatted_paths%,}&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `formatted_paths`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L579** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L580** 源码：<code>  echo &quot;[$formatted_paths]&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L581** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L582** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L583** 源码：<code>setup_training_environment() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `setup_training_environment`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L584** 源码：<code>  # Build dataset name string for run name</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L585** 源码：<code>  if [ ${#TRAIN_DATASET[@]} -gt 0 ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L586** 源码：<code>    for dataset in &quot;${TRAIN_DATASET[@]}&quot;; do</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L587** 源码：<code>      train_dataset_str+=&quot;_$(echo $dataset | sed &#x27;s/\//_/g&#x27;)&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `train_dataset_str+`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L588** 源码：<code>    done</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L589** 源码：<code>  fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L590** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L591** 源码：<code>  # for KL_LOSS_COEF</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L592** 源码：<code>  if (( $(echo &quot;$KL_LOSS_COEF == 0&quot; | bc -l) )); then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L593** 源码：<code>    USE_KL_LOSS=False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `USE_KL_LOSS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L594** 源码：<code>  else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L595** 源码：<code>    USE_KL_LOSS=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `USE_KL_LOSS`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L596** 源码：<code>  fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L597** 源码：<code>  echo &quot;Use KL Loss: $USE_KL_LOSS&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L598** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L599** 源码：<code>  # for KL_COEF</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L600** 源码：<code>  if (( $(echo &quot;$KL_COEF == 0&quot; | bc -l) )); then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L601** 源码：<code>    USE_KL_COEF=False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `USE_KL_COEF`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L602** 源码：<code>  else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L603** 源码：<code>    USE_KL_COEF=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `USE_KL_COEF`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L604** 源码：<code>  fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L605** 源码：<code>  echo &quot;Use KL Coef: $USE_KL_COEF&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L606** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L607** 源码：<code>  RUN_NAME+=&quot;$train_dataset_str&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `RUN_NAME+`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L608** 源码：<code>  RUN_NAME+=&quot;_$MODEL_NAME&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `RUN_NAME+`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L609** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L610** 源码：<code>  if [[ -n &quot;${MODEL_PATH:-}&quot; ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L611** 源码：<code>    MODEL_PATH_RESOLVED=&quot;$MODEL_PATH&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MODEL_PATH_RESOLVED`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L612** 源码：<code>  elif [[ -n &quot;${HDFS_MODEL_PATH}&quot; ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L613** 源码：<code>    MODEL_PATH_RESOLVED=&quot;${HDFS_MODEL_PATH}/${MODEL_NAME}&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MODEL_PATH_RESOLVED`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L614** 源码：<code>  else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L615** 源码：<code>    MODEL_PATH_RESOLVED=&quot;$MODEL_NAME&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `MODEL_PATH_RESOLVED`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L616** 源码：<code>  fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L617** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L618** 源码：<code>  if [[ -n &quot;${HDFS_CHECKPOINT_PATH}&quot; ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L619** 源码：<code>    CHECKPOINT_DIR=&quot;${HDFS_CHECKPOINT_PATH}/${RUN_NAME}&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `CHECKPOINT_DIR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L620** 源码：<code>  else</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L621** 源码：<code>    CHECKPOINT_DIR=&quot;checkpoints/${RUN_NAME}&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `CHECKPOINT_DIR`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L622** 源码：<code>  fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L623** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L624** 源码：<code>  N_GPUS_PER_NODE=${N_GPUS_PER_NODE:-${GPUS_PER_NODE:-${ARNOLD_WORKER_GPU:-8}}}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `N_GPUS_PER_NODE`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L625** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L626** 源码：<code>  export RUN_NAME</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L627** 源码：<code>  export MODEL_PATH_RESOLVED</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L628** 源码：<code>  export CHECKPOINT_DIR</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L629** 源码：<code>  export N_GPUS_PER_NODE</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L630** 源码：<code>  echo &quot;FULL RUN_NAME: $RUN_NAME&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L631** 源码：<code>  echo &quot;Training with the following parameters:&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L632** 源码：<code>  echo &quot;Train Batch Size: $TRAIN_BATCH_SIZE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L633** 源码：<code>  echo &quot;Max Prompt Length: $MAX_PROMPT_LENGTH&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L634** 源码：<code>  echo &quot;Max Response Length: $MAX_RESPONSE_LENGTH&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L635** 源码：<code>  echo &quot;Learning Rate: $LEARNING_RATE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L636** 源码：<code>  echo &quot;PPO Mini Batch Size: $PPO_MINI_BATCH_SIZE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L637** 源码：<code>  echo &quot;KL Loss Coefficient: $KL_LOSS_COEF&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L638** 源码：<code>  echo &quot;KL Loss Type: $KL_LOSS_TYPE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L639** 源码：<code>  echo &quot;Temperature: $TEMPERATURE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L640** 源码：<code>  echo &quot;Rollout N: $ROLLOUT_N&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L641** 源码：<code>  echo &quot;Rollout Mode: $ROLLOUT_MODE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L642** 源码：<code>  echo &quot;KL Coefficient: $KL_COEF&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L643** 源码：<code>  echo &quot;Total Epochs: $TOTAL_EPOCHS&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L644** 源码：<code>  echo &quot;Model Name: $MODEL_NAME&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L645** 源码：<code>  echo &quot;Model Path: $MODEL_PATH_RESOLVED&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L646** 源码：<code>  echo &quot;Checkpoint Dir: $CHECKPOINT_DIR&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L647** 源码：<code>  echo &quot;GPUs per Node: $N_GPUS_PER_NODE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L648** 源码：<code>  echo &quot;Remove Clip: $REMOVE_CLIP&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L649** 源码：<code>  echo &quot;Reward Manager: $REWARD_MANAGER&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L650** 源码：<code>  echo &quot;Automatic Oversampling: $AUTOMATIC_OVERSAMPLING&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L651** 源码：<code>  echo &quot;Moderate Sampling: $USE_MODERATE_SAMPLING&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L652** 源码：<code>  echo &quot;Refresh Sampling: $USE_REFRESH_SAMPLING&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L653** 源码：<code>  echo &quot;Solverate Ratio: $SOLVERATE_RATIO&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L654** 源码：<code>  echo &quot;Solverate Mean Std: $SOLVERATE_MEAN_STD&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L655** 源码：<code>  echo &quot;Entropy Clip Rate: $ENTROPY_CLIP_RATE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L656** 源码：<code>  echo &quot;Gradient Clip: $GRAD_CLIP&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L657** 源码：<code>  echo &quot;Val Only: $VAL_ONLY&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L658** 源码：<code>  echo &quot;Fix Qwen3 Chat Template: $FIX_QWEN3_CHAT_TEMPLATE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L659** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L660** 源码：<code>  # set ppo micro token</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L661** 源码：<code>  PPO_MICRO_TOKEN=$(generate_model_micro_token &quot;$MODEL_NAME&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `PPO_MICRO_TOKEN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L662** 源码：<code>  echo &quot;PPO_MICRO_TOKEN: $PPO_MICRO_TOKEN&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L663** 源码：<code>  LOG_PROB_MICRO_TOKEN=$((PPO_MICRO_TOKEN * 2))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `LOG_PROB_MICRO_TOKEN`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L664** 源码：<code>  max_num_batched_tokens=$(expr $MAX_PROMPT_LENGTH + $MAX_RESPONSE_LENGTH + 1000)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_num_batched_tokens`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L665** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L666** 源码：<code>  # calculate the sum of MAX_PROMPT_LENGTH and MAX_RESPONSE_LENGTH</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L667** 源码：<code>  required_token_length=$((MAX_PROMPT_LENGTH + MAX_RESPONSE_LENGTH))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `required_token_length`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L668** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L669** 源码：<code>  # if sp_size is greater than 1, we can increase the total_micro_token</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L670** 源码：<code>  total_micro_token=$((PPO_MICRO_TOKEN * SP_SIZE))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_micro_token`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L671** 源码：<code>  # verify if PPO_MICRO_TOKEN is less than required_token_length, if less then directly exit</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L672** 源码：<code>  if [ &quot;$total_micro_token&quot; -lt &quot;$required_token_length&quot; ]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L673** 源码：<code>      echo &quot;Warning: PPO_MICRO_TOKEN is less than the required token length ($required_token_length).&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L674** 源码：<code>      echo &quot;Please try increasing your rollout_tp, otherwise the script cannot be run using your current model.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L675** 源码：<code>      exit 1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L676** 源码：<code>  fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L677** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L678** 源码：<code>  parse_clip_ratio &quot;$CLIP_RATIO&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L679** 源码：<code>  parse_solve_ratio &quot;$SOLVERATE_RATIO&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L680** 源码：<code>  parse_solve_mean_std &quot;$SOLVERATE_MEAN_STD&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L681** 源码：<code>  parse_chat_scheduler &quot;$ROLLOUT_MODE&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L682** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L683** 源码：<code>  TRAIN_FILES=$(format_dataset_paths &quot;${TRAIN_DATASET[@]}&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `TRAIN_FILES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L684** 源码：<code>  VALID_FILES=$(format_dataset_paths &quot;${VALID_DATASET[@]}&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `VALID_FILES`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L685** 源码：<code>  echo &quot;TRAIN_FILES: $TRAIN_FILES&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L686** 源码：<code>  echo &quot;VALID_FILES: $VALID_FILES&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L687** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L688** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L689** 源码：<code>run_training() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `run_training`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L690** 源码：<code>  sleep 3</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L691** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L692** 源码：<code>  PYTHONUNBUFFERED=1 python -m kernel.main_kernel \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `PYTHONUNBUFFERED`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L693** 源码：<code>      trainer.val_before_train=$VAL_BEFORE_TRAIN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.val_before_train`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L694** 源码：<code>      algorithm.adv_estimator=$ALGORITHM \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.adv_estimator`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L695** 源码：<code>      algorithm.is_get_last_turn=$IS_GET_LAST_TURN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.is_get_last_turn`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L696** 源码：<code>      data.train_files=$TRAIN_FILES \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.train_files`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L697** 源码：<code>      data.val_files=$VALID_FILES \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.val_files`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L698** 源码：<code>      data.return_raw_chat=$RETURN_RAW_CHAT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.return_raw_chat`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L699** 源码：<code>      data.train_batch_size=$TRAIN_BATCH_SIZE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.train_batch_size`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L700** 源码：<code>      data.val_sample_size=$VAL_SAMPLE_SIZE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.val_sample_size`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L701** 源码：<code>      data.max_prompt_length=$MAX_PROMPT_LENGTH \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.max_prompt_length`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L702** 源码：<code>      data.max_response_length=$MAX_RESPONSE_LENGTH \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.max_response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L703** 源码：<code>      data.apply_chat_template=$APPLY_CHAT_TEMPLATE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.apply_chat_template`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L704** 源码：<code>      data.use_prioritized_sampling=$USE_PRIORITIZED_SAMPLING \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.use_prioritized_sampling`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L705** 源码：<code>      data.update_success_rates_every=1 \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.update_success_rates_every`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L706** 源码：<code>      data.prompt_oversampling_factor=$PROMPT_OVERSAMPLING_FACTOR \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.prompt_oversampling_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L707** 源码：<code>      data.sample_oversampling_factor=$SAMPLE_OVERSAMPLING_FACTOR \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.sample_oversampling_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L708** 源码：<code>      data.sample_selection_strategy=$SAMPLE_SELECTION_STRATEGY \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.sample_selection_strategy`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L709** 源码：<code>      data.automatic_oversampling=$AUTOMATIC_OVERSAMPLING \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.automatic_oversampling`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L710** 源码：<code>      data.use_moderate_sampling=$USE_MODERATE_SAMPLING \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.use_moderate_sampling`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L711** 源码：<code>      data.use_refresh_sampling=$USE_REFRESH_SAMPLING \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.use_refresh_sampling`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L712** 源码：<code>      data.solverate_low=$SOLVERATE_LOW \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.solverate_low`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L713** 源码：<code>      data.solverate_high=$SOLVERATE_HIGH \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.solverate_high`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L714** 源码：<code>      data.solverate_mean=$SOLVERATE_MEAN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.solverate_mean`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L715** 源码：<code>      data.solverate_std=$SOLVERATE_STD \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data.solverate_std`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L716** 源码：<code>      trainer.fix_qwen3_chat_template=$FIX_QWEN3_CHAT_TEMPLATE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.fix_qwen3_chat_template`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L717** 源码：<code>      +algorithm.rollout_is_kwargs=$ROLLOUT_IS_KWARGS \</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L718** 源码：<code>      +algorithm.rollout_rs_kwargs=$ROLLOUT_RS_KWARGS \</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L719** 源码：<code>      algorithm.rollout_rs=$ROLLOUT_RS \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.rollout_rs`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L720** 源码：<code>      algorithm.rollout_token_veto_threshold=$ROLLOUT_TOKEN_VETO_THRESHOLD \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.rollout_token_veto_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L721** 源码：<code>      actor_rollout_ref.rollout.multi_turn.enable=$ENABLE_MULTI_TURN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.multi_turn.enable`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L722** 源码：<code>      actor_rollout_ref.rollout.multi_turn.max_user_turns=$MAX_TURN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.multi_turn.max_user_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L723** 源码：<code>      actor_rollout_ref.model.path=$MODEL_PATH_RESOLVED \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.model.path`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L724** 源码：<code>      actor_rollout_ref.actor.optim.lr=$LEARNING_RATE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.optim.lr`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L725** 源码：<code>      actor_rollout_ref.model.use_remove_padding=True \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.model.use_remove_padding`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L726** 源码：<code>      actor_rollout_ref.actor.ppo_mini_batch_size=$PPO_MINI_BATCH_SIZE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.ppo_mini_batch_size`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L727** 源码：<code>      actor_rollout_ref.actor.use_dynamic_bsz=True \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.use_dynamic_bsz`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L728** 源码：<code>      actor_rollout_ref.actor.ppo_max_token_len_per_gpu=$PPO_MICRO_TOKEN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.ppo_max_token_len_per_gpu`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L729** 源码：<code>      actor_rollout_ref.actor.use_kl_loss=$USE_KL_LOSS \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.use_kl_loss`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L730** 源码：<code>      actor_rollout_ref.actor.kl_loss_coef=$KL_LOSS_COEF \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.kl_loss_coef`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L731** 源码：<code>      actor_rollout_ref.actor.kl_loss_type=$KL_LOSS_TYPE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.kl_loss_type`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L732** 源码：<code>      actor_rollout_ref.actor.entropy_coeff=$ENTROPY_COEFFIENT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.entropy_coeff`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L733** 源码：<code>      actor_rollout_ref.actor.clip_ratio_high=$CLIP_RATIO_HIGH \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.clip_ratio_high`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L734** 源码：<code>      actor_rollout_ref.actor.clip_ratio_low=$CLIP_RATIO_LOW \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.clip_ratio_low`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L735** 源码：<code>      actor_rollout_ref.actor.entropy_clip_rate=$ENTROPY_CLIP_RATE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.entropy_clip_rate`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L736** 源码：<code>      actor_rollout_ref.actor.loss_agg_mode=$LOSS_AGG_MODE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.loss_agg_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L737** 源码：<code>      actor_rollout_ref.actor.loss_scale_factor=$LOSS_SCALE_FACTOR \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.loss_scale_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L738** 源码：<code>      actor_rollout_ref.actor.extreme_risk_prob_threshold=$EXTREME_RISK_PROB_THRESHOLD \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.extreme_risk_prob_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L739** 源码：<code>      actor_rollout_ref.actor.grad_clip=$GRAD_CLIP \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.grad_clip`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L740** 源码：<code>      actor_rollout_ref.model.enable_gradient_checkpointing=True \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.model.enable_gradient_checkpointing`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L741** 源码：<code>      actor_rollout_ref.actor.fsdp_config.param_offload=$ACTOR_PARAMETER_OFFLOAD \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.fsdp_config.param_offload`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L742** 源码：<code>      actor_rollout_ref.actor.fsdp_config.optimizer_offload=$ACTOR_OPTIMIZER_OFFLOAD \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.fsdp_config.optimizer_offload`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L743** 源码：<code>      actor_rollout_ref.actor.ulysses_sequence_parallel_size=$SP_SIZE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.actor.ulysses_sequence_parallel_size`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L744** 源码：<code>      actor_rollout_ref.rollout.enforce_eager=$ENFORCE_EAGER \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.enforce_eager`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L745** 源码：<code>      actor_rollout_ref.rollout.free_cache_engine=$FREE_CACHE_ENGINE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.free_cache_engine`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L746** 源码：<code>      actor_rollout_ref.rollout.temperature=$TEMPERATURE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.temperature`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L747** 源码：<code>      actor_rollout_ref.rollout.top_p=$TOP_P \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.top_p`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L748** 源码：<code>      actor_rollout_ref.rollout.top_k=$TOP_K \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.top_k`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L749** 源码：<code>      actor_rollout_ref.rollout.min_p=$MIN_P \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.min_p`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L750** 源码：<code>      actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=$LOG_PROB_MICRO_TOKEN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L751** 源码：<code>      actor_rollout_ref.rollout.tensor_model_parallel_size=$ROLLOUT_TENSOR_MODEL_PARALLEL_SIZE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.tensor_model_parallel_size`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L752** 源码：<code>      actor_rollout_ref.rollout.name=vllm \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.name`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L753** 源码：<code>      actor_rollout_ref.rollout.mode=$ROLLOUT_MODE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.mode`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L754** 源码：<code>      actor_rollout_ref.rollout.gpu_memory_utilization=$ROLLOUT_GPU_MEMORY_UTIL \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.gpu_memory_utilization`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L755** 源码：<code>      actor_rollout_ref.rollout.n=$ROLLOUT_N \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.n`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L756** 源码：<code>      actor_rollout_ref.rollout.val_kwargs.n=$N_VAL \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.val_kwargs.n`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L757** 源码：<code>      actor_rollout_ref.rollout.val_kwargs.do_sample=$VAL_DO_SAMPLE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.val_kwargs.do_sample`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L758** 源码：<code>      actor_rollout_ref.rollout.val_kwargs.temperature=$VAL_TEMPERATURE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.val_kwargs.temperature`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L759** 源码：<code>      actor_rollout_ref.rollout.val_kwargs.top_p=0.95 \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.val_kwargs.top_p`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L760** 源码：<code>      actor_rollout_ref.rollout.val_kwargs.max_user_turns=$VAL_MAX_TURN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.val_kwargs.max_user_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L761** 源码：<code>      actor_rollout_ref.rollout.max_num_batched_tokens=$max_num_batched_tokens \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.max_num_batched_tokens`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L762** 源码：<code>      actor_rollout_ref.rollout.calculate_log_probs=$CALCULATE_LOG_PROBS \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.rollout.calculate_log_probs`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L763** 源码：<code>      actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=$LOG_PROB_MICRO_TOKEN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.ref.log_prob_max_token_len_per_gpu`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L764** 源码：<code>      actor_rollout_ref.ref.fsdp_config.param_offload=True \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.ref.fsdp_config.param_offload`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L765** 源码：<code>      actor_rollout_ref.ref.ulysses_sequence_parallel_size=$SP_SIZE\</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_ref.ref.ulysses_sequence_parallel_size`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L766** 源码：<code>      reward_model.enable=False \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.enable`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L767** 源码：<code>      reward_model.reward_manager=$REWARD_MANAGER \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.reward_manager`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L768** 源码：<code>      reward_model.enhanced=$REWARD_ENHANCED \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.enhanced`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L769** 源码：<code>      reward_model.use_sandbox_rate_limit=$REWARD_USE_SANDBOX_RATE_LIMIT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.use_sandbox_rate_limit`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L770** 源码：<code>      reward_model.server_url=&#x27;&quot;&#x27;$REWARD_SERVER_URL&#x27;&quot;&#x27; \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.server_url`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L771** 源码：<code>      reward_model.rate_limit=$REWARD_RATE_LIMIT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.rate_limit`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L772** 源码：<code>      reward_model.acquire_timeout=$REWARD_ACQUIRE_TIMEOUT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.acquire_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L773** 源码：<code>      reward_model.max_concurrent=$REWARD_MAX_CONCURRENT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.max_concurrent`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L774** 源码：<code>      reward_model.task_timeout=$REWARD_TASK_TIMEOUT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.task_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L775** 源码：<code>      reward_model.task_timeout_in_client=$REWARD_TASK_TIMEOUT_CLIENT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.task_timeout_in_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L776** 源码：<code>      reward_model.max_retries=$REWARD_MAX_RETRIES \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.max_retries`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L777** 源码：<code>      reward_model.task_timeout=$REWARD_TASK_TIMEOUT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.task_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L778** 源码：<code>      reward_model.num_perf_trials=$NUM_PERF_TRIALS \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.num_perf_trials`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L779** 源码：<code>      reward_model.print_status=$REWARD_PRINT_STATUS \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.print_status`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L780** 源码：<code>      reward_model.reward_func_name=$REWARD_FUNC_NAME \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.reward_func_name`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L781** 源码：<code>      reward_model.speedup_reward_upper_bound=$SPEEDUP_REWARD_UPPER_BOUND \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.speedup_reward_upper_bound`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L782** 源码：<code>      reward_model.speedup_reward_lower_bound=$SPEEDUP_REWARD_LOWER_BOUND \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.speedup_reward_lower_bound`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L783** 源码：<code>      reward_model.coverage_reward.reward_type=$COVERAGE_REWARD_TYPE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.coverage_reward.reward_type`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L784** 源码：<code>      reward_model.coverage_reward.weight=$COVERAGE_REWARD_WEIGHT \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.coverage_reward.weight`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L785** 源码：<code>      reward_model.coverage_reward.enable=$COVERAGE_REWARD_ENABLE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.coverage_reward.enable`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L786** 源码：<code>      reward_model.coverage_rs=$COVERAGE_RS \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.coverage_rs`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L787** 源码：<code>      reward_model.coverage_rs_threshold=$COVERAGE_RS_THRESHOLD \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.coverage_rs_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L788** 源码：<code>      reward_model.coverage_rs_factor=$COVERAGE_RS_FACTOR \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.coverage_rs_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L789** 源码：<code>      reward_model.coverage_rs_key=$COVERAGE_RS_KEY \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.coverage_rs_key`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L790** 源码：<code>      reward_model.speedup_threshold=$SPEEDUP_THRESHOLD \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.speedup_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L791** 源码：<code>      reward_model.detect_decoy_kernel=$DETECT_DECOY_KERNEL \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_model.detect_decoy_kernel`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L792** 源码：<code>      algorithm.reward_shaping=$REWARD_SHAPING \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.reward_shaping`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L793** 源码：<code>      algorithm.unbiased_shaping=$UNBIASED_SHAPING \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.unbiased_shaping`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L794** 源码：<code>      algorithm.adv_estimator=${ALGORITHM:-grpo} \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.adv_estimator`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L795** 源码：<code>      algorithm.use_kl_in_reward=$USE_KL_COEF \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.use_kl_in_reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L796** 源码：<code>      algorithm.kl_ctrl.kl_coef=$KL_COEF \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.kl_ctrl.kl_coef`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L797** 源码：<code>      algorithm.batch_std=${BATCH_STD:-False} \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.batch_std`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L798** 源码：<code>      algorithm.adv_by_last_turn=$ADV_BY_LAST_TURN \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.adv_by_last_turn`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L799** 源码：<code>      algorithm.use_final_reward=$USE_FINAL_REWARD \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.use_final_reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L800** 源码：<code>      algorithm.gamma=$GAMMA \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm.gamma`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L801** 源码：<code>      critic.ppo_micro_batch_size_per_gpu=4 \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `critic.ppo_micro_batch_size_per_gpu`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L802** 源码：<code>      trainer.critic_warmup=0 \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.critic_warmup`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L803** 源码：<code>      trainer.logger=[&#x27;console&#x27;,&#x27;wandb&#x27;] \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.logger`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L804** 源码：<code>      trainer.rejection_sample=$REJECTION_SAMPLE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.rejection_sample`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L805** 源码：<code>      trainer.project_name=$PROJECT_NAME \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.project_name`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L806** 源码：<code>      trainer.experiment_name=$RUN_NAME \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.experiment_name`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L807** 源码：<code>      trainer.n_gpus_per_node=$N_GPUS_PER_NODE \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.n_gpus_per_node`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L808** 源码：<code>      trainer.nnodes=$NNODES \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.nnodes`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L809** 源码：<code>      trainer.remove_clip=$REMOVE_CLIP \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.remove_clip`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L810** 源码：<code>      trainer.rollout_data_dir=$ROLLOUT_DATA_DIR \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.rollout_data_dir`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L811** 源码：<code>      trainer.validation_data_dir=$VALIDATION_DATA_DIR \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.validation_data_dir`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L812** 源码：<code>      trainer.log_val_generations=10 \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.log_val_generations`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L813** 源码：<code>      trainer.save_freq=$SAVE_FREQ \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.save_freq`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L814** 源码：<code>      trainer.test_freq=$TEST_FREQ \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.test_freq`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L815** 源码：<code>      trainer.default_local_dir=$CHECKPOINT_DIR \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.default_local_dir`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L816** 源码：<code>      trainer.total_epochs=$TOTAL_EPOCHS \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.total_epochs`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L817** 源码：<code>      trainer.val_only=$VAL_ONLY \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.val_only`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L818** 源码：<code>      trainer.max_skip_steps=$MAX_SKIP_STEPS \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer.max_skip_steps`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L819** 源码：<code>      rejection_sampling.enable_two_gate_filter=$ENABLE_TWO_GATE_FILTER \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rejection_sampling.enable_two_gate_filter`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L820** 源码：<code>      rejection_sampling.gate1.enabled=$GATE1_ENABLED \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rejection_sampling.gate1.enabled`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L821** 源码：<code>      rejection_sampling.gate1.bias_epsilon=$GATE1_BIAS_EPSILON \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rejection_sampling.gate1.bias_epsilon`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L822** 源码：<code>      rejection_sampling.gate2.enabled=$GATE2_ENABLED \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rejection_sampling.gate2.enabled`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L823** 源码：<code>      rejection_sampling.gate2.instability_threshold=$GATE2_INSTABILITY_THRESHOLD \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rejection_sampling.gate2.instability_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L824** 源码：<code>      rejection_sampling.log_rejected_samples=$LOG_REJECTED_SAMPLES \</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rejection_sampling.log_rejected_samples`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L825** 源码：<code>      rejection_sampling.save_rejection_stats=$SAVE_REJECTION_STATS</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rejection_sampling.save_rejection_stats`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L826** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L827** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L828** 源码：<code># Main execution function</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L829** 源码：<code>main() {</code>
+  - 语法与作用：函数/构造器调用语法；调用 `main`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L830** 源码：<code>  parse_arguments &quot;$@&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L831** 源码：<code>  setup_training_environment</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L832** 源码：<code>  run_training</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L833** 源码：<code>}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L834** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L835** 源码：<code># Only show error if this script is executed directly (not sourced)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L836** 源码：<code>if [[ &quot;${BASH_SOURCE[0]}&quot; == &quot;${0}&quot; ]]; then</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L837** 源码：<code>  echo &quot;Error: This script should not be run directly.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L838** 源码：<code>  echo &quot;Please use one of the task-specific scripts (train_grpo_math_tune.sh, train_grpo_swe_tune.sh, etc.)&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L839** 源码：<code>  exit 1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+- **L840** 源码：<code>fi</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件先被 source；第 18–228 行等顶层语句立即执行，函数定义行创建函数，函数体在最后的 `main` 中按调用顺序执行。
+
+
+
+---
+
+**导航**：[第三部分](../03-rollout-reward-training.md) · [附录目录](index.md) · [下一附录](02-python-entry.md)

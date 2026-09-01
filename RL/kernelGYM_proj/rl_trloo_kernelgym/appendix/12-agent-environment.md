@@ -1,0 +1,2239 @@
+# Agent 与 environment：KernelAgent、环境工厂与 CodeSandboxEnv
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+### 18.1 `KernelAgent`
+源码：`drkernel/kernel/workers/agent/kernel_agent.py`；逐行范围 1–86，状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。。
+
+- **L1** <code>import re</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L2** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L3** <code>from verl_patch.workers.code.agent.base_agent import BaseAgent</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L4** <code>from verl_patch.workers.code.agent_env.base_env import FinishReasonTypeEnum</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L5** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L6** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L7** <code>class KernelAgent(BaseAgent):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L8** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L9** <code>    Agent that supports multi-turn code generation, capable of handling code execution, self-test, and final answer extraction</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L10** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L11** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L12** <code>    def __init__(self, tokenizer) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L13** <code>        super().__init__(tokenizer)</code>
+  - 语法与作用：函数/方法调用；调用 `super` 并使用返回值或副作用。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L14** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L15** <code>        self.answer_block_re = re.compile(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.answer_block_re`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L16** <code>            r&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L17** <code>            (?P&lt;block&gt;</code>
+  - 语法与作用：函数/方法调用；调用 `` 并使用返回值或副作用。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L18** <code>                ```answer[ \t]*(?:\r?\n)?         # Opening fence: ```answer</code>
+  - 语法与作用：函数/方法调用；调用 ````answer[ \t]*` 并使用返回值或副作用。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L19** <code>                (?P&lt;code&gt;.*?)                     # Answer content</code>
+  - 语法与作用：函数/方法调用；调用 `` 并使用返回值或副作用。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L20** <code>                (?:\r?\n)?```                     # Closing fence</code>
+  - 语法与作用：函数/方法调用；调用 `` 并使用返回值或副作用。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L21** <code>            )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L22** <code>            &quot;&quot;&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L23** <code>            re.IGNORECASE | re.DOTALL | re.VERBOSE,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L24** <code>        )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L25** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L26** <code>        # Patterns borrowed from kernel/rewards/kernel_reward.py::extract_kernel_code</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L27** <code>        kernel_markers = [</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `kernel_markers`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L28** <code>            r&quot;#\s*Kernel\s+Implementation\s*\n(.*?)(?=\#\s*End\b|$)&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `r"#\s*Kernel\s+Implementation\s*\n(.*?)(?`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L29** <code>            r&quot;```python\s*#\s*Kernel\s*\n(.*?)```&quot;,</code>
+  - 语法与作用：函数/方法调用；调用 `r"```python\s*#\s*Kernel\s*\n` 并使用返回值或副作用。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L30** <code>            r&quot;#\s*Your\s+implementation:\s*\n(.*?)(?=\#\s*End\b|$)&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `r"#\s*Your\s+implementation:\s*\n(.*?)(?`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L31** <code>            r&quot;#\s*Generated\s+kernel:\s*\n(.*?)(?=\#\s*End\b|$)&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `r"#\s*Generated\s+kernel:\s*\n(.*?)(?`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L32** <code>        ]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L33** <code>        self.kernel_code_patterns = [re.compile(pattern, re.IGNORECASE | re.DOTALL) for pattern in kernel_markers]</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.kernel_code_patterns`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L34** <code>        self.generic_code_block_re = re.compile(r&quot;```(?:[\w+-]+)?\s*\n?(.*?)```&quot;, re.DOTALL)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.generic_code_block_re`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L35** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L36** <code>    async def generate_thought_and_action(</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L37** <code>        self, response_token_ids: list[int], response_truncation: str</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L38** <code>    ) -&gt; tuple[str | None, str | None, bool | None, dict]:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L39** <code>        # remove padding token ids</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L40** <code>        response_token_ids = [id for id in response_token_ids if id != self.tokenizer.pad_token_id]</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `response_token_ids`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L41** <code>        # translate result_token_id back to string</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L42** <code>        response = self.tokenizer.decode(response_token_ids, skip_special_tokens=True)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `response`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L43** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L44** <code>        if response is None:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L45** <code>            return None, None, None, True, {}</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L46** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L47** <code>        # Always treat any extracted block as final answer; otherwise no tool call</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L48** <code>        answer_block = self._extract_answer_block(response)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `answer_block`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L49** <code>        if answer_block is not None:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L50** <code>            return response, response_token_ids, answer_block, True, {</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L51** <code>                &#x27;finish_type&#x27;: FinishReasonTypeEnum.ANSWER</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L52** <code>            }</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L53** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L54** <code>        python_code = self._extract_python_code(response)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `python_code`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L55** <code>        if python_code is not None:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L56** <code>            if python_code.strip().startswith(&quot;```&quot;):</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L57** <code>                code_block = python_code.strip()</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `code_block`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L58** <code>            else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L59** <code>                code_block = f&quot;```python\n{python_code.strip()}\n```&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `code_block`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L60** <code>            return response, response_token_ids, code_block, True, {</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L61** <code>                &#x27;finish_type&#x27;: FinishReasonTypeEnum.ANSWER</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L62** <code>            }</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L63** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L64** <code>        return response, response_token_ids, None, True, {</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L65** <code>            &#x27;finish_type&#x27;: FinishReasonTypeEnum.NO_TOOL_CALL</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L66** <code>        }</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L67** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L68** <code>    def _extract_answer_block(self, response: str) -&gt; str | None:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L69** <code>        match = self.answer_block_re.search(response)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `match`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L70** <code>        if match:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L71** <code>            return match.group(&quot;block&quot;)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L72** <code>        return None</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L73** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L74** <code>    def _extract_python_code(self, response: str) -&gt; str | None:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L75** <code>        for pattern in self.kernel_code_patterns:</code>
+  - 语法与作用：循环；遍历对象或在条件为真时重复执行缩进块。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L76** <code>            match = pattern.search(response)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `match`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L77** <code>            if match:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L78** <code>                return match.group(1).strip()</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L79** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L80** <code>        code_blocks = self.generic_code_block_re.findall(response)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `code_blocks`。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L81** <code>        if code_blocks:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L82** <code>            # Return the last discovered block, similar to kernel_reward.extract_kernel_code</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L83** <code>            return code_blocks[-1].strip()</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L84** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+- **L85** <code>        return None</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 async rollout 会创建并调用 `generate_thought_and_action`；抽取方法由该调用进入。
+
+### 18.2 `BaseAgent`
+源码：`drkernel/verl_patch/workers/code/agent/base_agent.py`；逐行范围 1–132，状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。。
+
+- **L1** <code>import logging</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L2** <code>from bisect import bisect_left</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L3** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L4** <code>import torch</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L5** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L6** <code>logger = logging.getLogger(__file__)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `logger`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L7** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L8** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L9** <code>class BaseAgent:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L10** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L11** <code>    def __init__(self, tokenizer):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L12** <code>        self.tokenizer = tokenizer</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.tokenizer`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L13** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L14** <code>    def reset(self):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L15** <code>        &quot;&quot;&quot;Reset the agent.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L16** <code>        pass</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L17** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L18** <code>    def finalize(self, req, turn_rewards, finish_reason_type: str):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L19** <code>        &quot;&quot;&quot;Finalize the agent.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L20** <code>        return req.finalize(turn_rewards, finish_reason_type)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L21** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L22** <code>    def _truncate_to_prefix_ids(self, response_ids: list[int], target_str: str) -&gt; torch.Tensor:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L23** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L24** <code>        Truncate the response to a target string prefix</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L25** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L26** <code>        Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L27** <code>            response_ids: LongTensor of shape (L,) with padding</code>
+  - 语法与作用：函数/方法调用；调用 `response_ids: LongTensor of shape` 并使用返回值或副作用。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L28** <code>            target_str: Target prefix string that is guaranteed to be a prefix</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L29** <code>                of the decoded full response string.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L30** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L31** <code>        Example:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L32** <code>            response_ids = tensor(tokenizer.tokenize(&quot;It is a good day&quot;))</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `response_ids`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L33** <code>            target_str = &quot;It is a&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `target_str`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L34** <code>            truncated_ids = truncate_to_prefix_ids(response_ids, target_str)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `truncated_ids`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L35** <code>            # truncated_ids will be:</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L36** <code>            # tensor(tokenizer.tokenize(&quot;It is a&quot;))</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L37** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L38** <code>        Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L39** <code>            truncated_ids: LongTensor of shape (Lcut,) containing the truncated</code>
+  - 语法与作用：函数/方法调用；调用 `truncated_ids: LongTensor of shape` 并使用返回值或副作用。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L40** <code>                token IDs without padding.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L41** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L42** <code>        tokenizer = self.tokenizer</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tokenizer`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L43** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L44** <code>        # The target str must match the prefix of the decoded response</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L45** <code>        decoded_response = tokenizer.decode(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `decoded_response`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L46** <code>            response_ids,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L47** <code>            skip_special_tokens=True,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `skip_special_tokens`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L48** <code>            clean_up_tokenization_spaces=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `clean_up_tokenization_spaces`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L49** <code>        )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L50** <code>        assert decoded_response.startswith(</code>
+  - 语法与作用：assert；检查不变量，失败时抛出 AssertionError。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L51** <code>            target_str</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L52** <code>        ), f&quot;Target string &#x27;{target_str}&#x27; is not a prefix of decoded response &#x27;{decoded_response}&#x27;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L53** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L54** <code>        # Remove padding tokens from response_ids if any</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L55** <code>        processed_response_ids = []</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `processed_response_ids`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L56** <code>        for id in response_ids:</code>
+  - 语法与作用：循环；遍历对象或在条件为真时重复执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L57** <code>            if id != tokenizer.pad_token_id:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L58** <code>                processed_response_ids.append(id)</code>
+  - 语法与作用：函数/方法调用；调用 `processed_response_ids.append` 并使用返回值或副作用。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L59** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L60** <code>        if len(processed_response_ids) != len(response_ids):</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L61** <code>            print(</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L62** <code>                f&quot;WARNING: Removed {len(response_ids) - len(processed_response_ids)} padding tokens from response_ids.&quot;</code>
+  - 语法与作用：函数/方法调用；调用 `f"WARNING: Removed {len` 并使用返回值或副作用。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L63** <code>            )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L64** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L65** <code>        # Find the smallest truncation idx such that decode(response_ids[:idx]) == target_str</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L66** <code>        # Use binary search with a tiny linear fallback if there is no exact matching during search</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L67** <code>        n = len(processed_response_ids)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `n`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L68** <code>        if n == 0:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L69** <code>            logger.warning(&quot;Response IDs are empty after truncation. Returning original response_ids.&quot;)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L70** <code>            idx = 0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `idx`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L71** <code>        else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L72** <code>            # Binary search over token prefix length</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L73** <code>            left, right = 1, n</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `left, right`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L74** <code>            best = None</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `best`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L75** <code>            while left &lt;= right:</code>
+  - 语法与作用：循环；遍历对象或在条件为真时重复执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L76** <code>                mid = (left + right) // 2</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `mid`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L77** <code>                dec = tokenizer.decode(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `dec`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L78** <code>                    processed_response_ids[:mid],</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L79** <code>                    skip_special_tokens=True,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `skip_special_tokens`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L80** <code>                    clean_up_tokenization_spaces=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `clean_up_tokenization_spaces`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L81** <code>                )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L82** <code>                if dec == target_str:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L83** <code>                    best = mid  # try to minimize further</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `best`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L84** <code>                    right = mid - 1</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `right`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L85** <code>                elif target_str.startswith(dec):</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L86** <code>                    left = mid + 1  # need more tokens to cover target</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `left`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L87** <code>                else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L88** <code>                    right = mid - 1  # decoded has diverged, reduce</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `right`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L89** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L90** <code>            if best is not None:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L91** <code>                idx = best</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `idx`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L92** <code>            else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L93** <code>                # Fallback (very short linear probe) to be extra safe against odd spacing cases</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L94** <code>                idx = 0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `idx`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L95** <code>                for k in range(1, n + 1):</code>
+  - 语法与作用：循环；遍历对象或在条件为真时重复执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L96** <code>                    dec = tokenizer.decode(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `dec`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L97** <code>                        processed_response_ids[:k],</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L98** <code>                        skip_special_tokens=True,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `skip_special_tokens`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L99** <code>                        clean_up_tokenization_spaces=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `clean_up_tokenization_spaces`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L100** <code>                    )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L101** <code>                    if dec == target_str or dec.startswith(target_str):</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L102** <code>                        idx = k</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `idx`。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L103** <code>                        break</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L104** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L105** <code>                # If still no match found, log warning and return original</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L106** <code>                if idx == 0:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L107** <code>                    logger.warning(</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L108** <code>                        f&quot;Could not find truncation point for target string &#x27;{target_str}&#x27; in response. Returning original response_ids.&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L109** <code>                    )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L110** <code>                    return processed_response_ids</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L111** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L112** <code>        # Return truncated tensor without padding</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L113** <code>        if idx &gt; 0:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L114** <code>            return processed_response_ids[:idx]</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L115** <code>        else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L116** <code>            # return the original if idx is 0</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L117** <code>            return response_ids</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L118** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L119** <code>    async def generate_thought_and_action(</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L120** <code>        self, response_token_ids: list[int], response_truncation: str</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L121** <code>    ) -&gt; tuple[str | None, str | None, bool | None, dict]:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L122** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L123** <code>        Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L124** <code>            response_token_ids: list[int], the response token ids from the inference engine</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L125** <code>            response_truncation: str, the response truncation regex patterns to use</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L126** <code>        Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L127** <code>            str, the preceding text, i.e., the reasoning</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L128** <code>            str, the tool call, i.e., the action</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L129** <code>            bool, whether the task is done</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L130** <code>            dict, additional info</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L131** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+- **L132** <code>        raise NotImplementedError</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：当前 `KernelAgent.__init__` 调用父类初始化，`finalize` 在每条轨迹结束时调用；通用截断和抽象方法按条件/未执行状态标记。
+
+### 18.3 环境工厂
+源码：`drkernel/verl_patch/workers/code/agent_env/__init__.py`；逐行范围 1–100，状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。。
+
+- **L1** <code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L2** <code>Agent environment module with base classes and implementations.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L3** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L4** <code>This module ensures that all exec_tool_call methods in environments</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L5** <code>inheriting from BaseEnv are decorated with with_timeout_and_retry.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L6** <code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L7** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L8** <code>import functools</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L9** <code>import inspect</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L10** <code>from typing import get_type_hints</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L11** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L12** <code>from .base_env import BaseEnv, FinishReasonTypeEnum, with_timeout_and_retry</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L13** <code>from .code_sandbox_env import CodeSandboxEnv</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L14** <code>from .file_search_env import FileSearchEnv</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L15** <code>from .local_search_env import LocalSearchEnv</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L16** <code>from .math_sandbox_env import MathSandboxEnv</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L17** <code>from .swe_file_location_env import SWEFileLocationEnv</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L18** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L19** <code># Export all environment classes</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L20** <code>__all__ = [</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `__all__`。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L21** <code>    &quot;BaseEnv&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L22** <code>    &quot;MathSandboxEnv&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L23** <code>    &quot;CodeSandboxEnv&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L24** <code>    &quot;LocalSearchEnv&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L25** <code>    &quot;FileSearchEnv&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L26** <code>    &quot;SWEFileLocationEnv&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L27** <code>    &quot;with_timeout_and_retry&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L28** <code>    &quot;FinishReasonTypeEnum&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L29** <code>    &quot;create_environment&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L30** <code>]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L31** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L32** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L33** <code>def create_environment(env_type: str, max_turns: int, extra_info: dict = None) -&gt; BaseEnv:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L34** <code>    &quot;&quot;&quot;Factory function to create environment instances based on configuration.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L35** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L36** <code>    Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L37** <code>        env_type: Type of environment to create (e.g., &#x27;MathSandboxEnv&#x27;, &#x27;CodeSandboxEnv&#x27;)</code>
+  - 语法与作用：函数/方法调用；调用 `env_type: Type of environment to create` 并使用返回值或副作用。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L38** <code>        max_turns: Maximum number of turns for the environment</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L39** <code>        extra_info: Extra information from dataset (e.g., prompt-dependent import code)</code>
+  - 语法与作用：函数/方法调用；调用 `extra_info: Extra information from dataset` 并使用返回值或副作用。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L40** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L41** <code>    Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L42** <code>        BaseEnv instance</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L43** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L44** <code>    Raises:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L45** <code>        ValueError: If env_type is not supported</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L46** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L47** <code>    env_map = {</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `env_map`。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L48** <code>        &#x27;MathSandboxEnv&#x27;: MathSandboxEnv,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L49** <code>        &#x27;CodeSandboxEnv&#x27;: CodeSandboxEnv,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L50** <code>        &#x27;LocalSearchEnv&#x27;: LocalSearchEnv,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L51** <code>        &#x27;FileSearchEnv&#x27;: FileSearchEnv,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L52** <code>        &#x27;SWEFileLocationEnv&#x27;: SWEFileLocationEnv,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L53** <code>    }</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L54** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L55** <code>    if env_type not in env_map:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L56** <code>        raise ValueError(f&quot;Unsupported environment type: {env_type}. Supported types: {list(env_map.keys())}&quot;)</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L57** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L58** <code>    return env_map[env_type](max_turns=max_turns, extra_info=extra_info)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L59** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L60** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L61** <code>def _check_exec_tool_call_decorator(cls):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L62** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L63** <code>    Check if a class&#x27;s exec_tool_call method is decorated with with_timeout_and_retry.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L64** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L65** <code>    This function verifies that any override of exec_tool_call in a BaseEnv subclass</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L66** <code>    has the required timeout and retry decorator applied.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L67** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L68** <code>    if not issubclass(cls, BaseEnv):</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L69** <code>        return</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L70** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L71** <code>    # Skip BaseEnv itself</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L72** <code>    if cls is BaseEnv:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L73** <code>        return</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L74** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L75** <code>    # Check if the class overrides exec_tool_call</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L76** <code>    if &#x27;exec_tool_call&#x27; in cls.__dict__:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L77** <code>        method = cls.__dict__[&#x27;exec_tool_call&#x27;]</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `method`。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L78** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L79** <code>        # Check if the method is decorated by looking at its wrapper attributes</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L80** <code>        # The with_timeout_and_retry decorator adds retry and timeout functionality</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L81** <code>        if not (</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L82** <code>            hasattr(method, &#x27;__wrapped__&#x27;)</code>
+  - 语法与作用：函数/方法调用；调用 `hasattr` 并使用返回值或副作用。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L83** <code>            or (hasattr(method, &#x27;__name__&#x27;) and &#x27;wrapper&#x27; in str(method))</code>
+  - 语法与作用：函数/方法调用；调用 `or` 并使用返回值或副作用。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L84** <code>            or (hasattr(method, &#x27;__code__&#x27;) and method.__code__.co_name == &#x27;wrapper&#x27;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `or (hasattr(method, '__code__') and method.__code__.co_name`。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L85** <code>        ):</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L86** <code>            raise AssertionError(</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L87** <code>                f&quot;{cls.__name__}.exec_tool_call must be decorated with @with_timeout_and_retry. &quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L88** <code>                f&quot;Add the decorator like this:\n&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L89** <code>                f&quot;@with_timeout_and_retry(timeout_seconds=30.0, max_attempts=3)\n&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `f"@with_timeout_and_retry(timeout_seconds`。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L90** <code>                f&quot;async def exec_tool_call(self, action: str) -&gt; tuple[str, float, bool, dict]:\n&quot;</code>
+  - 语法与作用：函数/方法调用；调用 `f"async def exec_tool_call` 并使用返回值或副作用。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L91** <code>                f&quot;    ...&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L92** <code>            )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L93** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L94** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L95** <code># Perform runtime checks on all imported environment classes</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L96** <code>for name in __all__:</code>
+  - 语法与作用：循环；遍历对象或在条件为真时重复执行缩进块。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L97** <code>    obj = globals().get(name)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `obj`。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L98** <code>    if obj and inspect.isclass(obj) and issubclass(obj, BaseEnv):</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+- **L99** <code>        _check_exec_tool_call_decorator(obj)</code>
+  - 语法与作用：函数/方法调用；调用 `_check_exec_tool_call_decorator` 并使用返回值或副作用。
+  - 执行状态：当前 `_async_agent_loop` 调用工厂；但 `env_type=KernelEnv` 在当前配置下不属于工厂映射，实际 Kernel reward 由 reward_fn 直接完成。
+
+### 18.4 环境基类
+源码：`drkernel/verl_patch/workers/code/agent_env/base_env.py`；逐行范围 1–280，状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。。
+
+- **L1** <code>import asyncio</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L2** <code>import functools</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L3** <code>import logging</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L4** <code>import random</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L5** <code>import time</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L6** <code>from enum import Enum</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L7** <code>from functools import wraps</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L8** <code>from typing import Any, Callable, Coroutine, Dict, List, Optional, Tuple, TypeVar, cast</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L9** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L10** <code>import ray</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L11** <code>from tenacity import retry, stop_after_attempt, wait_fixed, wait_random</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L12** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L13** <code>from verl_patch.workers.code.reward_manager.reward_cache import (</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L14** <code>    DistributedCacheWrapper,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L15** <code>    DistributedRewardCache,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L16** <code>)</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L17** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L18** <code># Type variable for return type annotations</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L19** <code>T = TypeVar(&#x27;T&#x27;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `T`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L20** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L21** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L22** <code>def on_retry_error(retry_state):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L23** <code>    &quot;&quot;&quot;Callback function for when all retries are exhausted&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L24** <code>    e = retry_state.outcome.exception()</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `e`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L25** <code>    logging.error(f&#x27;Give up retrying after {retry_state.attempt_number} attempts. Error: {e}&#x27;)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L26** <code>    raise e</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L27** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L28** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L29** <code>def before_retry_sleep(retry_state):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L30** <code>    &quot;&quot;&quot;Callback function before each retry sleep&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L31** <code>    msg = f&#x27;Function call error for {retry_state.attempt_number} time(s), will retry... Error: {retry_state.outcome.exception()}&#x27;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `msg`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L32** <code>    if retry_state.attempt_number &gt; 2:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L33** <code>        logging.warning(msg)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L34** <code>    else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L35** <code>        logging.debug(msg)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L36** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L37** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L38** <code>def configurable_retry(max_attempts: int = 3, timeout_seconds: int = 20):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L39** <code>    &quot;&quot;&quot;Decorator to add retry logic with constant wait to async/sync functions</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L40** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L41** <code>    Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L42** <code>        max_attempts: Maximum number of attempts before giving up</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L43** <code>        timeout_seconds: Timeout in seconds, used to calculate wait time and jitter</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L44** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L45** <code>    Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L46** <code>        Decorated function with retry logic</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L47** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L48** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L49** <code>    def decorator(func):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L50** <code>        # Calculate wait time and jitter based on timeout_seconds</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L51** <code>        # Use a percentage of timeout_seconds for wait time (e.g., 10-20%)</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L52** <code>        wait_time = min(10, timeout_seconds * 0.25)  # 25% of timeout, max 10 seconds</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `wait_time`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L53** <code>        jitter_time = min(10, timeout_seconds * 0.75)  # 75% of wait time as jitter, max 10 seconds</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `jitter_time`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L54** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L55** <code>        @wraps(func)</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L56** <code>        @retry(</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L57** <code>            wait=wait_fixed(wait_time) + wait_random(0, jitter_time),</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `wait`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L58** <code>            stop=stop_after_attempt(max_attempts),</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `stop`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L59** <code>            before_sleep=before_retry_sleep,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `before_sleep`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L60** <code>            retry_error_callback=on_retry_error,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `retry_error_callback`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L61** <code>        )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L62** <code>        async def async_wrapper(*args, **kwargs):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L63** <code>            return await func(*args, **kwargs)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L64** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L65** <code>        @wraps(func)</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L66** <code>        @retry(</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L67** <code>            wait=wait_fixed(wait_time) + wait_random(0, jitter_time),</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `wait`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L68** <code>            stop=stop_after_attempt(max_attempts),</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `stop`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L69** <code>            before_sleep=before_retry_sleep,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `before_sleep`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L70** <code>            retry_error_callback=on_retry_error,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `retry_error_callback`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L71** <code>        )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L72** <code>        def sync_wrapper(*args, **kwargs):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L73** <code>            return func(*args, **kwargs)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L74** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L75** <code>        return async_wrapper if asyncio.iscoroutinefunction(func) else sync_wrapper</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L76** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L77** <code>    return decorator</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L78** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L79** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L80** <code>def with_timeout(timeout_seconds: float):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L81** <code>    &quot;&quot;&quot;Decorator to add timeout to async functions</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L82** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L83** <code>    Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L84** <code>        timeout_seconds: Timeout in seconds</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L85** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L86** <code>    Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L87** <code>        Decorated function with timeout</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L88** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L89** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L90** <code>    def decorator(func):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L91** <code>        @wraps(func)</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L92** <code>        async def wrapper(*args, **kwargs):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L93** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L94** <code>                return await asyncio.wait_for(func(*args, **kwargs), timeout=timeout_seconds)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L95** <code>            except asyncio.TimeoutError:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L96** <code>                raise</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L97** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L98** <code>        if asyncio.iscoroutinefunction(func):</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L99** <code>            return wrapper</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L100** <code>        else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L101** <code>            raise ValueError(&quot;with_timeout decorator can only be used with async functions&quot;)</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L102** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L103** <code>    return decorator</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L104** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L105** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L106** <code>def with_timeout_and_retry(timeout_seconds: float = 30.0, max_attempts: int = 3):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L107** <code>    &quot;&quot;&quot;Decorator combining both timeout and retry logic</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L108** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L109** <code>    Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L110** <code>        timeout_seconds: Timeout in seconds for each attempt</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L111** <code>        max_attempts: Maximum number of retry attempts</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L112** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L113** <code>    Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L114** <code>        Decorated function with both timeout and retry</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L115** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L116** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L117** <code>    def decorator(func):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L118** <code>        @configurable_retry(max_attempts, timeout_seconds)</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L119** <code>        @with_timeout(timeout_seconds)</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L120** <code>        @wraps(func)</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L121** <code>        async def wrapper(*args, **kwargs):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L122** <code>            return await func(*args, **kwargs)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L123** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L124** <code>        if asyncio.iscoroutinefunction(func):</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L125** <code>            return wrapper</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L126** <code>        else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L127** <code>            raise ValueError(&quot;with_timeout_and_retry decorator can only be used with async functions&quot;)</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L128** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L129** <code>    return decorator</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L130** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L131** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L132** <code>def get_env_reward_cache(max_retries: int = 5) -&gt; DistributedCacheWrapper:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L133** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L134** <code>    使用重试机制处理并发创建</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L135** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L136** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L137** <code>    for attempt in range(max_retries):</code>
+  - 语法与作用：循环；遍历对象或在条件为真时重复执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L138** <code>        try:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L139** <code>            # 尝试获取现有 actor</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L140** <code>            actor = ray.get_actor(&quot;env_reward_cache&quot;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `actor`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L141** <code>            logging.info(&quot;Connected to existing reward cache actor&quot;)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L142** <code>            return DistributedCacheWrapper(actor)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L143** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L144** <code>        except ValueError:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L145** <code>            # Actor 不存在，尝试创建</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L146** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L147** <code>                logging.info(f&quot;Creating reward cache actor (attempt {attempt + 1})&quot;)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L148** <code>                actor = DistributedRewardCache.options(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `actor`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L149** <code>                    name=&quot;env_reward_cache&quot;, lifetime=&quot;detached&quot;, max_restarts=3</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `name`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L150** <code>                ).remote(name=&quot;env_reward_cache&quot;, max_size=512 * 128, persist_threshold=3)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `).remote(name`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L151** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L152** <code>                logging.info(&quot;Successfully created reward cache actor&quot;)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L153** <code>                return DistributedCacheWrapper(actor)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L154** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L155** <code>            except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L156** <code>                error_msg = str(e).lower()</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `error_msg`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L157** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L158** <code>                if &quot;already exists&quot; in error_msg or &quot;name is already taken&quot; in error_msg:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L159** <code>                    # 另一个进程已经创建，下次循环会获取到</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L160** <code>                    logging.info(&quot;Actor created by another process, will retry getting it&quot;)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L161** <code>                    # 随机延迟避免所有进程同时重试</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L162** <code>                    time.sleep(random.uniform(0.01, 0.1))</code>
+  - 语法与作用：函数/方法调用；调用 `time.sleep` 并使用返回值或副作用。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L163** <code>                    continue</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L164** <code>                else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L165** <code>                    # 其他错误</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L166** <code>                    logging.error(f&quot;Failed to create actor: {e}&quot;)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L167** <code>                    if attempt == max_retries - 1:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L168** <code>                        raise</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L169** <code>                    time.sleep(random.uniform(0.1, 0.5))</code>
+  - 语法与作用：函数/方法调用；调用 `time.sleep` 并使用返回值或副作用。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L170** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L171** <code>    raise RuntimeError(f&quot;Failed to get reward cache after {max_retries} attempts&quot;)</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L172** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L173** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L174** <code>class BaseEnv:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L175** <code>    def __init__(self, max_turns: int = 2):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L176** <code>        self.max_turns = max_turns</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.max_turns`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L177** <code>        self.num_turns = 0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.num_turns`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L178** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L179** <code>        # Initialize distributed cache using global actor pattern</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L180** <code>        self.cache = get_env_reward_cache()</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.cache`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L181** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L182** <code>    async def reset(self, extra_info: dict | None = None) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L183** <code>        self.num_turns = 0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.num_turns`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L184** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L185** <code>    async def step(self, action: str | None) -&gt; tuple[str | None, bool, bool, float, dict]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L186** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L187** <code>        Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L188** <code>            action: str, the action from the agent</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L189** <code>        Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L190** <code>            str, the tool response</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L191** <code>            bool, whether the episode is done</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L192** <code>            bool, whether the episode is truncated</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L193** <code>            float, the reward of the current step</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L194** <code>            dict, additional info</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L195** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L196** <code>        self.num_turns += 1</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.num_turns +`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L197** <code>        done, truncate, reward = False, False, 0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done, truncate, reward`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L198** <code>        tool_response, tool_info = None, {}</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_response, tool_info`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L199** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L200** <code>        if action is None:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L201** <code>            done = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L202** <code>            tool_info[&quot;finish_type&quot;] = FinishReasonTypeEnum.NO_TOOL_CALL</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["finish_type"]`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L203** <code>        else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L204** <code>            # execute tool call and obtain relative information</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L205** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L206** <code>                exec_result = await self.exec_tool_call(action)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `exec_result`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L207** <code>                tool_response, reward, done, tool_info = exec_result</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_response, reward, done, tool_info`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L208** <code>            except asyncio.TimeoutError:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L209** <code>                # Handle timeout case</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L210** <code>                tool_response = &quot;Execution timed out.&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_response`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L211** <code>                reward = 0.0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `reward`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L212** <code>                done = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L213** <code>                tool_info[&quot;finish_type&quot;] = FinishReasonTypeEnum.ERROR</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["finish_type"]`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L214** <code>                tool_info[&quot;error_type&quot;] = &quot;timeout&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["error_type"]`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L215** <code>                tool_info[&quot;error_message&quot;] = &quot;Operation timed out after exhausting all retry attempts&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["error_message"]`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L216** <code>            except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L217** <code>                # Handle other exceptions that might occur during execution</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L218** <code>                tool_response = f&quot;Execution failed with error: {str(e)}&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_response`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L219** <code>                reward = 0.0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `reward`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L220** <code>                done = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L221** <code>                tool_info[&quot;finish_type&quot;] = FinishReasonTypeEnum.ERROR</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["finish_type"]`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L222** <code>                tool_info[&quot;error_type&quot;] = &quot;execution_error&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["error_type"]`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L223** <code>                tool_info[&quot;error_message&quot;] = str(e)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["error_message"]`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L224** <code>            else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L225** <code>                if self.num_turns &gt;= self.max_turns:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L226** <code>                    done = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L227** <code>                    truncate = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `truncate`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L228** <code>                    tool_info[&quot;finish_type&quot;] = FinishReasonTypeEnum.MAX_TOOL_CALL</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["finish_type"]`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L229** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L230** <code>        if tool_response is None or tool_response.strip() == &quot;&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L231** <code>            tool_response = &quot;The tool did not return any response.&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_response`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L232** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L233** <code>        return tool_response, done, truncate, reward, tool_info</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L234** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L235** <code>    async def exec_tool_call(self, action: str) -&gt; tuple[str, float, bool, dict]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L236** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L237** <code>        Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L238** <code>            action: str, the action from the agent</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L239** <code>        Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L240** <code>            str, the tool response</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L241** <code>            float, the reward of the current step</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L242** <code>            bool, whether the episode is done</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L243** <code>            dict, additional info</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L244** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L245** <code>        raise NotImplementedError(&quot;exec_tool_call must be implemented&quot;)</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L246** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L247** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L248** <code>class FinishReasonTypeEnum(str, Enum):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L249** <code>    &quot;&quot;&quot;The enum for finish reason type.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L250** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L251** <code>    LENGTH = &quot;length&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `LENGTH`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L252** <code>    STOP = &quot;stop&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `STOP`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L253** <code>    TOOL_CALL = &quot;tool_calls&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `TOOL_CALL`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L254** <code>    NO_TOOL_CALL = &quot;no_tool_call&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `NO_TOOL_CALL`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L255** <code>    ANSWER = &quot;answer&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `ANSWER`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L256** <code>    MAX_TOOL_CALL = &quot;max_tool_call&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `MAX_TOOL_CALL`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L257** <code>    ERROR = &quot;error&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `ERROR`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L258** <code>    ASYNC_TIMEOUT = &quot;async_timeout&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `ASYNC_TIMEOUT`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L259** <code>    SKIPPED = &quot;skipped&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `SKIPPED`。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L260** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L261** <code>    @classmethod</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L262** <code>    def from_str(cls, value: str) -&gt; &quot;FinishReasonTypeEnum&quot;:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L263** <code>        if value == &quot;stop&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L264** <code>            return cls.STOP</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L265** <code>        elif value == &quot;length&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L266** <code>            return cls.LENGTH</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L267** <code>        elif value == &quot;tool_calls&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L268** <code>            return cls.TOOL_CALL</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L269** <code>        elif value == &quot;no_tool_call&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L270** <code>            return cls.NO_TOOL_CALL</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L271** <code>        elif value == &quot;answer&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L272** <code>            return cls.ANSWER</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L273** <code>        elif value == &quot;max_tool_call&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L274** <code>            return cls.MAX_TOOL_CALL</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L275** <code>        elif value == &quot;async_timeout&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L276** <code>            return cls.ASYNC_TIMEOUT</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L277** <code>        elif value == &quot;error&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L278** <code>            return cls.ERROR</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L279** <code>        else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+- **L280** <code>            raise ValueError(f&quot;Unsupported finish reason type: {value}&quot;)</code>
+  - 语法与作用：raise；抛出/重抛异常，结束当前正常控制流。
+  - 执行状态：`BaseEnv` 会被配置环境继承；当前 KernelEnv 路径只调用 `reset`，通用 `step`/`exec_tool_call` 未经过。
+
+### 18.5 `CodeSandboxEnv` 配置环境
+源码：`drkernel/verl_patch/workers/code/agent_env/code_sandbox_env.py`；逐行范围 1–140，状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。。
+
+- **L1** <code>import asyncio</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L2** <code>import os</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L3** <code>import re</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L4** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L5** <code>from sandbox_fusion import CommandRunStatus, RunStatus</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L6** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L7** <code>from verl_patch.utils.tools.sandbox_fusion import (</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L8** <code>    execute_single_task,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L9** <code>    parse_sandbox_output,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L10** <code>)</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L11** <code>from verl_patch.workers.code.agent_env.base_env import (</code>
+  - 语法与作用：导入语句；加载依赖并创建当前模块中的名称绑定。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L12** <code>    BaseEnv,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L13** <code>    FinishReasonTypeEnum,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L14** <code>    with_timeout_and_retry,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L15** <code>)</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L16** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L17** <code># 从环境变量获取超时配置</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L18** <code>SANDBOX_RUN_TIMEOUT = int(os.getenv(&quot;SANDBOX_RUN_TIMEOUT&quot;, 5))</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `SANDBOX_RUN_TIMEOUT`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L19** <code>SANDBOX_CLIENT_TIMEOUT = int(os.getenv(&quot;SANDBOX_CLIENT_TIMEOUT&quot;, 30))</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `SANDBOX_CLIENT_TIMEOUT`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L20** <code>print(f&quot;SANDBOX_RUN_TIMEOUT: {SANDBOX_RUN_TIMEOUT}, SANDBOX_CLIENT_TIMEOUT: {SANDBOX_CLIENT_TIMEOUT}&quot;)</code>
+  - 语法与作用：输出/日志调用；记录运行状态、调试信息或错误。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L21** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L22** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L23** <code>class CodeSandboxEnv(BaseEnv):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L24** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L25** <code>    Sandbox environment that supports multi-turn code generation and self-test.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L26** <code>    Capable of executing Python code and handling code execution results</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L27** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L28** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L29** <code>    def __init__(self, max_turns: int = 2, extra_info: dict = None):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L30** <code>        super().__init__(max_turns=max_turns)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `super().__init__(max_turns`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L31** <code>        self.extra_info = extra_info</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.extra_info`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L32** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L33** <code>        # Regular expression to extract code from code blocks (supports both ```python and ```answer)</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L34** <code>        self.code_extraction_re = re.compile(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.code_extraction_re`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L35** <code>            r&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L36** <code>            ```[ \t]*(?P&lt;lang&gt;python|py|answer)?[ \t]*(?:\r?\n)?   # Opening fence: ``` with optional python/py/answer identifier</code>
+  - 语法与作用：函数/方法调用；调用 ````[ \t]*` 并使用返回值或副作用。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L37** <code>            (?P&lt;code&gt;.*?)                            # Capture group: pure code content</code>
+  - 语法与作用：函数/方法调用；调用 `` 并使用返回值或副作用。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L38** <code>            (?:\r?\n)?```                            # Closing fence: ```</code>
+  - 语法与作用：函数/方法调用；调用 `` 并使用返回值或副作用。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L39** <code>            &quot;&quot;&quot;,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L40** <code>            re.IGNORECASE | re.DOTALL | re.VERBOSE,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L41** <code>        )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L42** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L43** <code>    async def step(self, action: str | None) -&gt; tuple[str | None, bool, bool, float, dict]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L44** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L45** <code>        Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L46** <code>            action: str, the action from the agent</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L47** <code>        Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L48** <code>            str, the tool response</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L49** <code>            bool, whether the episode is done</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L50** <code>            bool, whether the episode is truncated</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L51** <code>            float, the reward of the current step</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L52** <code>            dict, additional info</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L53** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L54** <code>        self.num_turns += 1</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `self.num_turns +`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L55** <code>        done, truncate, reward = False, False, 0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done, truncate, reward`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L56** <code>        tool_response, tool_info = None, {}</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_response, tool_info`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L57** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L58** <code>        if action is None:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L59** <code>            done = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L60** <code>            tool_info[&quot;finish_type&quot;] = FinishReasonTypeEnum.NO_TOOL_CALL</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["finish_type"]`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L61** <code>        else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L62** <code>            # execute tool call and obtain relative information</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L63** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L64** <code>                exec_result = await self.exec_tool_call(action)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `exec_result`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L65** <code>                tool_response, reward, done, tool_info = exec_result</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_response, reward, done, tool_info`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L66** <code>            except asyncio.TimeoutError:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L67** <code>                # Handle timeout case</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L68** <code>                tool_response = &quot;Execution timed out.&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_response`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L69** <code>                reward = 0.0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `reward`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L70** <code>                done = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L71** <code>                tool_info[&quot;finish_type&quot;] = FinishReasonTypeEnum.ERROR</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["finish_type"]`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L72** <code>                tool_info[&quot;error_type&quot;] = &quot;timeout&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["error_type"]`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L73** <code>                tool_info[&quot;error_message&quot;] = &quot;Operation timed out after exhausting all retry attempts&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["error_message"]`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L74** <code>            except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获或清理异常。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L75** <code>                # Handle other exceptions that might occur during execution</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L76** <code>                tool_response = f&quot;Execution failed with error: {str(e)}&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_response`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L77** <code>                reward = 0.0</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `reward`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L78** <code>                done = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L79** <code>                tool_info[&quot;finish_type&quot;] = FinishReasonTypeEnum.ERROR</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["finish_type"]`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L80** <code>                tool_info[&quot;error_type&quot;] = &quot;execution_error&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["error_type"]`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L81** <code>                tool_info[&quot;error_message&quot;] = str(e)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["error_message"]`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L82** <code>            else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L83** <code>                if self.num_turns &gt;= self.max_turns:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L84** <code>                    done = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L85** <code>                    truncate = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `truncate`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L86** <code>                    tool_info[&quot;finish_type&quot;] = FinishReasonTypeEnum.MAX_TOOL_CALL</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info["finish_type"]`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L87** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L88** <code>        return tool_response, done, truncate, reward, tool_info</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L89** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L90** <code>    @with_timeout_and_retry(timeout_seconds=5000.0, max_attempts=1)</code>
+  - 语法与作用：装饰器；在下方函数定义时包装该函数，当前行执行注册/包装动作。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L91** <code>    async def exec_tool_call(self, action: str) -&gt; tuple[str, float, bool, dict]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体要等调用时才执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L92** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L93** <code>        Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L94** <code>            action: str, the code from the agent</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L95** <code>        Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L96** <code>            str, the tool response</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L97** <code>            float, the reward of the current step</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L98** <code>            bool, whether the episode is done</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L99** <code>            dict, additional info</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L100** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L101** <code>        # Extract code block and language type</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L102** <code>        match = self.code_extraction_re.search(action)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `match`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L103** <code>        lang = match.group(&quot;lang&quot;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `lang`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L104** <code>        code_content = match.group(&quot;code&quot;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `code_content`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L105** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L106** <code>        # Check if it&#x27;s an answer block</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L107** <code>        if lang and lang.lower() == &quot;answer&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L108** <code>            done = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L109** <code>            tool_info = {&quot;finish_type&quot;: FinishReasonTypeEnum.ANSWER}</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L110** <code>            code_execution_result = None</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `code_execution_result`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L111** <code>        else:</code>
+  - 语法与作用：else 分支；前面条件均不成立时执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L112** <code>            done = False</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `done`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L113** <code>            code_to_execute = f&quot;{self.extra_info[&#x27;ground_truth&#x27;][&#x27;import_code&#x27;]}\n\n{code_content}&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `code_to_execute`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L114** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L115** <code>            # Execute code</code>
+  - 语法与作用：注释；解释实现或限制，Python 不执行。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L116** <code>            run_result, run_status = await execute_single_task(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `run_result, run_status`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L117** <code>                code_to_execute, run_timeout=SANDBOX_RUN_TIMEOUT, client_timeout=SANDBOX_CLIENT_TIMEOUT, max_attempts=3</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `code_to_execute, run_timeout`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L118** <code>            )</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L119** <code>            sandbox_stdout = run_result[&quot;stdout&quot;]</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `sandbox_stdout`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L120** <code>            sandbox_stderr = run_result[&quot;stderr&quot;]</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `sandbox_stderr`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L121** <code>            command_run_status = run_result[&quot;status&quot;]</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `command_run_status`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L122** <code>            code_execution_result = parse_sandbox_output(sandbox_stdout, sandbox_stderr, run_status, command_run_status)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `code_execution_result`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L123** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L124** <code>            if code_execution_result is None or code_execution_result.strip() == &quot;&quot;:</code>
+  - 语法与作用：条件分支；条件为真时执行缩进块。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L125** <code>                code_execution_result = &quot;The code is successfully executed, but did not print any output.&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `code_execution_result`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L126** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L127** <code>            tool_info = {</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `tool_info`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L128** <code>                &quot;is_correct_code&quot;: run_status == RunStatus.Success,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `"is_correct_code": run_status`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L129** <code>                &quot;is_error_code&quot;: run_status == RunStatus.Failed and command_run_status == CommandRunStatus.Finished,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `"is_error_code": run_status`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L130** <code>                &quot;is_other_error&quot;: run_status == RunStatus.Failed and command_run_status == CommandRunStatus.Error,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `"is_other_error": run_status`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L131** <code>                &quot;is_timeout_code&quot;: run_status == RunStatus.Failed</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `"is_timeout_code": run_status`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L132** <code>                and command_run_status == CommandRunStatus.TimeLimitExceeded,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `and command_run_status`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L133** <code>                &quot;is_sandbox_error&quot;: run_status == RunStatus.SandboxError,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定到 `"is_sandbox_error": run_status`。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L134** <code>                &quot;local_queue_time&quot;: run_result[&quot;local_queue_time&quot;],</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L135** <code>                &quot;sandbox_queue_time&quot;: run_result[&quot;sandbox_queue_time&quot;],</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L136** <code>                &quot;execution_time&quot;: run_result[&quot;execution_time&quot;],</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L137** <code>            }</code>
+  - 语法与作用：普通 Python 语句；在当前作用域按 Python 语义求值。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L138** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+- **L139** <code>        return code_execution_result, 0, done, tool_info</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：该类由工厂支持且当前配置文本写的是 `CodeSandboxEnv`，但 Kernel engine 的 `env_type` 分支只组装 extra_info，随后 reward_fn 直接评测；因此本类的 step/exec_tool_call 不在 Kernel 主 reward 路径执行。
+
+
+
+
+---
+
+**导航**：[上一附录](11-fsdp-boundaries.md) · [附录目录](index.md) · [下一附录](13-kernelgym-workflow.md)

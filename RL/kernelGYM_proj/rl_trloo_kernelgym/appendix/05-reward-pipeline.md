@@ -1,0 +1,3916 @@
+# Reward pipeline：manager、代码抽取与 HTTP client
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+### 15.6 reward manager 与自定义 reward
+源码文件：`drkernel/kernel/workers/reward_manager/kernel_async.py`。以下保留指定范围内的每一行；`空行` 和 `注释` 也列出，分别标记为无运行时效果和不执行。训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+
+#### 原始行 1–338
+- **L1** 源码：<code># Copyright 2025 Bytedance Ltd. and/or its affiliates</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L2** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L3** 源码：<code># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L4** 源码：<code># you may not use this file except in compliance with the License.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L5** 源码：<code># You may obtain a copy of the License at</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L6** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L7** 源码：<code>#     http://www.apache.org/licenses/LICENSE-2.0</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L8** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L9** 源码：<code># Unless required by applicable law or agreed to in writing, software</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L10** 源码：<code># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L11** 源码：<code># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L12** 源码：<code># See the License for the specific language governing permissions and</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L13** 源码：<code># limitations under the License.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L14** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L15** 源码：<code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L16** 源码：<code>Kernel 奖励管理器，专门用于 kernel code RL 训练</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L17** 源码：<code>复用 laser 的架构，集成 KernelServer 进行性能评估</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L18** 源码：<code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L19** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L20** 源码：<code>from collections import defaultdict</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L21** 源码：<code>import torch</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L22** 源码：<code>import logging</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L23** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L24** 源码：<code>from verl import DataProto</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L25** 源码：<code>from verl.utils.reward_score import default_compute_score</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L26** 源码：<code>from verl.workers.reward_manager import register</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L27** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L28** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L29** 源码：<code># @register(&quot;kernel&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L30** 源码：<code>class AsyncKernelRewardManager:</code>
+  - 语法与作用：类定义语法；声明 `AsyncKernelRewardManager`，类体在定义阶段执行一次并创建类型对象。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L31** 源码：<code>    &quot;&quot;&quot;Kernel 奖励管理器，集成 KernelServer 进行内核性能评估&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L32** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L33** 源码：<code>    def __init__(</code>
+  - 语法与作用：函数定义语法；声明 `__init__` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L34** 源码：<code>        self,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L35** 源码：<code>        tokenizer,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L36** 源码：<code>        num_examine=5,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_examine`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L37** 源码：<code>        compute_score=None,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `compute_score`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L38** 源码：<code>        reward_fn_key=&quot;data_source&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn_key`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L39** 源码：<code>        reward_config=None,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_config`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L40** 源码：<code>        **kwargs</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L41** 源码：<code>    ) -&gt; None:</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L42** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L43** 源码：<code>        初始化 KernelRewardManager</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L44** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L45** 源码：<code>        Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L46** 源码：<code>            tokenizer: 分词器</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L47** 源码：<code>            num_examine: 打印到控制台的样本数量</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L48** 源码：<code>            compute_score: 自定义评分函数</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L49** 源码：<code>            reward_fn_key: 用于识别数据源的键</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L50** 源码：<code>            reward_config: Hydra/OmegaConf 下的 reward_model 配置（唯一客户端配置载体）</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L51** 源码：<code>            **kwargs: 其他参数</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L52** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L53** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L54** 源码：<code>        if hasattr(reward_config, &quot;reward_model&quot;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L55** 源码：<code>            reward_config = reward_config.reward_model</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_config`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L56** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L57** 源码：<code>        self.reward_config = reward_config</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.reward_config`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L58** 源码：<code>        self.tokenizer = tokenizer</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.tokenizer`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L59** 源码：<code>        self.num_examine = num_examine</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.num_examine`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L60** 源码：<code>        self.compute_score = compute_score or default_compute_score</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.compute_score`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L61** 源码：<code>        self.reward_fn_key = reward_fn_key</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.reward_fn_key`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L62** 源码：<code>        self.is_valid = kwargs.get(&quot;is_valid&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.is_valid`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L63** 源码：<code>        self.server_url = self.reward_config.server_url</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.server_url`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L64** 源码：<code>        self.reward_policy = self.reward_config.reward_policy</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.reward_policy`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L65** 源码：<code>        self.task_timeout = self.reward_config.task_timeout</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.task_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L66** 源码：<code>        self.print_status = getattr(self.reward_config, &quot;print_status&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.print_status`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L67** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L68** 源码：<code>        # 验证 server_url 不为空</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L69** 源码：<code>        if not self.server_url:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L70** 源码：<code>            raise ValueError(&quot;server_url is required for KernelRewardManager&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L71** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L72** 源码：<code>        self.reward_weights = self.reward_config.reward_weights</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.reward_weights`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L73** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L74** 源码：<code>        self.logger = logging.getLogger(__name__)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.logger`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L75** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L76** 源码：<code>        # 打印配置信息（全部来源于 reward_config）</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L77** 源码：<code>        self.logger.info(f&quot;KernelRewardManager initialized with server: {self.server_url}&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.logger.info`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L78** 源码：<code>        self.logger.info(f&quot;Reward weights: {self.reward_weights}&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.logger.info`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L79** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L80** 源码：<code>            enhanced = self.reward_config.enhanced</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `enhanced`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L81** 源码：<code>            use_sandbox_rate_limit = self.reward_config.use_sandbox_rate_limit</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_sandbox_rate_limit`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L82** 源码：<code>            rate_limit = self.reward_config.rate_limit</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rate_limit`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L83** 源码：<code>            timeout = self.reward_config.timeout</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L84** 源码：<code>            max_concurrent = self.reward_config.max_concurrent</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_concurrent`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L85** 源码：<code>            print(f&quot;[RewardManager] cfg enhanced={enhanced} use_sandbox_rate_limit={use_sandbox_rate_limit} rate_limit={rate_limit} timeout={timeout} max_concurrent={max_concurrent}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L86** 源码：<code>        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L87** 源码：<code>            pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L88** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L89** 源码：<code>    def execute_env(self, response_str: str, ground_truth: str, entry_point: str, uuid: str, response_ids: list[int]):</code>
+  - 语法与作用：函数定义语法；声明 `execute_env` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L90** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L91** 源码：<code>        Execute the environment and return the result</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L92** 源码：<code>        We split it since we hope to re-evaluate when the speedup value is anomaly large.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L93** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L94** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L95** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L96** 源码：<code>            # 准备批量计算的参数</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L97** 源码：<code>            solution_strs = [response_str]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `solution_strs`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L98** 源码：<code>            ground_truths = [ground_truth]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ground_truths`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L99** 源码：<code>            entry_points = [entry_point]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entry_points`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L100** 源码：<code>            uuids = [uuid]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuids`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L101** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L102** 源码：<code>            # 调用评分函数</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L103** 源码：<code>            if hasattr(self.compute_score, &#x27;__call__&#x27;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L104** 源码：<code>                # 检查是否支持批量处理（更稳健地识别 partial 包裹的真实函数）</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L105** 源码：<code>                is_batch = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L106** 源码：<code>                func_name = &#x27;&#x27;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `func_name`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L107** 源码：<code>                # 直接标记优先</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L108** 源码：<code>                if getattr(self.compute_score, &quot;_is_batch&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L109** 源码：<code>                    is_batch = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L110** 源码：<code>                # 尝试从 partial 的 raw_fn 中获取标记或名称</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L111** 源码：<code>                underlying_func = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `underlying_func`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L112** 源码：<code>                if hasattr(self.compute_score, &#x27;func&#x27;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L113** 源码：<code>                    # functools.partial(func, *args, **kwargs) 中的 func</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L114** 源码：<code>                    underlying_func = self.compute_score.func</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `underlying_func`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L115** 源码：<code>                    if getattr(underlying_func, &quot;_is_batch&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L116** 源码：<code>                        is_batch = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L117** 源码：<code>                # 对于 _call_with_kwargs 这类包装，raw_fn 通常在 partial.args[0]</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L118** 源码：<code>                if hasattr(self.compute_score, &#x27;args&#x27;) and self.compute_score.args:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L119** 源码：<code>                    possible_raw_fn = self.compute_score.args[0]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `possible_raw_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L120** 源码：<code>                    if callable(possible_raw_fn):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L121** 源码：<code>                        underlying_func = possible_raw_fn</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `underlying_func`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L122** 源码：<code>                        if getattr(underlying_func, &quot;_is_batch&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L123** 源码：<code>                            is_batch = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L124** 源码：<code>                # 名称兜底判断</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L125** 源码：<code>                if hasattr(self.compute_score, &#x27;__name__&#x27;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L126** 源码：<code>                    func_name = self.compute_score.__name__</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `func_name`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L127** 源码：<code>                elif underlying_func is not None and hasattr(underlying_func, &#x27;__name__&#x27;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L128** 源码：<code>                    func_name = underlying_func.__name__</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `func_name`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L129** 源码：<code>                if &#x27;batch&#x27; in func_name.lower():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L130** 源码：<code>                    is_batch = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L131** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L132** 源码：<code>                # 仅传递必要控制参数：reward_config 与 is_valid</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L133** 源码：<code>                safe_kwargs = {&quot;reward_config&quot;: self.reward_config, &quot;is_valid&quot;: self.is_valid}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `safe_kwargs`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L134** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L135** 源码：<code>                if is_batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L136** 源码：<code>                    results = self.compute_score(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L137** 源码：<code>                        solution_strs, ground_truths, entry_points,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L138** 源码：<code>                        uuids=uuids,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuids`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L139** 源码：<code>                        **safe_kwargs</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L140** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L141** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L142** 源码：<code>                    # 单个处理</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L143** 源码：<code>                    results = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L144** 源码：<code>                    for i, (solution_str, ground_truth, entry_point) in enumerate(zip(solution_strs, ground_truths, entry_points)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L145** 源码：<code>                        uuid_val = uuids[i] if i &lt; len(uuids) else None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuid_val`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L146** 源码：<code>                        single_kwargs = {**safe_kwargs, &quot;entry_point&quot;: entry_point, &quot;uuid&quot;: uuid_val}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `single_kwargs`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L147** 源码：<code>                        result = self.compute_score(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `result`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L148** 源码：<code>                            solution_str=solution_str,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `solution_str`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L149** 源码：<code>                            ground_truth=ground_truth,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ground_truth`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L150** 源码：<code>                            **single_kwargs</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L151** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L152** 源码：<code>                        results.append(result)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `results.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L153** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L154** 源码：<code>                # 使用默认评分函数</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L155** 源码：<code>                results = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L156** 源码：<code>                for i, (solution_str, ground_truth, entry_point) in enumerate(zip(solution_strs, ground_truths, entry_points)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L157** 源码：<code>                    uuid_val = uuids[i] if i &lt; len(uuids) else None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuid_val`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L158** 源码：<code>                    result = default_compute_score(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `result`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L159** 源码：<code>                        solution_str=solution_str,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `solution_str`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L160** 源码：<code>                        ground_truth=ground_truth,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ground_truth`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L161** 源码：<code>                        entry_point=entry_point,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entry_point`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L162** 源码：<code>                        uuid=uuid_val,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuid`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L163** 源码：<code>                        is_valid=self.is_valid,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_valid`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L164** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L165** 源码：<code>                    results.append(result)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `results.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L166** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L167** 源码：<code>        except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L168** 源码：<code>            self.logger.error(f&quot;Error in reward computation: {e}&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.logger.error`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L169** 源码：<code>            results = [</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L170** 源码：<code>                {</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L171** 源码：<code>                    &quot;score&quot;: self.reward_config.reward_policy.penalties.penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L172** 源码：<code>                    &quot;reward&quot;: self.reward_config.reward_policy.penalties.penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L173** 源码：<code>                    &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L174** 源码：<code>                    &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L175** 源码：<code>                    &quot;compiled&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L176** 源码：<code>                    &quot;error&quot;: str(e),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L177** 源码：<code>                    &quot;num_custom_kernel&quot;: 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L178** 源码：<code>                    &quot;num_total_kernels&quot;: 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L179** 源码：<code>                    &quot;custom_kernel_cuda_time_in_profiling_us&quot;: 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L180** 源码：<code>                    &quot;total_kernel_run_time_in_profiling_us&quot;: 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L181** 源码：<code>                }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L182** 源码：<code>                for _ in range(len(response_ids))</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L183** 源码：<code>            ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L184** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L185** 源码：<code>        if len(results) != 1:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L186** 源码：<code>            raise ValueError(f&quot;The length of results should be 1, but got {len(results)}&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L187** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L188** 源码：<code>        return results</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L189** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L190** 源码：<code>    # def __call__(self, data: DataProto, return_dict: bool = False, **kwargs):</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L191** 源码：<code>    def __call__(self, </code>
+  - 语法与作用：函数定义语法；声明 `__call__` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L192** 源码：<code>                response_ids: list[int], </code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L193** 源码：<code>                response_str: str, </code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L194** 源码：<code>                ground_truth: str, </code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L195** 源码：<code>                entry_point: str, </code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L196** 源码：<code>                uuid: str, </code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L197** 源码：<code>                return_dict: bool = True,</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L198** 源码：<code>                return_full_state: bool = False,</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L199** 源码：<code>                **kwargs):</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L200** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L201** 源码：<code>        Async reward manager for kernel code RL training</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L202** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L203** 源码：<code>        Only pass necessary data to the reward manager to keep efficient in async mode.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L204** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L205** 源码：<code>        Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L206** 源码：<code>            response_ids: Response token ids</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L207** 源码：<code>            response_str: Response string</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L208** 源码：<code>            ground_truth: Ground truth</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L209** 源码：<code>            entry_point: Entry point</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L210** 源码：<code>            uuid: UUID</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L211** 源码：<code>            return_dict: Whether to return a dictionary</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L212** 源码：<code>            **kwargs: Additional keyword arguments for the reward function</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L213** 源码：<code>        Returns:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L214** 源码：<code>            Reward tensor or a dictionary containing reward information</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L215** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L216** 源码：<code>        # 如果已经有 rm_scores，直接返回</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L217** 源码：<code>        # if &quot;rm_scores&quot; in data.batch.keys():</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L218** 源码：<code>        #     if return_dict:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L219** 源码：<code>        #         return {&quot;reward_tensor&quot;: data.batch[&quot;rm_scores&quot;]}</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L220** 源码：<code>        #     else:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L221** 源码：<code>        #         return data.batch[&quot;rm_scores&quot;]</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L222** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L223** 源码：<code>        # 初始化返回张量，长度与响应截断长度一致，避免在后续裁剪时丢失分数</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L224** 源码：<code>        max_response_length = kwargs.get(&quot;response_length&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L225** 源码：<code>        valid_response_length = len(response_ids)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `valid_response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L226** 源码：<code>        if max_response_length is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L227** 源码：<code>            valid_response_length = min(valid_response_length, int(max_response_length))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `valid_response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L228** 源码：<code>        valid_response_length = max(valid_response_length, 1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `valid_response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L229** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L230** 源码：<code>        reward_tensor = torch.zeros(valid_response_length, dtype=torch.float32)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L231** 源码：<code>        # reward_extra_info = defaultdict(list)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L232** 源码：<code>        reward_extra_info = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L233** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L234** 源码：<code>        # 性能指标张量</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L235** 源码：<code>        correctness_tensor = torch.zeros(1, dtype=torch.float32)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L236** 源码：<code>        performance_tensor = torch.zeros(1, dtype=torch.float32)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `performance_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L237** 源码：<code>        compilation_tensor = torch.zeros(1, dtype=torch.float32)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `compilation_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L238** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L239** 源码：<code>        already_print_data_sources = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `already_print_data_sources`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L240** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L241** 源码：<code>        print(f&quot;[DEBUG] entry point in reward manager: {entry_point}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L242** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L243** 源码：<code>        # 使用计算函数进行评估</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L244** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L245** 源码：<code>        results = self.execute_env(response_str, ground_truth, entry_point, uuid, response_ids)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L246** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L247** 源码：<code>        speedup = results[0].get(&quot;speedup&quot;, 0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L248** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L249** 源码：<code>        if speedup is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L250** 源码：<code>            speedup = 0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L251** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L252** 源码：<code>        if speedup &gt; self.reward_config.speedup_reward_upper_bound:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L253** 源码：<code>            print(f&quot;[DEBUG] speedup is anomaly large, re-execute the environment&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L254** 源码：<code>            results = self.execute_env(response_str, ground_truth, entry_point, uuid, response_ids)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L255** 源码：<code>            speedup = results[0].get(&quot;speedup&quot;, 0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L256** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L257** 源码：<code>        results = results[0]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L258** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L259** 源码：<code>        score = results.get(&quot;score&quot;, results.get(&quot;reward&quot;, 0.0))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `score`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L260** 源码：<code>        num_custom_kernel = results.get(&quot;num_custom_kernel&quot;, 0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_custom_kernel`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L261** 源码：<code>        num_total_kernels = results.get(&quot;num_total_kernels&quot;, 0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_total_kernels`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L262** 源码：<code>        custom_kernel_cuda_time_in_profiling_us = results.get(&quot;custom_kernel_cuda_time_in_profiling_us&quot;, 0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `custom_kernel_cuda_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L263** 源码：<code>        total_kernel_run_time_in_profiling_us = results.get(&quot;total_kernel_run_time_in_profiling_us&quot;, 0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_kernel_run_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L264** 源码：<code>        correctness = results.get(&quot;correctness&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L265** 源码：<code>        success = results.get(&quot;success&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `success`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L266** 源码：<code>        compiled = results.get(&quot;compiled&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `compiled`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L267** 源码：<code>        speedup = results.get(&quot;speedup&quot;, 0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L268** 源码：<code>        if speedup is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L269** 源码：<code>            speedup = 0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L270** 源码：<code>        status = results.get(&quot;status&quot;, &quot;unknown&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `status`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L271** 源码：<code>        err_msg = results.get(&quot;error&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `err_msg`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L272** 源码：<code>        is_speedup_positive = (speedup &gt;= 1.0 + self.reward_config.speedup_eps)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_speedup_positive`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L273** 源码：<code>        is_decoy_kernel = results.get(&quot;decoy_kernel&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_decoy_kernel`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L274** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L275** 源码：<code>        target_index = valid_response_length - 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `target_index`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L276** 源码：<code>        reward_tensor[target_index] = score</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_tensor[target_index]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L277** 源码：<code>        correctness_tensor[0] = float(correctness)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness_tensor[0]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L278** 源码：<code>        performance_tensor[0] = speedup</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `performance_tensor[0]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L279** 源码：<code>        compilation_tensor[0] = float(compiled)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `compilation_tensor[0]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L280** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L281** 源码：<code>        reward_extra_info[&quot;correctness&quot;] = correctness</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["correctness"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L282** 源码：<code>        reward_extra_info[&quot;performance&quot;] = speedup</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["performance"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L283** 源码：<code>        reward_extra_info[&quot;is_speedup_positive&quot;] = is_speedup_positive</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["is_speedup_positive"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L284** 源码：<code>        reward_extra_info[&quot;is_decoy_kernel&quot;] = is_decoy_kernel</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["is_decoy_kernel"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L285** 源码：<code>        reward_extra_info[&quot;compilation&quot;] = compiled</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["compilation"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L286** 源码：<code>        reward_extra_info[&quot;success&quot;] = success</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["success"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L287** 源码：<code>        reward_extra_info[&quot;status&quot;] = status</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["status"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L288** 源码：<code>        reward_extra_info[&quot;error&quot;] = err_msg</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["error"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L289** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L290** 源码：<code>        print(f&quot;[DEBUG] num_custom_kernel in reward manager: {num_custom_kernel}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L291** 源码：<code>        print(f&quot;[DEBUG] num_total_kernels in reward manager: {num_total_kernels}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L292** 源码：<code>        print(f&quot;[DEBUG] custom_kernel_cuda_time_in_profiling_us in reward manager: {custom_kernel_cuda_time_in_profiling_us}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L293** 源码：<code>        print(f&quot;[DEBUG] total_kernel_run_time_in_profiling_us in reward manager: {total_kernel_run_time_in_profiling_us}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L294** 源码：<code>        # new features</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L295** 源码：<code>        reward_extra_info[&quot;num_custom_kernel&quot;] = num_custom_kernel</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["num_custom_kernel"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L296** 源码：<code>        reward_extra_info[&quot;num_total_kernels&quot;] = num_total_kernels</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["num_total_kernels"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L297** 源码：<code>        num_coverage = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L298** 源码：<code>        if num_total_kernels &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L299** 源码：<code>            num_coverage = num_custom_kernel / num_total_kernels</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L300** 源码：<code>        reward_extra_info[&quot;num_coverage&quot;] = float(f&quot;{num_coverage:.2f}&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["num_coverage"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L301** 源码：<code>        reward_extra_info[&quot;custom_kernel_cuda_time_in_profiling_us&quot;] = custom_kernel_cuda_time_in_profiling_us</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["custom_kernel_cuda_time_in_profiling_us"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L302** 源码：<code>        reward_extra_info[&quot;total_kernel_run_time_in_profiling_us&quot;] = total_kernel_run_time_in_profiling_us</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["total_kernel_run_time_in_profiling_us"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L303** 源码：<code>        time_coverage = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `time_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L304** 源码：<code>        if total_kernel_run_time_in_profiling_us &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L305** 源码：<code>            time_coverage = custom_kernel_cuda_time_in_profiling_us / total_kernel_run_time_in_profiling_us</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `time_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L306** 源码：<code>        reward_extra_info[&quot;time_coverage&quot;] = float(f&quot;{time_coverage:.2f}&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["time_coverage"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L307** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L308** 源码：<code>        # reward_extra_info[&quot;correctness&quot;].append(correctness)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L309** 源码：<code>        # reward_extra_info[&quot;performance&quot;].append(speedup)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L310** 源码：<code>        # reward_extra_info[&quot;is_speedup_positive&quot;].append(is_speedup_positive)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L311** 源码：<code>        # reward_extra_info[&quot;is_decoy_kernel&quot;].append(is_decoy_kernel)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L312** 源码：<code>        # reward_extra_info[&quot;compilation&quot;].append(compiled)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L313** 源码：<code>        # reward_extra_info[&quot;success&quot;].append(success)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L314** 源码：<code>        # reward_extra_info.setdefault(&quot;status&quot;, []).append(status)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L315** 源码：<code>        # reward_extra_info.setdefault(&quot;error&quot;, []).append(err_msg or &quot;&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L316** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L317** 源码：<code>        if self.print_status:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L318** 源码：<code>            self.logger.info(f&quot;[KernelEvalStatus] idx={0} status={status} compiled={compiled} correct={correctness} speedup={speedup} uuid={uuid} entry={entry_point} error={err_msg}&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.logger.info`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L319** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L320** 源码：<code>        if return_dict:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L321** 源码：<code>            reward_extra_info[&quot;correctness_tensor&quot;] = correctness_tensor</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["correctness_tensor"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L322** 源码：<code>            reward_extra_info[&quot;performance_tensor&quot;] = performance_tensor</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["performance_tensor"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L323** 源码：<code>            reward_extra_info[&quot;compilation_tensor&quot;] = compilation_tensor</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info["compilation_tensor"]`，可能创建、覆盖或累加状态。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L324** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L325** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L326** 源码：<code>            return_dict = {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L327** 源码：<code>                &quot;reward_tensor&quot;: reward_tensor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L328** 源码：<code>                &quot;reward_extra_info&quot;: reward_extra_info,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L329** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L330** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L331** 源码：<code>            if return_full_state:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L332** 源码：<code>                return_dict[&quot;env_state&quot;] = results</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L333** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L334** 源码：<code>            return return_dict</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L335** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L336** 源码：<code>            if return_full_state:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L337** 源码：<code>                return reward_tensor, reward_extra_info, results</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+- **L338** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练和验证都会构造该 manager；每个实际 rollout turn 都会进入其 reward 调用。
+
+### 15.7 reward 代码抽取与任务构造
+源码文件：`drkernel/kernel/rewards/kernel_reward.py`。以下保留指定范围内的每一行；`空行` 和 `注释` 也列出，分别标记为无运行时效果和不执行。该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+
+#### 原始行 1–203
+- **L1** 源码：<code># Copyright 2025 Bytedance Ltd. and/or its affiliates</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L2** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L3** 源码：<code># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L4** 源码：<code># you may not use this file except in compliance with the License.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L5** 源码：<code># You may obtain a copy of the License at</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L6** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L7** 源码：<code>#     http://www.apache.org/licenses/LICENSE-2.0</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L8** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L9** 源码：<code># Unless required by applicable law or agreed to in writing, software</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L10** 源码：<code># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L11** 源码：<code># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L12** 源码：<code># See the License for the specific language governing permissions and</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L13** 源码：<code># limitations under the License.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L14** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L15** 源码：<code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L16** 源码：<code>Kernel 奖励函数实现</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L17** 源码：<code>与 KernelServer 集成，评估内核代码的质量和性能</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L18** 源码：<code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L19** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L20** 源码：<code>import asyncio</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L21** 源码：<code>import logging</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L22** 源码：<code>import re</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L23** 源码：<code>from typing import Dict, Any</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L24** 源码：<code>from kernel.rewards.reward_client import KernelRewardClient</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L25** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L26** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L27** 源码：<code># 全局客户端实例与其配置，复用连接且在配置变更时重建</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L28** 源码：<code>_global_client = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `_global_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L29** 源码：<code>_global_client_cfg = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `_global_client_cfg`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L30** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L31** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L32** 源码：<code>def extract_reference_code(solution_str: str) -&gt; str:</code>
+  - 语法与作用：函数定义语法；声明 `extract_reference_code` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L33** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L34** 源码：<code>    从解决方案字符串中提取参考代码</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L35** 源码：<code>    </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L36** 源码：<code>    Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L37** 源码：<code>        solution_str: 包含提示和响应的完整字符串</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L38** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L39** 源码：<code>    Returns:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L40** 源码：<code>        提取的参考代码</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L41** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L42** 源码：<code>    # 查找参考实现标记</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L43** 源码：<code>    patterns = [</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `patterns`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L44** 源码：<code>        r&quot;# Reference Implementation\s*\n(.*?)(?=# Your Task|# Generate|$)&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L45** 源码：<code>        r&quot;```python\s*# Reference\s*\n(.*?)```&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L46** 源码：<code>        r&quot;# PyTorch Reference:\s*\n(.*?)(?=# Task|# Generate|$)&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L47** 源码：<code>    ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L48** 源码：<code>    </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L49** 源码：<code>    for pattern in patterns:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L50** 源码：<code>        match = re.search(pattern, solution_str, re.DOTALL)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `match`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L51** 源码：<code>        if match:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L52** 源码：<code>            return match.group(1).strip()</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L53** 源码：<code>    </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L54** 源码：<code>    # 如果没有找到特定标记，尝试提取第一个 Python 代码块</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L55** 源码：<code>    code_block_match = re.search(r&quot;```python\s*\n(.*?)```&quot;, solution_str, re.DOTALL)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `code_block_match`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L56** 源码：<code>    if code_block_match:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L57** 源码：<code>        return code_block_match.group(1).strip()</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L58** 源码：<code>    </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L59** 源码：<code>    # 回退到整个字符串</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L60** 源码：<code>    return solution_str</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L61** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L62** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L63** 源码：<code>def extract_kernel_code(solution_str: str) -&gt; str:</code>
+  - 语法与作用：函数定义语法；声明 `extract_kernel_code` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L64** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L65** 源码：<code>    从解决方案字符串中提取内核代码</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L66** 源码：<code>    </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L67** 源码：<code>    Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L68** 源码：<code>        solution_str: 包含提示和响应的完整字符串</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L69** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L70** 源码：<code>    Returns:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L71** 源码：<code>        提取的内核代码</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L72** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L73** 源码：<code>    # 查找内核实现标记</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L74** 源码：<code>    patterns = [</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `patterns`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L75** 源码：<code>        r&quot;# Kernel Implementation\s*\n(.*?)(?=# End|$)&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L76** 源码：<code>        r&quot;```python\s*# Kernel\s*\n(.*?)```&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L77** 源码：<code>        r&quot;# Your implementation:\s*\n(.*?)(?=# End|$)&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L78** 源码：<code>        r&quot;# Generated kernel:\s*\n(.*?)(?=# End|$)&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L79** 源码：<code>    ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L80** 源码：<code>    </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L81** 源码：<code>    for pattern in patterns:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L82** 源码：<code>        match = re.search(pattern, solution_str, re.DOTALL)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `match`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L83** 源码：<code>        if match:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L84** 源码：<code>            return match.group(1).strip()</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L85** 源码：<code>    </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L86** 源码：<code>    # 如果没有找到特定标记，尝试提取最后一个代码块</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L87** 源码：<code>    code_blocks = re.findall(r&quot;```(?:\w+)?\s*\n?(.*?)```&quot;, solution_str, re.DOTALL)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `code_blocks`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L88** 源码：<code>    if code_blocks:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L89** 源码：<code>        return code_blocks[-1].strip()</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L90** 源码：<code>    </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L91** 源码：<code>    # 回退：假设整个响应就是内核代码</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L92** 源码：<code>    return solution_str</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L93** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L94** 源码：<code>def compute_kernel_reward_batch(solution_strs: list, ground_truths: list, entry_points: str, **kwargs) -&gt; list:</code>
+  - 语法与作用：函数定义语法；声明 `compute_kernel_reward_batch` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L95** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L96** 源码：<code>    批量计算内核代码奖励值</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L97** 源码：<code>    </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L98** 源码：<code>    Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L99** 源码：<code>        solution_strs: 解决方案字符串列表</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L100** 源码：<code>        ground_truths: 参考实现列表</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L101** 源码：<code>        **kwargs: 其他参数</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L102** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L103** 源码：<code>    Returns:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L104** 源码：<code>        奖励结果列表</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L105** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L106** 源码：<code>    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L107** 源码：<code>        # 准备任务数据</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L108** 源码：<code>        tasks = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tasks`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L109** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L110** 源码：<code>        # 统一从 reward_config 读取客户端配置</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L111** 源码：<code>        reward_config = kwargs.get(&quot;reward_config&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L112** 源码：<code>        if hasattr(reward_config, &quot;reward_model&quot;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L113** 源码：<code>            reward_config = reward_config.reward_model</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L114** 源码：<code>        uuids = kwargs.get(&quot;uuids&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuids`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L115** 源码：<code>        is_valid = kwargs.get(&quot;is_valid&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_valid`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L116** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L117** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L118** 源码：<code>            task_timeout = getattr(reward_config, &quot;task_timeout&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `task_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L119** 源码：<code>            task_timeout_in_client = getattr(reward_config, &quot;task_timeout_in_client&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `task_timeout_in_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L120** 源码：<code>        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L121** 源码：<code>            task_timeout = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `task_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L122** 源码：<code>            task_timeout_in_client = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `task_timeout_in_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L123** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L124** 源码：<code>        num_perf_trials = getattr(reward_config, &quot;num_perf_trials&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_perf_trials`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L125** 源码：<code>        num_correct_trials = getattr(reward_config, &quot;num_correct_trials&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_correct_trials`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L126** 源码：<code>        enable_profiling = getattr(reward_config, &quot;enable_profiling&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `enable_profiling`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L127** 源码：<code>        verbose_errors = getattr(reward_config, &quot;verbose_errors&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `verbose_errors`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L128** 源码：<code>        detect_decoy_kernel = getattr(reward_config, &quot;detect_decoy_kernel&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `detect_decoy_kernel`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L129** 源码：<code>        reference_backend = getattr(reward_config, &quot;reference_backend&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reference_backend`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L130** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L131** 源码：<code>        for i, solution_str in enumerate(solution_strs):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L132** 源码：<code>            # reference_code = extract_reference_code(solution_str)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L133** 源码：<code>            reference_code = ground_truths[i]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reference_code`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L134** 源码：<code>            kernel_code = extract_kernel_code(solution_str)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `kernel_code`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L135** 源码：<code>            entry_point = entry_points[i]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entry_point`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L136** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L137** 源码：<code>            if uuids is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L138** 源码：<code>                uuid = uuids[i]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuid`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L139** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L140** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L141** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L142** 源码：<code>            tasks.append({</code>
+  - 语法与作用：函数/构造器调用语法；调用 `tasks.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L143** 源码：<code>                &quot;reference_code&quot;: reference_code,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L144** 源码：<code>                &quot;kernel_code&quot;: kernel_code,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L145** 源码：<code>                &quot;entry_point&quot;: entry_point,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L146** 源码：<code>                &quot;use_reference_cache&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L147** 源码：<code>                &quot;uuid&quot;: uuid if uuids is not None else &quot;&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L148** 源码：<code>                &quot;is_valid&quot;: is_valid,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L149** 源码：<code>                &quot;task_timeout&quot;: task_timeout,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L150** 源码：<code>                &quot;task_timeout_in_client&quot;: task_timeout_in_client,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L151** 源码：<code>                &quot;num_correct_trials&quot;: num_correct_trials,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L152** 源码：<code>                &quot;num_perf_trials&quot;: num_perf_trials,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L153** 源码：<code>                &quot;enable_profiling&quot;: enable_profiling,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L154** 源码：<code>                &quot;verbose_errors&quot;: verbose_errors,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L155** 源码：<code>                &quot;detect_decoy_kernel&quot;: detect_decoy_kernel,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L156** 源码：<code>                &quot;reference_backend&quot;: reference_backend,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L157** 源码：<code>            })</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L158** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L159** 源码：<code>        # 同步调用异步函数</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L160** 源码：<code>        loop = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loop`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L161** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L162** 源码：<code>            loop = asyncio.get_event_loop()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loop`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L163** 源码：<code>        except RuntimeError:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L164** 源码：<code>            loop = asyncio.new_event_loop()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loop`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L165** 源码：<code>            asyncio.set_event_loop(loop)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `asyncio.set_event_loop`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L166** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L167** 源码：<code>        # 获取客户端并批量计算奖励（仅从 reward_config 取值）</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L168** 源码：<code>        if reward_config is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L169** 源码：<code>            raise ValueError(&quot;reward_config is required&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L170** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L171** 源码：<code>        server_url = getattr(reward_config, &quot;server_url&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `server_url`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L172** 源码：<code>        if not server_url:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L173** 源码：<code>            raise ValueError(&quot;server_url is required and cannot be None or empty&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L174** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L175** 源码：<code>        global _global_client, _global_client_cfg</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L176** 源码：<code>        if _global_client is None or _global_client_cfg is not reward_config:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L177** 源码：<code>            _global_client = KernelRewardClient(reward_config=reward_config)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `_global_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L178** 源码：<code>            _global_client_cfg = reward_config</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `_global_client_cfg`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L179** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L180** 源码：<code>        client = _global_client</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `client`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L181** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L182** 源码：<code>        # 调用时传递 task_timeout</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L183** 源码：<code>        results = loop.run_until_complete(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L184** 源码：<code>            client.compute_batch_rewards(tasks, use_reference_cache=False, </code>
+  - 语法与作用：函数/构造器调用语法；调用 `client.compute_batch_rewards`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L185** 源码：<code>                                       is_valid=is_valid, task_timeout=task_timeout, </code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_valid`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L186** 源码：<code>                                       task_timeout_in_client=task_timeout_in_client)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `task_timeout_in_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L187** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L188** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L189** 源码：<code>        return results</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L190** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L191** 源码：<code>    except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L192** 源码：<code>        logging.error(f&quot;Error in compute_kernel_reward_batch: {e}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L193** 源码：<code>        # 返回错误结果列表</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L194** 源码：<code>        return [</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L195** 源码：<code>            {</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L196** 源码：<code>                &quot;score&quot;: reward_config.reward_policy.penalties.penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L197** 源码：<code>                &quot;reward&quot;: reward_config.reward_policy.penalties.penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L198** 源码：<code>                &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L199** 源码：<code>                &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L200** 源码：<code>                &quot;error&quot;: str(e)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L201** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L202** 源码：<code>            for _ in solution_strs</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+- **L203** 源码：<code>        ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该模块由 `main_kernel.py` 动态加载；`compute_kernel_reward_batch` 被 reward manager 调用。
+
+### 15.8 HTTP reward client
+源码文件：`drkernel/kernel/rewards/reward_client.py`。以下保留指定范围内的每一行；`空行` 和 `注释` 也列出，分别标记为无运行时效果和不执行。该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+
+#### 原始行 1–755
+- **L1** 源码：<code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L2** 源码：<code>Hybrid Kernel reward client (composed implementation):</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L3** 源码：<code>- External API matches KernelServer (/evaluate submit, /status poll, /results fetch).</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L4** 源码：<code>- Concurrency and rate limiting use the sandbox fusion Ray worker pool + global token bucket.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L5** 源码：<code>- Does not inherit Enhanced; it directly reuses the core request/poll/reward logic to keep behavior aligned,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L6** 源码：<code>  leaving observability to be added later if needed.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L7** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L8** 源码：<code>Two-level timeout design:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L9** 源码：<code>1. task_timeout (in payload[&quot;timeout&quot;]): Server-side execution limit for kernel evaluation</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L10** 源码：<code>2. task_timeout_in_client: Client-side polling timeout including queue wait time</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L11** 源码：<code>Invariant: task_timeout_in_client &gt;= task_timeout (client waits longer due to queuing)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L12** 源码：<code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L13** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L14** 源码：<code>from __future__ import annotations</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L15** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L16** 源码：<code>import asyncio</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L17** 源码：<code>import time</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L18** 源码：<code>import logging</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L19** 源码：<code>from typing import Any, Dict, List, Optional, Tuple</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L20** 源码：<code>import random</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L21** 源码：<code>from uuid import uuid4</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L22** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L23** 源码：<code>import httpx</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L24** 源码：<code>import ray</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L25** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L26** 源码：<code>from verl.tools.sandbox_fusion_tools import TokenBucketWorker</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L27** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L28** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L29** 源码：<code>logger = logging.getLogger(__name__)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `logger`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L30** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L31** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L32** 源码：<code>@ray.remote</code>
+  - 语法与作用：装饰器语法；在定义下面的函数/类时先调用该装饰器，替换或包装定义对象。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L33** 源码：<code>class _HybridHttpWorker:</code>
+  - 语法与作用：类定义语法；声明 `_HybridHttpWorker`，类体在定义阶段执行一次并创建类型对象。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L34** 源码：<code>    def __init__(self, server_url: str, rate_limit: int, default_timeout: int, acquire_timeout: int) -&gt; None:</code>
+  - 语法与作用：函数定义语法；声明 `__init__` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L35** 源码：<code>        self.server_url = server_url</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.server_url`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L36** 源码：<code>        # print(f&quot;[DEBUG] Default timeout: {default_timeout}&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L37** 源码：<code>        self.default_timeout = int(default_timeout)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.default_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L38** 源码：<code>        self.acquire_timeout = int(acquire_timeout)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.acquire_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L39** 源码：<code>        self._limits = httpx.Limits(max_keepalive_connections=64, max_connections=128, keepalive_expiry=30.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self._limits`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L40** 源码：<code>        self._client = httpx.Client(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self._client`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L41** 源码：<code>            timeout=httpx.Timeout(connect=10.0, read=self.default_timeout, write=10.0, pool=5.0),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L42** 源码：<code>            limits=self._limits,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `limits`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L43** 源码：<code>            headers={&quot;Content-Type&quot;: &quot;application/json&quot;},</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `headers`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L44** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L45** 源码：<code>        self._rate_limit_worker = TokenBucketWorker.options(name=&quot;rate-limiter&quot;, get_if_exists=True).remote(rate_limit)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self._rate_limit_worker`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L46** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L47** 源码：<code>    def _backoff(self, attempt: int, base: int = 2, cap: int = 30) -&gt; float:</code>
+  - 语法与作用：函数定义语法；声明 `_backoff` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L48** 源码：<code>        return min(base ** attempt, cap)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L49** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L50** 源码：<code>    def get_token_in_use(self) -&gt; int:</code>
+  - 语法与作用：函数定义语法；声明 `get_token_in_use` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L51** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L52** 源码：<code>            return ray.get(self._rate_limit_worker.get_current_count.remote())</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L53** 源码：<code>        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L54** 源码：<code>            return -1</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L55** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L56** 源码：<code>    def submit_and_poll(self, task_data: Dict[str, Any], client_timeout: int, max_retries: Optional[int]) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：函数定义语法；声明 `submit_and_poll` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L57** 源码：<code>        &quot;&quot;&quot;Submit task and poll for results.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L58** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L59** 源码：<code>        Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L60** 源码：<code>            task_data: Task payload including server-side timeout in task_data[&quot;timeout&quot;]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L61** 源码：<code>            client_timeout: Client-side total timeout including queue wait + execution time</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L62** 源码：<code>            max_retries: Max retry attempts for submission failures</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L63** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L64** 源码：<code>        start_ts = time.time()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `start_ts`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L65** 源码：<code>        # Rate-limit only during submission; polling does not consume tokens.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L66** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L67** 源码：<code>            # Submit with limited retries: 429/503/timeout/connect errors.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L68** 源码：<code>            attempt = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `attempt`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L69** 源码：<code>            unlimited = max_retries is None or max_retries == -1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `unlimited`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L70** 源码：<code>            while unlimited or attempt &lt; (max_retries or 0):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L71** 源码：<code>                try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L72** 源码：<code>                    # Acquire token with timeout.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L73** 源码：<code>                    acquire_ref = self._rate_limit_worker.acquire.remote()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `acquire_ref`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L74** 源码：<code>                    ready, _ = ray.wait([acquire_ref], timeout=self.acquire_timeout)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L75** 源码：<code>                    if not ready:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L76** 源码：<code>                        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L77** 源码：<code>                            curr = ray.get(self._rate_limit_worker.get_current_count.remote())</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `curr`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L78** 源码：<code>                        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L79** 源码：<code>                            curr = -1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `curr`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L80** 源码：<code>                        print(f&quot;[HybridWorker] acquire timeout tokens_in_use={curr}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L81** 源码：<code>                        return {&quot;status&quot;: &quot;failed&quot;, &quot;error_message&quot;: &quot;rate limiter acquire timeout&quot;}</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L82** 源码：<code>                    # Log once on first attempt to help debug &quot;server did not receive request&quot;.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L83** 源码：<code>                    if attempt == 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L84** 源码：<code>                        print(f&quot;[HybridWorker] POST /evaluate task_id={task_data.get(&#x27;task_id&#x27;, &#x27;&#x27;)} url={self.server_url}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L85** 源码：<code>                    resp = self._client.post(f&quot;{self.server_url}/evaluate&quot;, json=task_data)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `resp`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L86** 源码：<code>                    # Log status code to help diagnose non-200 responses.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L87** 源码：<code>                    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L88** 源码：<code>                        print(f&quot;[HybridWorker] POST /evaluate resp={resp.status_code} task_id={task_data.get(&#x27;task_id&#x27;,&#x27;&#x27;)}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L89** 源码：<code>                    except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L90** 源码：<code>                        pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L91** 源码：<code>                    # Release token immediately after submission.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L92** 源码：<code>                    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L93** 源码：<code>                        self._rate_limit_worker.release.remote()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._rate_limit_worker.release.remote`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L94** 源码：<code>                    except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L95** 源码：<code>                        pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L96** 源码：<code>                    if resp.status_code == 200:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L97** 源码：<code>                        break</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L98** 源码：<code>                    if resp.status_code in (429, 503):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L99** 源码：<code>                        time.sleep(self._backoff(attempt, base=2 if resp.status_code == 429 else 5))</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L100** 源码：<code>                        attempt += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `attempt +`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L101** 源码：<code>                        continue</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L102** 源码：<code>                    resp.raise_for_status()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `resp.raise_for_status`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L103** 源码：<code>                except (httpx.TimeoutException, httpx.ConnectError) as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L104** 源码：<code>                    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L105** 源码：<code>                        self._rate_limit_worker.release.remote()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._rate_limit_worker.release.remote`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L106** 源码：<code>                    except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L107** 源码：<code>                        pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L108** 源码：<code>                    if unlimited or attempt &lt; (max_retries or 0) - 1:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L109** 源码：<code>                        time.sleep(self._backoff(attempt))</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L110** 源码：<code>                        attempt += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `attempt +`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L111** 源码：<code>                        continue</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L112** 源码：<code>                    return {&quot;status&quot;: &quot;failed&quot;, &quot;error_message&quot;: str(e)}</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L113** 源码：<code>                except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L114** 源码：<code>                    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L115** 源码：<code>                        self._rate_limit_worker.release.remote()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._rate_limit_worker.release.remote`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L116** 源码：<code>                    except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L117** 源码：<code>                        pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L118** 源码：<code>                    return {&quot;status&quot;: &quot;failed&quot;, &quot;error_message&quot;: str(e)}</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L119** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L120** 源码：<code>            # Poll status at a fixed 1s interval.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L121** 源码：<code>            task_id = task_data.get(&quot;task_id&quot;, &quot;&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `task_id`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L122** 源码：<code>            last_status = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `last_status`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L123** 源码：<code>            while time.time() - start_ts &lt; client_timeout:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L124** 源码：<code>                try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L125** 源码：<code>                    s = self._client.get(f&quot;{self.server_url}/status/{task_id}&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `s`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L126** 源码：<code>                    if s.status_code == 200:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L127** 源码：<code>                        data = s.json()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L128** 源码：<code>                        status = data.get(&quot;status&quot;, &quot;unknown&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `status`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L129** 源码：<code>                        if status != last_status:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L130** 源码：<code>                            last_status = status</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `last_status`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L131** 源码：<code>                            try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L132** 源码：<code>                                print(f&quot;[HybridWorker] STATUS task_id={task_id} -&gt; {status}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L133** 源码：<code>                            except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L134** 源码：<code>                                pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L135** 源码：<code>                        if status in (&quot;completed&quot;, &quot;failed&quot;, &quot;timeout&quot;, &quot;cancelled&quot;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L136** 源码：<code>                            if status == &quot;completed&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L137** 源码：<code>                                r = self._client.get(f&quot;{self.server_url}/results/{task_id}&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `r`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L138** 源码：<code>                                if r.status_code == 200:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L139** 源码：<code>                                    result = r.json()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `result`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L140** 源码：<code>                                    result[&quot;status&quot;] = status</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `result["status"]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L141** 源码：<code>                                    return result</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L142** 源码：<code>                                return {&quot;status&quot;: status, &quot;error_message&quot;: f&quot;Failed to fetch results: HTTP {r.status_code}&quot;}</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L143** 源码：<code>                            return {&quot;status&quot;: status, &quot;error_message&quot;: data.get(&quot;error_message&quot;, f&quot;Task {status}&quot;)}</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L144** 源码：<code>                except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L145** 源码：<code>                    pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L146** 源码：<code>                time.sleep(1.0)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L147** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L148** 源码：<code>            return {&quot;status&quot;: &quot;timeout&quot;, &quot;error_message&quot;: f&quot;Task timeout after {client_timeout}s (client-side)&quot;}</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L149** 源码：<code>        finally:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L150** 源码：<code>            # No need to release here (already released during submission).</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L151** 源码：<code>            pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L152** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L153** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L154** 源码：<code>class KernelRewardClient:</code>
+  - 语法与作用：类定义语法；声明 `KernelRewardClient`，类体在定义阶段执行一次并创建类型对象。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L155** 源码：<code>    def __init__(self, *, reward_config: Any) -&gt; None:</code>
+  - 语法与作用：函数定义语法；声明 `__init__` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L156** 源码：<code>        # Allow passing a wrapper config object.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L157** 源码：<code>        if hasattr(reward_config, &quot;reward_model&quot;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L158** 源码：<code>            reward_config = reward_config.reward_model</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L159** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L160** 源码：<code>        # Read required fields from reward_config.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L161** 源码：<code>        self.server_url = str(reward_config.server_url)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.server_url`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L162** 源码：<code>        self.timeout = float(reward_config.timeout)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L163** 源码：<code>        # task_timeout_in_client: client-side timeout including queue wait (should &gt;= task_timeout)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L164** 源码：<code>        self.task_timeout_in_client = int(getattr(reward_config, &#x27;task_timeout_in_client&#x27;, self.timeout))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.task_timeout_in_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L165** 源码：<code>        self.max_retries = reward_config.max_retries</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.max_retries`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L166** 源码：<code>        self.rate_limit = int(reward_config.rate_limit)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.rate_limit`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L167** 源码：<code>        if self.rate_limit &lt;= 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L168** 源码：<code>            self.rate_limit = 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.rate_limit`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L169** 源码：<code>        # Use max_concurrent as worker concurrency.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L170** 源码：<code>        self.num_workers = int(reward_config.max_concurrent)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.num_workers`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L171** 源码：<code>        self.task_counter = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.task_counter`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L172** 源码：<code>        self.acquire_timeout = int(reward_config.acquire_timeout)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.acquire_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L173** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L174** 源码：<code>        # Reward policy (aligned with KernelRewardClient); use defaults if not set.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L175** 源码：<code>        self.reward_config = reward_config</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.reward_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L176** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L177** 源码：<code>        # Ray worker (persistent httpx.Client + global token bucket).</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L178** 源码：<code>        self._worker = _HybridHttpWorker.options(max_concurrency=self.num_workers).remote(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self._worker`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L179** 源码：<code>            self.server_url, self.rate_limit, int(self.timeout), self.acquire_timeout</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L180** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L181** 源码：<code>        # Keep a separate token bucket handle for heartbeat water-level checks.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L182** 源码：<code>        self._rate_limit_worker = TokenBucketWorker.options(name=&quot;rate-limiter&quot;, get_if_exists=True).remote(self.rate_limit)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self._rate_limit_worker`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L183** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L184** 源码：<code>        # Reward function weights and parameters.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L185** 源码：<code>        self.reward_func_name = reward_config.reward_func_name</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.reward_func_name`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L186** 源码：<code>        self.init_correct_weight = float(reward_config.init_correct_weight)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.init_correct_weight`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L187** 源码：<code>        self.init_performance_weight = float(reward_config.init_performance_weight)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.init_performance_weight`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L188** 源码：<code>        self.speedup_eps = float(reward_config.speedup_eps)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.speedup_eps`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L189** 源码：<code>        self.penalty_score = float(reward_config.reward_policy.penalties.penalty_score)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.penalty_score`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L190** 源码：<code>        self.speedup_reward_upper_bound = float(reward_config.speedup_reward_upper_bound)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.speedup_reward_upper_bound`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L191** 源码：<code>        self.speedup_reward_lower_bound = float(reward_config.speedup_reward_lower_bound)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.speedup_reward_lower_bound`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L192** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L193** 源码：<code>    def _get_reward_func(self):</code>
+  - 语法与作用：函数定义语法；声明 `_get_reward_func` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L194** 源码：<code>        &quot;&quot;&quot;Select reward function based on config; default to calculate_reward_like_kernel.&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L195** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L196** 源码：<code>            func = getattr(self, str(self.reward_func_name), None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `func`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L197** 源码：<code>            if callable(func):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L198** 源码：<code>                return func</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L199** 源码：<code>        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L200** 源码：<code>            pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L201** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L202** 源码：<code>            print(f&quot;[HybridClient] invalid reward_func_name={self.reward_func_name}, fallback to calculate_reward_like_kernel&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L203** 源码：<code>        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L204** 源码：<code>            pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L205** 源码：<code>        return self.calculate_reward_like_kernel</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L206** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L207** 源码：<code>    def _next_task_id(self, prefix: str) -&gt; str:</code>
+  - 语法与作用：函数定义语法；声明 `_next_task_id` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L208** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L209** 源码：<code>            self.task_counter += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.task_counter +`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L210** 源码：<code>        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L211** 源码：<code>            # Fallback: still guarantee uniqueness.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L212** 源码：<code>            self.task_counter = int(time.time() * 1000) % 1000000</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.task_counter`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L213** 源码：<code>        return f&quot;{prefix}_{self.task_counter:06d}_{uuid4().hex[:8]}&quot;</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L214** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L215** 源码：<code>    def _preflight_validate(self, reference_code: str, kernel_code: str, entry_point: str) -&gt; Tuple[bool, str]:</code>
+  - 语法与作用：函数定义语法；声明 `_preflight_validate` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L216** 源码：<code>        &quot;&quot;&quot;Minimal preflight: verify entry point exists to avoid meaningless requests.&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L217** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L218** 源码：<code>            ref_required = f&quot;class {entry_point}&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ref_required`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L219** 源码：<code>            ker_required = f&quot;class {entry_point}New&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ker_required`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L220** 源码：<code>            ref_ok = ref_required in (reference_code or &quot;&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ref_ok`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L221** 源码：<code>            ker_ok = ker_required in (kernel_code or &quot;&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ker_ok`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L222** 源码：<code>            if ref_ok and ker_ok:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L223** 源码：<code>                return True, &quot;&quot;</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L224** 源码：<code>            missing = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `missing`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L225** 源码：<code>            if not ref_ok:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L226** 源码：<code>                missing.append(ref_required)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `missing.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L227** 源码：<code>            if not ker_ok:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L228** 源码：<code>                missing.append(ker_required)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `missing.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L229** 源码：<code>            return False, &quot;, &quot;.join(missing)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L230** 源码：<code>        except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L231** 源码：<code>            logger.debug(f&quot;preflight skipped due to error: {e}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L232** 源码：<code>            return True, &quot;&quot;</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L233** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L234** 源码：<code>    def calculate_reward_like_kernel(self, result: Dict[str, Any]) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：函数定义语法；声明 `calculate_reward_like_kernel` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L235** 源码：<code>        if result.get(&quot;status&quot;) != &quot;completed&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L236** 源码：<code>            error_message = result.get(&quot;error_message&quot;, &quot;Task failed&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `error_message`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L237** 源码：<code>            if error_message == &quot;Task failed&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L238** 源码：<code>                error_message = result.get(&quot;error&quot;, &quot;Task failed&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `error_message`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L239** 源码：<code>            print(f&quot;[HybridClient] calculate_reward_like_kernel error_message: {error_message}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L240** 源码：<code>            print(f&quot;[HybridClient] Task failed result: {result}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L241** 源码：<code>            return {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L242** 源码：<code>                &quot;reward&quot;: -1.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L243** 源码：<code>                &quot;speedup&quot;: 0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L244** 源码：<code>                &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L245** 源码：<code>                &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L246** 源码：<code>                &quot;compiled&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L247** 源码：<code>                &quot;error&quot;: error_message,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L248** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L249** 源码：<code>        # Server returned a decoy kernel; force -1 and carry the marker.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L250** 源码：<code>        if result.get(&quot;decoy_kernel&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L251** 源码：<code>            try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L252** 源码：<code>                print(&quot;[HybridClient] decoy_kernel detected; forcing reward -1&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L253** 源码：<code>            except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L254** 源码：<code>                pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L255** 源码：<code>            return {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L256** 源码：<code>                &quot;reward&quot;: -1.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L257** 源码：<code>                &quot;speedup&quot;: 0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L258** 源码：<code>                &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L259** 源码：<code>                &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L260** 源码：<code>                &quot;compiled&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L261** 源码：<code>                &quot;decoy_kernel&quot;: True,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L262** 源码：<code>                &quot;error&quot;: &quot;Reward hacking: Decoy kernel detected&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L263** 源码：<code>                &quot;score&quot;: -1.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L264** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L265** 源码：<code>        correctness = result.get(&quot;correctness&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L266** 源码：<code>        speedup = result.get(&quot;speedup&quot;, 0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L267** 源码：<code>        compiled = result.get(&quot;compiled&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `compiled`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L268** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L269** 源码：<code>        penalties = self.reward_config.reward_policy.penalties</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `penalties`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L270** 源码：<code>        compilation_fail_penalty = float(penalties.get(&quot;compilation_fail&quot;, -0.5))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `compilation_fail_penalty`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L271** 源码：<code>        correctness_fail_penalty = float(penalties.get(&quot;correctness_fail&quot;, -0.3))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness_fail_penalty`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L272** 源码：<code>        perf_degrade_penalty = float(penalties.get(&quot;perf_degrade&quot;, -0.1))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `perf_degrade_penalty`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L273** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L274** 源码：<code>        if not compiled:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L275** 源码：<code>            reward = compilation_fail_penalty</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L276** 源码：<code>        elif not correctness:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L277** 源码：<code>            reward = correctness_fail_penalty</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L278** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L279** 源码：<code>            if speedup &gt;= 3.0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L280** 源码：<code>                reward = 1.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L281** 源码：<code>            elif speedup &gt;= 2.0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L282** 源码：<code>                reward = 0.8</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L283** 源码：<code>            elif speedup &gt;= 1.5:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L284** 源码：<code>                reward = 0.6</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L285** 源码：<code>            elif speedup &gt;= 1.2:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L286** 源码：<code>                reward = 0.4</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L287** 源码：<code>            elif speedup &gt;= 1.0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L288** 源码：<code>                reward = 0.2</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L289** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L290** 源码：<code>                reward = perf_degrade_penalty</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L291** 源码：<code>        return {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L292** 源码：<code>            &quot;reward&quot;: reward,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L293** 源码：<code>            &quot;speedup&quot;: speedup,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L294** 源码：<code>            &quot;success&quot;: compiled and correctness,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L295** 源码：<code>            &quot;correctness&quot;: correctness,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L296** 源码：<code>            &quot;compiled&quot;: compiled,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L297** 源码：<code>            &quot;score&quot;: reward,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L298** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L299** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L300** 源码：<code>    def compute_coverage_reward(self, result: Dict[str, Any]) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：函数定义语法；声明 `compute_coverage_reward` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L301** 源码：<code>        # Some server versions put coverage fields in metadata, possibly with plural names; normalize here.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L302** 源码：<code>        metadata = result.get(&quot;metadata&quot;) or {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `metadata`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L303** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L304** 源码：<code>        def _get_field(*keys: str, default: int = 0) -&gt; int:</code>
+  - 语法与作用：函数定义语法；声明 `_get_field` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L305** 源码：<code>            for k in keys:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L306** 源码：<code>                if k in metadata:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L307** 源码：<code>                    return metadata.get(k) or default</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L308** 源码：<code>                if k in result:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L309** 源码：<code>                    return result.get(k) or default</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L310** 源码：<code>            return default</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L311** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L312** 源码：<code>        num_custom_kernel = _get_field(&quot;num_custom_kernels&quot;, &quot;num_custom_kernel&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_custom_kernel`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L313** 源码：<code>        num_total_kernels = _get_field(&quot;num_total_kernels&quot;, &quot;num_total_kernel&quot;, &quot;num_total_kernels&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_total_kernels`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L314** 源码：<code>        custom_kernel_cuda_time_in_profiling_us = _get_field(&quot;custom_kernel_cuda_time_in_profiling_us&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `custom_kernel_cuda_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L315** 源码：<code>        total_kernel_run_time_in_profiling_us = _get_field(&quot;total_kernel_run_time_in_profiling_us&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_kernel_run_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L316** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L317** 源码：<code>        # Only log keys once when all fields are missing to aid debugging.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L318** 源码：<code>        if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L319** 源码：<code>            not num_custom_kernel</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L320** 源码：<code>            and not num_total_kernels</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L321** 源码：<code>            and &quot;num_custom_kernel&quot; not in result</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L322** 源码：<code>            and &quot;num_total_kernels&quot; not in result</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L323** 源码：<code>            and &quot;num_custom_kernels&quot; not in metadata</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L324** 源码：<code>            and &quot;num_total_kernels&quot; not in metadata</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L325** 源码：<code>        ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L326** 源码：<code>            try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L327** 源码：<code>                print(f&quot;[HybridClient] coverage fields missing, fallback to 0: keys={list(result.keys())}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L328** 源码：<code>            except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L329** 源码：<code>                pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L330** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L331** 源码：<code>        num_coverage = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L332** 源码：<code>        if num_total_kernels &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L333** 源码：<code>            num_coverage = num_custom_kernel / num_total_kernels</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L334** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L335** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L336** 源码：<code>        time_coverage = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `time_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L337** 源码：<code>        if total_kernel_run_time_in_profiling_us &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L338** 源码：<code>            time_coverage = custom_kernel_cuda_time_in_profiling_us / total_kernel_run_time_in_profiling_us</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `time_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L339** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L340** 源码：<code>        if self.reward_config.coverage_reward.reward_type == &quot;time_coverage&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L341** 源码：<code>            coverage = time_coverage</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L342** 源码：<code>        elif self.reward_config.coverage_reward.reward_type == &quot;number_coverage&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L343** 源码：<code>            coverage = num_coverage</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L344** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L345** 源码：<code>            raise ValueError(f&quot;Invalid reward type: {self.reward_config.coverage_reward.reward_type}&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L346** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L347** 源码：<code>        return {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L348** 源码：<code>            &quot;coverage&quot;: coverage,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L349** 源码：<code>            &quot;num_custom_kernel&quot;: num_custom_kernel,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L350** 源码：<code>            &quot;num_total_kernels&quot;: num_total_kernels,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L351** 源码：<code>            &quot;custom_kernel_cuda_time_in_profiling_us&quot;: custom_kernel_cuda_time_in_profiling_us,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L352** 源码：<code>            &quot;total_kernel_run_time_in_profiling_us&quot;: total_kernel_run_time_in_profiling_us,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L353** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L354** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L355** 源码：<code>    def calculate_reward_weighted(self, result: Dict[str, Any]) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：函数定义语法；声明 `calculate_reward_weighted` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L356** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L357** 源码：<code>        penalty_score = self.penalty_score</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `penalty_score`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L358** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L359** 源码：<code>        if result.get(&quot;status&quot;) != &quot;completed&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L360** 源码：<code>            error_message = result.get(&quot;error_message&quot;, &quot;Task failed&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `error_message`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L361** 源码：<code>            if error_message == &quot;Task failed&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L362** 源码：<code>                error_message = result.get(&quot;error&quot;, &quot;Task failed&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `error_message`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L363** 源码：<code>            print(f&quot;[HybridClient] calculate_reward_like_kernel error_message: {error_message}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L364** 源码：<code>            print(f&quot;[HybridClient] Task failed result: {result}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L365** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L366** 源码：<code>            return_result = {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L367** 源码：<code>                &quot;reward&quot;: penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L368** 源码：<code>                &quot;speedup&quot;: 0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L369** 源码：<code>                &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L370** 源码：<code>                &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L371** 源码：<code>                &quot;compiled&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L372** 源码：<code>                &quot;error&quot;: error_message,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L373** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L374** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L375** 源码：<code>            for key in result.keys():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L376** 源码：<code>                if key not in return_result:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L377** 源码：<code>                    return_result[key] = result[key]</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L378** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L379** 源码：<code>            return return_result</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L380** 源码：<code>        # Server returned a decoy kernel; force penalty and carry the marker.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L381** 源码：<code>        # TODO Temporary disable decoy kernel detection</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L382** 源码：<code>        if result.get(&quot;decoy_kernel&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L383** 源码：<code>            try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L384** 源码：<code>                print(&quot;[HybridClient] decoy_kernel detected; forcing reward -1&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L385** 源码：<code>            except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L386** 源码：<code>                pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L387** 源码：<code>            return {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L388** 源码：<code>                &quot;reward&quot;: penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L389** 源码：<code>                &quot;speedup&quot;: 0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L390** 源码：<code>                &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L391** 源码：<code>                &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L392** 源码：<code>                &quot;compiled&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L393** 源码：<code>                &quot;decoy_kernel&quot;: True,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L394** 源码：<code>                &quot;error&quot;: &quot;Reward hacking: Decoy kernel detected&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L395** 源码：<code>                &quot;score&quot;: penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L396** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L397** 源码：<code>        correctness = result.get(&quot;correctness&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L398** 源码：<code>        speedup = result.get(&quot;speedup&quot;, 0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L399** 源码：<code>        compiled = result.get(&quot;compiled&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `compiled`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L400** 源码：<code>        # In fact, profiling is always None here since it is actually inside metadata</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L401** 源码：<code>        profiling = result.get(&quot;profiling&quot;, None) </code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `profiling`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L402** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L403** 源码：<code>        if speedup is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L404** 源码：<code>            speedup = 0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L405** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L406** 源码：<code>        is_speedup_positive = speedup &gt;= (1 + self.speedup_eps) # ignore too small speedup</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_speedup_positive`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L407** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L408** 源码：<code>        reward = self.init_correct_weight * correctness + self.init_performance_weight * is_speedup_positive</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L409** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L410** 源码：<code>        num_custom_kernel = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_custom_kernel`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L411** 源码：<code>        num_total_kernels = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_total_kernels`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L412** 源码：<code>        custom_kernel_cuda_time_in_profiling_us = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `custom_kernel_cuda_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L413** 源码：<code>        total_kernel_run_time_in_profiling_us = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_kernel_run_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L414** 源码：<code>        # if self.reward_config.coverage_reward.enable and correctness:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L415** 源码：<code>        final_reward = reward</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `final_reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L416** 源码：<code>        if correctness:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L417** 源码：<code>            coverage_dict = self.compute_coverage_reward(result)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage_dict`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L418** 源码：<code>            coverage = coverage_dict[&quot;coverage&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L419** 源码：<code>            num_custom_kernel = coverage_dict[&quot;num_custom_kernel&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_custom_kernel`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L420** 源码：<code>            num_total_kernels = coverage_dict[&quot;num_total_kernels&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_total_kernels`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L421** 源码：<code>            custom_kernel_cuda_time_in_profiling_us = coverage_dict[&quot;custom_kernel_cuda_time_in_profiling_us&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `custom_kernel_cuda_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L422** 源码：<code>            total_kernel_run_time_in_profiling_us = coverage_dict[&quot;total_kernel_run_time_in_profiling_us&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_kernel_run_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L423** 源码：<code>            print(f&quot;[DEBUG] coverage: {coverage}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L424** 源码：<code>            print(f&quot;[DEBUG] num_custom_kernel: {num_custom_kernel}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L425** 源码：<code>            print(f&quot;[DEBUG] num_total_kernels: {num_total_kernels}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L426** 源码：<code>            print(f&quot;[DEBUG] custom_kernel_cuda_time_in_profiling_us: {custom_kernel_cuda_time_in_profiling_us}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L427** 源码：<code>            print(f&quot;[DEBUG] total_kernel_run_time_in_profiling_us: {total_kernel_run_time_in_profiling_us}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L428** 源码：<code>            if self.reward_config.coverage_reward.enable:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L429** 源码：<code>                final_reward += self.reward_config.coverage_reward.weight * coverage</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `final_reward +`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L430** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L431** 源码：<code>        return {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L432** 源码：<code>            &quot;reward&quot;: final_reward,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L433** 源码：<code>            &quot;speedup&quot;: speedup,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L434** 源码：<code>            &quot;success&quot;: compiled and correctness,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L435** 源码：<code>            &quot;correctness&quot;: correctness,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L436** 源码：<code>            &quot;compiled&quot;: compiled,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L437** 源码：<code>            &quot;score&quot;: final_reward,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L438** 源码：<code>            &quot;profiling&quot;: profiling,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L439** 源码：<code>            &quot;num_custom_kernel&quot;: num_custom_kernel,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L440** 源码：<code>            &quot;num_total_kernels&quot;: num_total_kernels,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L441** 源码：<code>            &quot;custom_kernel_cuda_time_in_profiling_us&quot;: custom_kernel_cuda_time_in_profiling_us,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L442** 源码：<code>            &quot;total_kernel_run_time_in_profiling_us&quot;: total_kernel_run_time_in_profiling_us,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L443** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L444** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L445** 源码：<code>    def calculate_reward_speedup(self, result: Dict[str, Any]) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：函数定义语法；声明 `calculate_reward_speedup` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L446** 源码：<code>        penalty_score = self.penalty_score</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `penalty_score`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L447** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L448** 源码：<code>        if result.get(&quot;status&quot;) != &quot;completed&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L449** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L450** 源码：<code>            error_message = result.get(&quot;error_message&quot;, &quot;Task failed&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `error_message`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L451** 源码：<code>            if error_message == &quot;Task failed&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L452** 源码：<code>                error_message = result.get(&quot;error&quot;, &quot;Task failed&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `error_message`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L453** 源码：<code>            print(f&quot;[HybridClient] calculate_reward_like_kernel error_message: {error_message}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L454** 源码：<code>            print(f&quot;[HybridClient] Task failed result: {result}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L455** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L456** 源码：<code>            return_result = {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L457** 源码：<code>                &quot;reward&quot;: penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L458** 源码：<code>                &quot;speedup&quot;: 0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L459** 源码：<code>                &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L460** 源码：<code>                &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L461** 源码：<code>                &quot;compiled&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L462** 源码：<code>                &quot;error&quot;: error_message,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L463** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L464** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L465** 源码：<code>            for key in result.keys():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L466** 源码：<code>                if key not in return_result:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L467** 源码：<code>                    return_result[key] = result[key]</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L468** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L469** 源码：<code>            return return_result</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L470** 源码：<code>        # Server returned a decoy kernel; force penalty and carry the marker.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L471** 源码：<code>        # TODO Temporary disable decoy kernel detection</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L472** 源码：<code>        if result.get(&quot;decoy_kernel&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L473** 源码：<code>            try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L474** 源码：<code>                print(&quot;[HybridClient] decoy_kernel detected; forcing reward -1&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L475** 源码：<code>            except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L476** 源码：<code>                pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L477** 源码：<code>            return {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L478** 源码：<code>                &quot;reward&quot;: penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L479** 源码：<code>                &quot;speedup&quot;: 0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L480** 源码：<code>                &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L481** 源码：<code>                &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L482** 源码：<code>                &quot;compiled&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L483** 源码：<code>                &quot;decoy_kernel&quot;: True,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L484** 源码：<code>                &quot;error&quot;: &quot;Reward hacking: Decoy kernel detected&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L485** 源码：<code>                &quot;score&quot;: penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L486** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L487** 源码：<code>        correctness = result.get(&quot;correctness&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L488** 源码：<code>        speedup = result.get(&quot;speedup&quot;, 0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L489** 源码：<code>        compiled = result.get(&quot;compiled&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `compiled`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L490** 源码：<code>        # In fact, profiling is always None here since it is actually inside metadata</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L491** 源码：<code>        profiling = result.get(&quot;profiling&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `profiling`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L492** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L493** 源码：<code>        if speedup is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L494** 源码：<code>            speedup = 0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L495** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L496** 源码：<code>        # is_speedup_positive = speedup &gt;= (1 + self.speedup_eps) # ignore too small speedup</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L497** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L498** 源码：<code>        reward_speedup = speedup</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L499** 源码：<code>        if speedup &gt; self.speedup_reward_upper_bound:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L500** 源码：<code>            reward_speedup = self.speedup_reward_upper_bound</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L501** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L502** 源码：<code>        if reward_speedup &lt; self.speedup_reward_lower_bound:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L503** 源码：<code>            reward_speedup = 0.0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L504** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L505** 源码：<code>        reward = self.init_correct_weight * correctness + self.init_performance_weight * reward_speedup</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L506** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L507** 源码：<code>        num_custom_kernel = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_custom_kernel`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L508** 源码：<code>        num_total_kernels = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_total_kernels`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L509** 源码：<code>        custom_kernel_cuda_time_in_profiling_us = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `custom_kernel_cuda_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L510** 源码：<code>        total_kernel_run_time_in_profiling_us = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_kernel_run_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L511** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L512** 源码：<code>        # if self.reward_config.coverage_reward.enable and correctness:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L513** 源码：<code>        final_reward = reward</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `final_reward`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L514** 源码：<code>        if correctness:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L515** 源码：<code>            coverage_dict = self.compute_coverage_reward(result)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage_dict`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L516** 源码：<code>            coverage = coverage_dict[&quot;coverage&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L517** 源码：<code>            num_custom_kernel = coverage_dict[&quot;num_custom_kernel&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_custom_kernel`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L518** 源码：<code>            num_total_kernels = coverage_dict[&quot;num_total_kernels&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_total_kernels`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L519** 源码：<code>            custom_kernel_cuda_time_in_profiling_us = coverage_dict[&quot;custom_kernel_cuda_time_in_profiling_us&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `custom_kernel_cuda_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L520** 源码：<code>            total_kernel_run_time_in_profiling_us = coverage_dict[&quot;total_kernel_run_time_in_profiling_us&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_kernel_run_time_in_profiling_us`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L521** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L522** 源码：<code>            print(f&quot;[DEBUG] coverage: {coverage}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L523** 源码：<code>            print(f&quot;[DEBUG] num_custom_kernel: {num_custom_kernel}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L524** 源码：<code>            print(f&quot;[DEBUG] num_total_kernels: {num_total_kernels}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L525** 源码：<code>            print(f&quot;[DEBUG] custom_kernel_cuda_time_in_profiling_us: {custom_kernel_cuda_time_in_profiling_us}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L526** 源码：<code>            print(f&quot;[DEBUG] total_kernel_run_time_in_profiling_us: {total_kernel_run_time_in_profiling_us}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L527** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L528** 源码：<code>            if self.reward_config.coverage_reward.enable:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L529** 源码：<code>                final_reward += self.reward_config.coverage_reward.weight * coverage</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `final_reward +`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L530** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L531** 源码：<code>        return {</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L532** 源码：<code>            &quot;reward&quot;: final_reward,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L533** 源码：<code>            &quot;speedup&quot;: speedup,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L534** 源码：<code>            &quot;success&quot;: compiled and correctness,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L535** 源码：<code>            &quot;correctness&quot;: correctness,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L536** 源码：<code>            &quot;compiled&quot;: compiled,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L537** 源码：<code>            &quot;score&quot;: final_reward,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L538** 源码：<code>            &quot;profiling&quot;: profiling,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L539** 源码：<code>            &quot;num_custom_kernel&quot;: num_custom_kernel,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L540** 源码：<code>            &quot;num_total_kernels&quot;: num_total_kernels,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L541** 源码：<code>            &quot;custom_kernel_cuda_time_in_profiling_us&quot;: custom_kernel_cuda_time_in_profiling_us,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L542** 源码：<code>            &quot;total_kernel_run_time_in_profiling_us&quot;: total_kernel_run_time_in_profiling_us,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L543** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L544** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L545** 源码：<code>    def _merge_reward_result(self, raw_result: Dict[str, Any], reward_summary: Dict[str, Any]) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：函数定义语法；声明 `_merge_reward_result` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L546** 源码：<code>        &quot;&quot;&quot;Merge raw KernelServer response payload with derived reward summary.&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L547** 源码：<code>        merged: Dict[str, Any] = {}</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L548** 源码：<code>        if raw_result:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L549** 源码：<code>            merged.update(raw_result)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `merged.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L550** 源码：<code>        if reward_summary:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L551** 源码：<code>            merged.update(reward_summary)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `merged.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L552** 源码：<code>        return merged</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L553** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L554** 源码：<code>    async def compute_batch_rewards(</code>
+  - 语法与作用：函数定义语法；声明 `compute_batch_rewards` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L555** 源码：<code>        self,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L556** 源码：<code>        tasks: List[Dict[str, Any]],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L557** 源码：<code>        *,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L558** 源码：<code>        use_reference_cache: Optional[bool] = None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L559** 源码：<code>        is_valid: Optional[bool] = None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L560** 源码：<code>        task_timeout: Optional[int] = None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L561** 源码：<code>        task_timeout_in_client: Optional[int] = None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L562** 源码：<code>        **_: Any,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L563** 源码：<code>    ) -&gt; List[Dict[str, Any]]:</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L564** 源码：<code>        penalty_score = self.penalty_score</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `penalty_score`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L565** 源码：<code>        if not tasks:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L566** 源码：<code>            return []</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L567** 源码：<code>        # print(f&quot;[DEBUG] Task timeout: {task_timeout or self.timeout}&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L568** 源码：<code>        effective_timeout = int(task_timeout or self.timeout)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `effective_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L569** 源码：<code>        effective_timeout_in_client = int(task_timeout_in_client or self.task_timeout_in_client)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `effective_timeout_in_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L570** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L571** 源码：<code>        # Validate timeout invariant: client timeout should be &gt;= server timeout</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L572** 源码：<code>        if effective_timeout_in_client &lt; effective_timeout:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L573** 源码：<code>            print(f&quot;[WARNING] task_timeout_in_client ({effective_timeout_in_client}s) &lt; task_timeout ({effective_timeout}s)&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L574** 源码：<code>            print(f&quot;[WARNING] Adjusting task_timeout_in_client to match task_timeout to respect timeout invariant&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L575** 源码：<code>            effective_timeout_in_client = effective_timeout</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `effective_timeout_in_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L576** 源码：<code>        obj_refs: List[ray.ObjectRef] = []</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L577** 源码：<code>        index_map: List[int] = []  # worker submission order -&gt; original index</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L578** 源码：<code>        prefilled: Dict[int, Dict[str, Any]] = {}</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L579** 源码：<code>        submitted: int = 0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L580** 源码：<code>        skipped: int = 0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L581** 源码：<code>        # Map obj_ref index -&gt; task metadata for heartbeat tracking of pending tasks.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L582** 源码：<code>        idx_to_task_info: Dict[int, Dict[str, Any]] = {}</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L583** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L584** 源码：<code>        for idx, task in enumerate(tasks):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L585** 源码：<code>            kcode = task.get(&quot;kernel_code&quot;, &quot;&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `kcode`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L586** 源码：<code>            ep = task.get(&quot;entry_point&quot;, &quot;Model&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ep`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L587** 源码：<code>            ok, missing = self._preflight_validate(task.get(&quot;reference_code&quot;, &quot;&quot;), kcode, ep)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L588** 源码：<code>            if not ok:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L589** 源码：<code>                try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L590** 源码：<code>                    print(f&quot;[HybridClient] preflight failed(idx={idx}): missing {missing} entry_point={ep}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L591** 源码：<code>                except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L592** 源码：<code>                    pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L593** 源码：<code>                prefilled[idx] = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prefilled[idx]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L594** 源码：<code>                    &quot;reward&quot;: penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L595** 源码：<code>                    &quot;speedup&quot;: 0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L596** 源码：<code>                    &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L597** 源码：<code>                    &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L598** 源码：<code>                    &quot;compiled&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L599** 源码：<code>                    &quot;error&quot;: f&quot;Client validation failed: missing {missing}&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L600** 源码：<code>                }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L601** 源码：<code>                continue</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L602** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L603** 源码：<code>            # Per-task timeout handling: fall back to batch default when explicitly None.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L604** 源码：<code>            # Server-side task execution timeout.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L605** 源码：<code>            per_task_timeout_raw = task.get(&quot;task_timeout&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `per_task_timeout_raw`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L606** 源码：<code>            per_task_timeout = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `per_task_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L607** 源码：<code>                effective_timeout if per_task_timeout_raw is None else int(per_task_timeout_raw)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L608** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L609** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L610** 源码：<code>            # Client-side task execution timeout.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L611** 源码：<code>            # Client-side timeout should be &gt;= server-side timeout.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L612** 源码：<code>            # Because queuing is involved, client timeout should be &gt;= server timeout.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L613** 源码：<code>            per_task_timeout_in_client_raw = task.get(&quot;task_timeout_in_client&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `per_task_timeout_in_client_raw`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L614** 源码：<code>            per_task_timeout_in_client = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `per_task_timeout_in_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L615** 源码：<code>                effective_timeout_in_client if per_task_timeout_in_client_raw is None else int(per_task_timeout_in_client_raw)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L616** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L617** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L618** 源码：<code>            # Validate per-task timeout invariant</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L619** 源码：<code>            if per_task_timeout_in_client &lt; per_task_timeout:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L620** 源码：<code>                per_task_timeout_in_client = per_task_timeout</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `per_task_timeout_in_client`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L621** 源码：<code>            # print(f&quot;[DEBUG] Per task timeout: {per_task_timeout}&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L622** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L623** 源码：<code>            # Randomly log one task (~5%).</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L624** 源码：<code>            try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L625** 源码：<code>                if random.random() &lt; 0.05:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L626** 源码：<code>                    def _clip2(s: Optional[str], n: int = 600) -&gt; str:</code>
+  - 语法与作用：函数定义语法；声明 `_clip2` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L627** 源码：<code>                        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L628** 源码：<code>                            return (s or &quot;&quot;)[:n]</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L629** 源码：<code>                        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L630** 源码：<code>                            return str(s)[:n]</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L631** 源码：<code>                    print(f&quot;[HybridClient] DEBUG(entry_point={ep})\n[ref]\n{task.get(&#x27;reference_code&#x27;,&#x27;&#x27;)}\n[kernel]\n{kcode}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L632** 源码：<code>            except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L633** 源码：<code>                pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L634** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L635** 源码：<code>            payload = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `payload`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L636** 源码：<code>                &quot;task_id&quot;: task.get(&quot;task_id&quot;) or self._next_task_id(&quot;parallel_task&quot;),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L637** 源码：<code>                &quot;reference_code&quot;: task.get(&quot;reference_code&quot;, &quot;&quot;),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L638** 源码：<code>                &quot;kernel_code&quot;: kcode,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L639** 源码：<code>                &quot;backend&quot;: &quot;triton&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L640** 源码：<code>                &quot;num_correct_trials&quot;: task.get(&quot;num_correct_trials&quot;, 5),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L641** 源码：<code>                &quot;num_perf_trials&quot;: task.get(&quot;num_perf_trials&quot;, 100),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L642** 源码：<code>                &quot;timeout&quot;: per_task_timeout,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L643** 源码：<code>                &quot;priority&quot;: &quot;normal&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L644** 源码：<code>                &quot;entry_point&quot;: ep,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L645** 源码：<code>                &quot;is_valid&quot;: task.get(&quot;is_valid&quot;, is_valid),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L646** 源码：<code>                &quot;verbose_errors&quot;: task.get(&quot;verbose_errors&quot;, True),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L647** 源码：<code>                &quot;enable_profiling&quot;: task.get(&quot;enable_profiling&quot;, True),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L648** 源码：<code>                &quot;detect_decoy_kernel&quot;: task.get(&quot;detect_decoy_kernel&quot;, True),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L649** 源码：<code>                &quot;reference_backend&quot;: task.get(&quot;reference_backend&quot;, None),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L650** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L651** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L652** 源码：<code>            # enforce detect decoy kernel if validate</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L653** 源码：<code>            if payload[&quot;is_valid&quot;]:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L654** 源码：<code>                print(f&quot;Enforce detect decoy kernel if validate: {payload[&#x27;detect_decoy_kernel&#x27;]}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L655** 源码：<code>                payload[&quot;detect_decoy_kernel&quot;] = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `payload["detect_decoy_kernel"]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L656** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L657** 源码：<code>            ucache = task.get(&quot;use_reference_cache&quot;, use_reference_cache)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ucache`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L658** 源码：<code>            if ucache:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L659** 源码：<code>                payload[&quot;use_reference_cache&quot;] = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `payload["use_reference_cache"]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L660** 源码：<code>                if task.get(&quot;uuid&quot;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L661** 源码：<code>                    payload[&quot;uuid&quot;] = task[&quot;uuid&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `payload["uuid"]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L662** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L663** 源码：<code>            # Record task metadata for heartbeat tracking.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L664** 源码：<code>            obj_ref_idx = len(obj_refs)  # Index of the obj_ref about to be appended to the list.</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `obj_ref_idx`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L665** 源码：<code>            idx_to_task_info[obj_ref_idx] = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `idx_to_task_info[obj_ref_idx]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L666** 源码：<code>                &quot;task_id&quot;: payload[&quot;task_id&quot;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L667** 源码：<code>                &quot;entry_point&quot;: ep,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L668** 源码：<code>                &quot;uuid&quot;: payload.get(&quot;uuid&quot;, &quot;&quot;),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L669** 源码：<code>                &quot;orig_idx&quot;: idx,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L670** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L671** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L672** 源码：<code>            obj_refs.append(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `obj_refs.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L673** 源码：<code>                self._worker.submit_and_poll.remote(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._worker.submit_and_poll.remote`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L674** 源码：<code>                    payload,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L675** 源码：<code>                    per_task_timeout_in_client,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L676** 源码：<code>                    self.max_retries,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L677** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L678** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L679** 源码：<code>            index_map.append(idx)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `index_map.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L680** 源码：<code>            submitted += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `submitted +`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L681** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L682** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L683** 源码：<code>            skipped = len(prefilled)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `skipped`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L684** 源码：<code>            print(f&quot;[HybridClient] batch submitted={submitted} skipped={skipped}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L685** 源码：<code>        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L686** 源码：<code>            pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L687** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L688** 源码：<code>        # Heartbeat: report progress and token-bucket level every 60s.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L689** 源码：<code>        pending = set(range(len(obj_refs)))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pending`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L690** 源码：<code>        results: List[Tuple[int, Dict[str, Any]]] = []</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L691** 源码：<code>        start_ts = time.time()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `start_ts`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L692** 源码：<code>        # Track remaining refs to avoid reprocessing completed tasks and looping.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L693** 源码：<code>        remaining_refs: List[ray.ObjectRef] = list(obj_refs)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L694** 源码：<code>        ref_to_idx = {ref: i for i, ref in enumerate(obj_refs)}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ref_to_idx`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L695** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L696** 源码：<code>        while remaining_refs:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L697** 源码：<code>            done, remaining_refs = await asyncio.to_thread(ray.wait, remaining_refs, num_returns=1, timeout=60)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L698** 源码：<code>            if done:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L699** 源码：<code>                ref = done[0]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ref`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L700** 源码：<code>                idx = ref_to_idx.get(ref, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `idx`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L701** 源码：<code>                try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L702** 源码：<code>                    res = await asyncio.to_thread(ray.get, ref)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `res`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L703** 源码：<code>                except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L704** 源码：<code>                    res = {&quot;status&quot;: &quot;failed&quot;, &quot;error_message&quot;: str(e)}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `res`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L705** 源码：<code>                if idx is not None and idx in pending:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L706** 源码：<code>                    results.append((idx, res))</code>
+  - 语法与作用：函数/构造器调用语法；调用 `results.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L707** 源码：<code>                    pending.discard(idx)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `pending.discard`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L708** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L709** 源码：<code>                elapsed = time.time() - start_ts</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `elapsed`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L710** 源码：<code>                in_use = -1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `in_use`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L711** 源码：<code>                try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L712** 源码：<code>                    in_use = await asyncio.to_thread(ray.get, self._rate_limit_worker.get_current_count.remote())</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `in_use`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L713** 源码：<code>                except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L714** 源码：<code>                    pass</code>
+  - 语法与作用：占位语句；当前不执行实际操作。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L715** 源码：<code>                </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L716** 源码：<code>                # Collect detailed info for pending tasks for logging.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L717** 源码：<code>                pending_tasks_info = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pending_tasks_info`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L718** 源码：<code>                for p_idx in sorted(list(pending))[:10]:  # Log at most the first 10 pending tasks.</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L719** 源码：<code>                    if p_idx in idx_to_task_info:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L720** 源码：<code>                        info = idx_to_task_info[p_idx]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `info`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L721** 源码：<code>                        pending_tasks_info.append(f&quot;task_id={info[&#x27;task_id&#x27;]} entry={info[&#x27;entry_point&#x27;]} uuid={info[&#x27;uuid&#x27;][:8] if info[&#x27;uuid&#x27;] else &#x27;N/A&#x27;}&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `pending_tasks_info.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L722** 源码：<code>                </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L723** 源码：<code>                pending_summary = &quot;; &quot;.join(pending_tasks_info) if pending_tasks_info else &quot;N/A&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pending_summary`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L724** 源码：<code>                if len(pending) &gt; 10:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L725** 源码：<code>                    pending_summary += f&quot; ... (+{len(pending)-10} more)&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pending_summary +`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L726** 源码：<code>                </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L727** 源码：<code>                print(f&quot;[BatchHeartbeat] hybrid: completed={len(results)}/{len(obj_refs)}, pending={len(pending)}, elapsed={elapsed:.1f}s tokens_in_use={in_use}/{self.rate_limit}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L728** 源码：<code>                print(f&quot;[BatchHeartbeat] pending_tasks: {pending_summary}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L729** 源码：<code>        # Merge back to original order.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L730** 源码：<code>        merged: List[Optional[Dict[str, Any]]] = [None] * len(tasks)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L731** 源码：<code>        # Fill prefilled first.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L732** 源码：<code>        for i, v in prefilled.items():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L733** 源码：<code>            merged[i] = v</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `merged[i]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L734** 源码：<code>        # Then fill worker results.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L735** 源码：<code>        for idx_in_obj, data in results:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L736** 源码：<code>            orig_idx = index_map[idx_in_obj]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `orig_idx`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L737** 源码：<code>            reward_func = self._get_reward_func()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_func`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L738** 源码：<code>            reward_summary = reward_func(data)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_summary`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L739** 源码：<code>            merged[orig_idx] = self._merge_reward_result(data, reward_summary)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `merged[orig_idx]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L740** 源码：<code>        # Fallback for any missing entries.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L741** 源码：<code>        for i, v in enumerate(merged):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L742** 源码：<code>            if v is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L743** 源码：<code>                merged[i] = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `merged[i]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L744** 源码：<code>                    &quot;reward&quot;: penalty_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L745** 源码：<code>                    &quot;speedup&quot;: 0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L746** 源码：<code>                    &quot;success&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L747** 源码：<code>                    &quot;correctness&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L748** 源码：<code>                    &quot;compiled&quot;: False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L749** 源码：<code>                    &quot;error&quot;: &quot;Unknown error&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L750** 源码：<code>                    &quot;num_custom_kernel&quot;: 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L751** 源码：<code>                    &quot;num_total_kernels&quot;: 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L752** 源码：<code>                    &quot;custom_kernel_cuda_time_in_profiling_us&quot;: 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L753** 源码：<code>                    &quot;total_kernel_run_time_in_profiling_us&quot;: 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L754** 源码：<code>                }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+- **L755** 源码：<code>        return merged  # type: ignore[return-value]</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件在 reward batch 中被调用；Ray remote worker、HTTP client 和 KernelGYM endpoint 是第三方/服务边界，边界调用行仍逐行保留。
+
+
+
+---
+
+**导航**：[上一附录](04-multiturn-rollout.md) · [附录目录](index.md) · [下一附录](06-trainer-foundation.md)

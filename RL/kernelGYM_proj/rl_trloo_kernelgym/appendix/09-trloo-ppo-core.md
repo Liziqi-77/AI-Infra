@@ -1,0 +1,3539 @@
+# TRLOO 与 PPO core algorithms
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+源码文件：`drkernel/verl_patch/trainer/code/ppo/core_algos.py`。本篇所有逐行条目均来自 `core_algos.py`；覆盖 returns、TRLOO、PPO policy loss 及其他算法辅助函数。
+
+#### 原始行 31–45
+- **L31** 源码：<code>def compute_multi_turn_returns(scores, gamma, max_turns):</code>
+  - 语法与作用：函数定义语法；声明 `compute_multi_turn_returns` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L32** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L33** 源码：<code>    with torch.no_grad():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L34** 源码：<code>        shaped_scores = scores.reshape(-1, max_turns)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `shaped_scores`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L35** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L36** 源码：<code>        returns = torch.zeros_like(shaped_scores)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L37** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L38** 源码：<code>        for i in reversed(range(max_turns)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L39** 源码：<code>            if i == max_turns - 1:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L40** 源码：<code>                returns[:, i] = shaped_scores[:, i]</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L41** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L42** 源码：<code>                returns[:, i] = shaped_scores[:, i] + gamma * returns[:, i + 1]</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L43** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L44** 源码：<code>        returns = returns.reshape(-1)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L45** 源码：<code>    return returns</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+
+#### 原始行 405–475
+- **L405** 源码：<code>def compute_multi_turn_rloo_outcome_advantage(</code>
+  - 语法与作用：函数定义语法；声明 `compute_multi_turn_rloo_outcome_advantage` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L406** 源码：<code>    token_level_rewards: torch.Tensor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L407** 源码：<code>    eos_mask: torch.Tensor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L408** 源码：<code>    loss_mask: torch.Tensor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L409** 源码：<code>    turn_indices: torch.Tensor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L410** 源码：<code>    index: np.ndarray,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L411** 源码：<code>    max_turns: int,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L412** 源码：<code>    gamma: float = 1.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L413** 源码：<code>    epsilon: float = 1e-6,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L414** 源码：<code>):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L415** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L416** 源码：<code>    Turn-aware REINFORCE Leave-one-out: compute advantages using mean of other samples</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L417** 源码：<code>    with same prompt, same turn, and loss_mask == 1</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L418** 源码：<code>    Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L419** 源码：<code>        token_level_rewards: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L420** 源码：<code>            shape: (bs, response_length)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L421** 源码：<code>        eos_mask: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L422** 源码：<code>            shape: (bs, response_length)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L423** 源码：<code>        loss_mask: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L424** 源码：<code>            shape: (bs, )</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L425** 源码：<code>        turn_indices: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L426** 源码：<code>            shape: (bs, )</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L427** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L428** 源码：<code>    Returns:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L429** 源码：<code>        advantages: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L430** 源码：<code>            shape: (bs, response_length)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L431** 源码：<code>        Returns: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L432** 源码：<code>            shape: (bs, response_length)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L433** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L434** 源码：<code>    response_length = token_level_rewards.shape[-1]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L435** 源码：<code>    scores = token_level_rewards.sum(dim=-1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `scores`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L436** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L437** 源码：<code>    returns = compute_multi_turn_returns(scores, gamma, max_turns)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L438** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L439** 源码：<code>    id2return = defaultdict(list)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `id2return`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L440** 源码：<code>    id2mean = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `id2mean`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L441** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L442** 源码：<code>    with torch.no_grad():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L443** 源码：<code>        bsz = returns.shape[0]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `bsz`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L444** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L445** 源码：<code>        advantages = torch.zeros_like(returns)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `advantages`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L446** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L447** 源码：<code>        for i in range(bsz):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L448** 源码：<code>            if turn_indices[i].item() == -1 or not loss_mask[i]:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L449** 源码：<code>                continue</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L450** 源码：<code>            idx = (index[i], turn_indices[i].item())</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `idx`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L451** 源码：<code>            id2return[idx].append(returns[i])</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L452** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L453** 源码：<code>        for idx in id2return:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L454** 源码：<code>            if len(id2return[idx]) == 1:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L455** 源码：<code>                id2mean[idx] = torch.tensor(0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `id2mean[idx]`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L456** 源码：<code>            elif len(id2return[idx]) &gt; 1:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L457** 源码：<code>                id2mean[idx] = torch.mean(torch.tensor(id2return[idx]))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `id2mean[idx]`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L458** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L459** 源码：<code>                raise ValueError(f&quot;no score in prompt index: {idx}&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L460** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L461** 源码：<code>        for i in range(bsz):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L462** 源码：<code>            if turn_indices[i].item() == -1 or not loss_mask[i]:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L463** 源码：<code>                continue</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L464** 源码：<code>            idx = (index[i], turn_indices[i].item())</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `idx`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L465** 源码：<code>            response_num = len(id2return[idx])</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_num`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L466** 源码：<code>            if response_num &gt; 1:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L467** 源码：<code>                advantages[i] = returns[i] * response_num / (response_num - 1) - id2mean[idx] * response_num / (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `advantages[i]`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L468** 源码：<code>                    response_num - 1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L469** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L470** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L471** 源码：<code>                advantages[i] = returns[i]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `advantages[i]`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L472** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L473** 源码：<code>        advantages = advantages.unsqueeze(-1).tile([1, response_length]) * eos_mask</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `advantages`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L474** 源码：<code>        returns = returns.unsqueeze(-1).tile([1, response_length]) * eos_mask</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L475** 源码：<code>        return advantages, returns</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+
+#### 原始行 655–924
+- **L655** 源码：<code>def compute_policy_loss(</code>
+  - 语法与作用：函数定义语法；声明 `compute_policy_loss` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L656** 源码：<code>    old_log_prob,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L657** 源码：<code>    log_prob,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L658** 源码：<code>    advantages,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L659** 源码：<code>    eos_mask,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L660** 源码：<code>    cliprange_low,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L661** 源码：<code>    cliprange_high,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L662** 源码：<code>    clip_ratio_c=3.0,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_ratio_c`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L663** 源码：<code>    entropy_clip_rate=0,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy_clip_rate`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L664** 源码：<code>    entropy=None,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L665** 源码：<code>    use_gspo=False,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_gspo`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L666** 源码：<code>    loss_agg_mode=&quot;seq-mean-token-sum&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_agg_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L667** 源码：<code>    loss_scale_factor=1.0,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_scale_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L668** 源码：<code>    rollout_is_weights=None,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_is_weights`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L669** 源码：<code>    extreme_risk_prob_threshold=None,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_prob_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L670** 源码：<code>):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L671** 源码：<code>    &quot;&quot;&quot;Compute policy loss for PPO or GSPO with optional rollout importance sampling correction.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L672** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L673** 源码：<code>    Adapted from https://github.com/huggingface/trl/blob/main/trl/trainer/ppo_trainer.py#L1122</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L674** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L675** 源码：<code>    Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L676** 源码：<code>        old_log_prob: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L677** 源码：<code>            Log probabilities from the old policy. Shape: (bs, response_length)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L678** 源码：<code>        log_prob: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L679** 源码：<code>            Log probabilities from the current policy. Shape: (bs, response_length)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L680** 源码：<code>        advantages: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L681** 源码：<code>            Advantage estimates for each token. Shape: (bs, response_length)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L682** 源码：<code>        eos_mask: `(torch.Tensor)`</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L683** 源码：<code>            Mask indicating valid tokens (1 for valid, 0 for padding). Shape: (bs, response_length)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L684** 源码：<code>        cliprange_low: (float)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L685** 源码：<code>            The lower clip range used in PPO. See https://arxiv.org/abs/1707.06347</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L686** 源码：<code>        cliprange_high: (float)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L687** 源码：<code>            The higher clip range used in PPO. See https://arxiv.org/abs/1707.06347</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L688** 源码：<code>        clip_ratio_c: (float)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L689** 源码：<code>            THe lower bound of the ratio for dual-clip PPO, defalut 3. See https://arxiv.org/pdf/1912.09729</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L690** 源码：<code>        entropy_clip_rate: (float)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L691** 源码：<code>            Fraction of tokens with low entropy to exclude from policy loss.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L692** 源码：<code>            For example, 0.8 means 80% of low-entropy tokens will not be trained on.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L693** 源码：<code>        entropy: `(torch.Tensor)` Optional</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L694** 源码：<code>            Token-level entropy values. Shape: (bs, response_length). Required if entropy_clip_rate &gt; 0.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L695** 源码：<code>        use_gspo: (bool)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L696** 源码：<code>            Whether to use GSPO (Group Sequence Policy Optimization) instead of standard PPO.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L697** 源码：<code>        loss_agg_mode: (str)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L698** 源码：<code>            Loss aggregation strategy. Choices:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L699** 源码：<code>            - &quot;token-mean&quot;: Average across all valid tokens in the batch (length-biased)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L700** 源码：<code>            - &quot;seq-mean-token-sum&quot;: Sum tokens per sequence, then average across sequences (REINFORCE-aligned, recommended)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L701** 源码：<code>            - &quot;seq-mean-token-mean&quot;: Mean tokens per sequence, then average across sequences (length-biased)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L702** 源码：<code>            - &quot;seq-mean-token-sum-norm&quot;: Sum tokens per sequence, normalize by max_seq_length (constant scaling)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L703** 源码：<code>            - &quot;seq-sum-no-norm&quot;: Sum all tokens across all sequences (no normalization)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L704** 源码：<code>        loss_scale_factor: (float)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L705** 源码：<code>            Multiplicative scaling factor applied to final loss value. Default: 1.0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L706** 源码：<code>        rollout_is_weights: `(torch.Tensor)` Optional</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L707** 源码：<code>            Pre-computed rollout importance sampling weights from the trainer.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L708** 源码：<code>            Shape: (bs, response_length). These weights correct for distribution mismatch</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L709** 源码：<code>            between rollout policy (e.g., vLLM BFloat16) and training policy (FSDP FP32).</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L710** 源码：<code>            Weights are computed centrally in ray_trainer.py using mismatch_helper.py.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L711** 源码：<code>        extreme_risk_prob_threshold: (float) Optional</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L712** 源码：<code>            Probability threshold for masking extreme risk tokens in negative advantage trajectories.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L713** 源码：<code>            Tokens with π(a|s) &lt; threshold AND negative advantages will be masked (zero loss).</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L714** 源码：<code>            This prevents gradient explosion from very low probability tokens.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L715** 源码：<code>            Typical values: 1e-5, 1e-6, or 1e-7 for aggressive risk mitigation.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L716** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L717** 源码：<code>    Returns:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L718** 源码：<code>        PolicyOutput: A dataclass containing:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L719** 源码：<code>            - loss: Policy gradient loss computed via PPO</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L720** 源码：<code>            - kl_divergence: KL between current and old policy</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L721** 源码：<code>            - clip_fraction: Fraction of ratios being clipped</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L722** 源码：<code>            - clip_fraction_lower/upper/dual: Detailed clipping statistics</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L723** 源码：<code>            - algorithm: &quot;ppo&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L724** 源码：<code>            - algorithm_metrics: Dict containing (when applicable):</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L725** 源码：<code>                - extreme_risk_*: Risk masking statistics (if extreme_risk_prob_threshold set)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L726** 源码：<code>            - loss_config: Configuration used for loss computation</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L727** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L728** 源码：<code>    Note:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L729** 源码：<code>        - Rollout IS weights and mismatch metrics are computed centrally in ray_trainer.py</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L730** 源码：<code>          using mismatch_helper.compute_rollout_importance_weights() before distributing</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L731** 源码：<code>          the batch to workers. This avoids duplicate computation and ensures consistency.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L732** 源码：<code>        - All mismatch metrics are prefixed with &quot;mismatch/&quot; and logged by the trainer.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L733** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L734** 源码：<code>    if use_gspo:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L735** 源码：<code>        # Compute policy loss for GSPO (Group Sequence Policy Optimization).</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L736** 源码：<code>        # Compute length-normalized sequence-level importance ratio</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L737** 源码：<code>        # Use masked_mean for better numerical stability</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L738** 源码：<code>        # This computes mean(log π) - mean(log μ) which is more stable than mean(log π - log μ)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L739** 源码：<code>        avg_log_prob = verl_F.masked_mean(log_prob, eos_mask, axis=-1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `avg_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L740** 源码：<code>        avg_old_log_prob = verl_F.masked_mean(old_log_prob, eos_mask, axis=-1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `avg_old_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L741** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L742** 源码：<code>        # Average log ratio per token (equivalent to seq_log_ratio but more numerically stable)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L743** 源码：<code>        seq_log_ratio = avg_log_prob - avg_old_log_prob</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `seq_log_ratio`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L744** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L745** 源码：<code>        # Compute sequence-level importance ratio s_i(θ)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L746** 源码：<code>        seq_ratio = torch.exp(seq_log_ratio)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `seq_ratio`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L747** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L748** 源码：<code>        # Extract sequence-level advantages (use the first valid token&#x27;s advantage)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L749** 源码：<code>        seq_advantages = advantages[:, 0]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `seq_advantages`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L750** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L751** 源码：<code>        # Compute GSPO loss with clipping</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L752** 源码：<code>        pg_losses = -seq_advantages * seq_ratio</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L753** 源码：<code>        pg_losses2 = -seq_advantages * torch.clamp(seq_ratio, 1.0 - cliprange_low, 1.0 + cliprange_high)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses2`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L754** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L755** 源码：<code>        # Choose the maximum (less negative) loss</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L756** 源码：<code>        pg_losses_clipped = torch.max(pg_losses, pg_losses2)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses_clipped`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L757** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L758** 源码：<code>        # Compute clip fraction</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L759** 源码：<code>        pg_clipfrac = torch.mean(torch.gt(pg_losses2, pg_losses).float())</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_clipfrac`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L760** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L761** 源码：<code>        # Final loss is the mean over sequences</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L762** 源码：<code>        pg_loss = torch.mean(pg_losses_clipped)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_loss`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L763** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L764** 源码：<code>        # Compute KL divergence (average KL per token)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L765** 源码：<code>        # Using the stable computation: mean(log_old) - mean(log_new) = -seq_log_ratio</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L766** 源码：<code>        gspo_kl = -seq_log_ratio.mean()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gspo_kl`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L767** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L768** 源码：<code>        # GSPO doesn&#x27;t use lower bound clipping, so return 0.0 for compatibility</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L769** 源码：<code>        pg_clipfrac_lower = torch.tensor(0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_clipfrac_lower`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L770** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L771** 源码：<code>        # Create unified output for GSPO</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L772** 源码：<code>        return PolicyOutput(</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L773** 源码：<code>            loss=pg_loss,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L774** 源码：<code>            kl_divergence=gspo_kl,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `kl_divergence`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L775** 源码：<code>            clip_fraction=pg_clipfrac,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_fraction`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L776** 源码：<code>            clip_fraction_lower=pg_clipfrac_lower,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_fraction_lower`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L777** 源码：<code>            clip_fraction_upper=torch.tensor(0.0),  # GSPO doesn&#x27;t use upper clipping</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_fraction_upper`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L778** 源码：<code>            clip_fraction_dual=torch.tensor(0.0),  # GSPO doesn&#x27;t use dual clipping</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_fraction_dual`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L779** 源码：<code>            algorithm=&quot;gspo&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L780** 源码：<code>            algorithm_metrics={},</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L781** 源码：<code>            loss_config={</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_config`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L782** 源码：<code>                &quot;loss_agg_mode&quot;: loss_agg_mode,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L783** 源码：<code>                &quot;loss_scale_factor&quot;: loss_scale_factor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L784** 源码：<code>                &quot;cliprange_low&quot;: cliprange_low,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L785** 源码：<code>                &quot;cliprange_high&quot;: cliprange_high,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L786** 源码：<code>                &quot;entropy_clip_rate&quot;: entropy_clip_rate,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L787** 源码：<code>            },</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L788** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L789** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L790** 源码：<code>    assert (</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L791** 源码：<code>        clip_ratio_c &gt; 1.0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L792** 源码：<code>    ), f&quot;The lower bound of the clip_ratio_c for dual-clip PPO should be greater than 1.0, but get the value: {clip_ratio_c}.&quot;</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L793** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L794** 源码：<code>    negative_approx_kl = log_prob - old_log_prob</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `negative_approx_kl`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L795** 源码：<code>    ratio = torch.exp(negative_approx_kl)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ratio`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L796** 源码：<code>    ppo_kl = verl_F.masked_mean(-negative_approx_kl, eos_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ppo_kl`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L797** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L798** 源码：<code>    pg_losses_original = -advantages * ratio</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses_original`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L799** 源码：<code>    pg_losses2 = -advantages * torch.clamp(ratio, 1.0 - cliprange_low, 1.0 + cliprange_high)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses2`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L800** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L801** 源码：<code>    clip_pg_losses1 = torch.maximum(pg_losses_original, pg_losses2)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_pg_losses1`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L802** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L803** 源码：<code>    pg_losses3 = -advantages * clip_ratio_c</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses3`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L804** 源码：<code>    clip_pg_losses2 = torch.minimum(pg_losses3, clip_pg_losses1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_pg_losses2`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L805** 源码：<code>    # We only apply the dual-clip when the advantage is negative.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L806** 源码：<code>    pg_losses = torch.where(advantages &lt; 0, clip_pg_losses2, clip_pg_losses1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L807** 源码：<code>    pg_loss = verl_F.masked_mean(pg_losses, eos_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_loss`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L808** 源码：<code>    # Correct clipping fraction calculations</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L809** 源码：<code>    # Dual-clip activated: when dual constraint is binding (dual loss &lt; standard loss)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L810** 源码：<code>    dual_clip_activated = torch.lt(pg_losses3, clip_pg_losses1) * (advantages &lt; 0).float()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `dual_clip_activated`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L811** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L812** 源码：<code>    # Standard PPO clipping bounds</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L813** 源码：<code>    ratio_upper_bound = ratio &gt; (1.0 + cliprange_high)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ratio_upper_bound`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L814** 源码：<code>    ratio_lower_bound = ratio &lt; (1.0 - cliprange_low)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ratio_lower_bound`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L815** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L816** 源码：<code>    # Make categories mutually exclusive: dual-clip takes precedence</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L817** 源码：<code>    # Upper bound clipping: ratio &gt; 1 + cliprange_high AND NOT dual-clipped</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L818** 源码：<code>    upper_clipped = ratio_upper_bound.float() * (1.0 - dual_clip_activated)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `upper_clipped`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L819** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L820** 源码：<code>    # Lower bound clipping: ratio &lt; 1 - cliprange_low OR dual-clip activated</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L821** 源码：<code>    lower_clipped = torch.clamp(ratio_lower_bound.float() + dual_clip_activated, 0.0, 1.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `lower_clipped`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L822** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L823** 源码：<code>    # Total clipping: upper + lower (now mutually exclusive)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L824** 源码：<code>    total_clipped = upper_clipped + lower_clipped</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_clipped`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L825** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L826** 源码：<code>    pg_clipfrac = verl_F.masked_mean(total_clipped, eos_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_clipfrac`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L827** 源码：<code>    pg_clipfrac_lower = verl_F.masked_mean(lower_clipped, eos_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_clipfrac_lower`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L828** 源码：<code>    pg_clipfrac_higher = verl_F.masked_mean(upper_clipped, eos_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_clipfrac_higher`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L829** 源码：<code>    pg_clipfrac_dual = verl_F.masked_mean(dual_clip_activated, eos_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_clipfrac_dual`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L830** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L831** 源码：<code>    # Compute entropy clip</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L832** 源码：<code>    if entropy_clip_rate &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L833** 源码：<code>        assert entropy is not None, &quot;entropy should be provided when entropy_clip_rate &gt; 0.&quot;</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L834** 源码：<code>        # Note: This uses masked_quantile which may not be available in all versions</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L835** 源码：<code>        # Consider implementing a fallback or ensuring this dependency is available</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L836** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L837** 源码：<code>            entropy_quantile = verl_F.masked_quantile(entropy, eos_mask, entropy_clip_rate)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy_quantile`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L838** 源码：<code>            pg_losses = torch.where(entropy &gt; entropy_quantile, pg_losses, 0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L839** 源码：<code>        except AttributeError:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L840** 源码：<code>            # Fallback: skip entropy clipping if masked_quantile is not available</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L841** 源码：<code>            import warnings</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L842** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L843** 源码：<code>            warnings.warn(&quot;masked_quantile not available, skipping entropy clipping&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `warnings.warn`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L844** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L845** 源码：<code>    # Mask extreme risk tokens ONLY in negative advantage trajectories</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L846** 源码：<code>    # This prevents gradient explosion from the policy gradient term: ∇L ∝ A/π</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L847** 源码：<code>    # When A &lt; 0 and π → 0, the gradient can explode catastrophically</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L848** 源码：<code>    extreme_risk_masked_fraction = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_masked_fraction`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L849** 源码：<code>    extreme_risk_masked_advantage_mass = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_masked_advantage_mass`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L850** 源码：<code>    extreme_risk_effective_batch_ratio = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_effective_batch_ratio`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L851** 源码：<code>    if extreme_risk_prob_threshold is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L852** 源码：<code>        # Work in log space for better numerical precision</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L853** 源码：<code>        log_threshold = torch.log(torch.tensor(extreme_risk_prob_threshold))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `log_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L854** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L855** 源码：<code>        # Identify extreme risk tokens: BOTH conditions must be true:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L856** 源码：<code>        # 1. Low probability: log(π) &lt; log(threshold) ⟺ π &lt; threshold (high gradient amplification)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L857** 源码：<code>        # 2. Negative advantage: A &lt; 0 (would cause large negative gradient)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L858** 源码：<code>        extreme_risk_mask = (old_log_prob &lt; log_threshold) &amp; (advantages &lt; 0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L859** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L860** 源码：<code>        # Essential monitoring metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L861** 源码：<code>        # 1. Fraction of tokens being masked</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L862** 源码：<code>        extreme_risk_masked_fraction = verl_F.masked_mean(extreme_risk_mask.float(), eos_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_masked_fraction`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L863** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L864** 源码：<code>        # 2. Total advantage mass being masked (shows importance of masked tokens)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L865** 源码：<code>        masked_advantages = torch.where(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `masked_advantages`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L866** 源码：<code>            extreme_risk_mask &amp; eos_mask.bool(), advantages.abs(), torch.zeros_like(advantages)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L867** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L868** 源码：<code>        total_advantages = torch.where(eos_mask.bool(), advantages.abs(), torch.zeros_like(advantages))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_advantages`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L869** 源码：<code>        masked_advantages_sum = verl_F.masked_sum(masked_advantages, eos_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `masked_advantages_sum`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L870** 源码：<code>        total_advantages_sum = verl_F.masked_sum(total_advantages, eos_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_advantages_sum`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L871** 源码：<code>        extreme_risk_masked_advantage_mass = masked_advantages_sum / (total_advantages_sum + 1e-8)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_masked_advantage_mass`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L872** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L873** 源码：<code>        # 3. Effective batch size ratio (how much data we&#x27;re actually using)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L874** 源码：<code>        total_valid_tokens = eos_mask.sum()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_valid_tokens`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L875** 源码：<code>        unmasked_tokens = (eos_mask.bool() &amp; ~extreme_risk_mask).float().sum()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `unmasked_tokens`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L876** 源码：<code>        extreme_risk_effective_batch_ratio = unmasked_tokens / (total_valid_tokens + 1e-8)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_effective_batch_ratio`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L877** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L878** 源码：<code>        # Zero out loss for extreme risk tokens to prevent gradient explosion</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L879** 源码：<code>        # This effectively removes these tokens from the gradient computation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L880** 源码：<code>        pg_losses = torch.where(extreme_risk_mask, torch.zeros_like(pg_losses), pg_losses)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L881** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L882** 源码：<code>    # vLLM Importance Sampling Correction</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L883** 源码：<code>    # NOTE: IS weights are now pre-computed centrally in ray_trainer.py</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L884** 源码：<code>    # This avoids duplicate computation and ensures consistency across workers</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L885** 源码：<code>    # Apply rollout importance sampling weights if provided</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L886** 源码：<code>    if rollout_is_weights is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L887** 源码：<code>        pg_losses = rollout_is_weights * pg_losses</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_losses`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L888** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L889** 源码：<code>    # Use the flexible loss aggregation function instead of hardcoded masked_mean</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L890** 源码：<code>    pg_loss = agg_loss(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_loss`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L891** 源码：<code>        loss_mat=pg_losses, loss_mask=eos_mask, loss_agg_mode=loss_agg_mode, scale_factor=loss_scale_factor</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_mat`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L892** 源码：<code>    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L893** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L894** 源码：<code>    # Create algorithm_metrics dict</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L895** 源码：<code>    # Note: IS and mismatch metrics are now computed centrally in ray_trainer.py</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L896** 源码：<code>    # to avoid duplication and ensure consistency</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L897** 源码：<code>    algorithm_metrics = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L898** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L899** 源码：<code>    if extreme_risk_masked_fraction is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L900** 源码：<code>        algorithm_metrics[&quot;extreme_risk_masked_fraction&quot;] = extreme_risk_masked_fraction</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm_metrics["extreme_risk_masked_fraction"]`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L901** 源码：<code>        algorithm_metrics[&quot;extreme_risk_masked_advantage_mass&quot;] = extreme_risk_masked_advantage_mass</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm_metrics["extreme_risk_masked_advantage_mass"]`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L902** 源码：<code>        algorithm_metrics[&quot;extreme_risk_effective_batch_ratio&quot;] = extreme_risk_effective_batch_ratio</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm_metrics["extreme_risk_effective_batch_ratio"]`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L903** 源码：<code>        algorithm_metrics[&quot;extreme_risk_prob_threshold&quot;] = extreme_risk_prob_threshold</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm_metrics["extreme_risk_prob_threshold"]`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L904** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L905** 源码：<code>    return PolicyOutput(</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L906** 源码：<code>        loss=pg_loss,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L907** 源码：<code>        kl_divergence=ppo_kl,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `kl_divergence`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L908** 源码：<code>        clip_fraction=pg_clipfrac,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_fraction`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L909** 源码：<code>        clip_fraction_lower=pg_clipfrac_lower,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_fraction_lower`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L910** 源码：<code>        clip_fraction_upper=pg_clipfrac_higher,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_fraction_upper`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L911** 源码：<code>        clip_fraction_dual=pg_clipfrac_dual,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_fraction_dual`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L912** 源码：<code>        algorithm=&quot;ppo&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L913** 源码：<code>        algorithm_metrics=algorithm_metrics,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `algorithm_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L914** 源码：<code>        loss_config={</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_config`，可能创建、覆盖或累加状态。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L915** 源码：<code>            &quot;loss_agg_mode&quot;: loss_agg_mode,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L916** 源码：<code>            &quot;loss_scale_factor&quot;: loss_scale_factor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L917** 源码：<code>            &quot;cliprange_low&quot;: cliprange_low,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L918** 源码：<code>            &quot;cliprange_high&quot;: cliprange_high,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L919** 源码：<code>            &quot;clip_ratio_c&quot;: clip_ratio_c,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L920** 源码：<code>            &quot;entropy_clip_rate&quot;: entropy_clip_rate,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L921** 源码：<code>            &quot;rollout_is_weights_applied&quot;: rollout_is_weights is not None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L922** 源码：<code>            &quot;extreme_risk_prob_threshold&quot;: extreme_risk_prob_threshold,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L923** 源码：<code>        },</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+- **L924** 源码：<code>    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：TRLOO 函数和 PPO policy loss 是项目 patch；调用 VERL tensor helper 的行只解释其输入输出，不展开 helper 内部。
+
+#### 原始行 1–30
+- **L1** <code># Copyright 2025 ByteDance Ltd. and/or its affiliates</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L2** <code># Copyright 2022 The HuggingFace Team. All rights reserved.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L3** <code>#</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L4** <code># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L5** <code># you may not use this file except in compliance with the License.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L6** <code># You may obtain a copy of the License at</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L7** <code>#</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L8** <code>#     http://www.apache.org/licenses/LICENSE-2.0</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L9** <code>#</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L10** <code># Unless required by applicable law or agreed to in writing, software</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L11** <code># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L12** <code># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L13** <code># See the License for the specific language governing permissions and</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L14** <code># limitations under the License.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L15** <code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L16** <code>Core functions to implement PPO algorithms with enhanced loss aggregation modes.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L17** <code>The function implemented in this file should be used by trainer with different distributed strategies to</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L18** <code>implement PPO</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L19** <code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L20** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L21** <code>from collections import defaultdict</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L22** <code>from typing import Optional</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L23** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L24** <code>import numpy as np</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L25** <code>import torch</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L26** <code>import verl.utils.torch_functional as verl_F</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L27** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L28** <code>from verl_patch.utils.metric import PolicyOutput</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L29** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L30** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+#### 原始行 46–404
+- **L46** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L47** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L48** <code>def compute_multi_turn_cumulative_rewards(scores, max_turns):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L49** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L50** <code>    with torch.no_grad():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L51** <code>        shaped_scores = scores.reshape(-1, max_turns)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `shaped_scores`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L52** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L53** <code>        cum_scores = torch.cumsum(shaped_scores, dim=-1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cum_scores`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L54** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L55** <code>        cum_scores = cum_scores.reshape(-1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cum_scores`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L56** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L57** <code>    return cum_scores</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L58** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L59** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L60** <code>def validate_loss_agg_mode(loss_agg_mode: str) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L61** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L62** <code>    Validate the loss aggregation mode parameter.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L63** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L64** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L65** <code>        loss_agg_mode: The loss aggregation mode to validate</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L66** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L67** <code>    Raises:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L68** <code>        ValueError: If the mode is not supported</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L69** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L70** <code>    valid_modes = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_modes`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L71** <code>        &quot;token-mean&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L72** <code>        &quot;seq-mean-token-sum&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L73** <code>        &quot;seq-mean-token-mean&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L74** <code>        &quot;seq-mean-token-sum-norm&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L75** <code>        &quot;seq-sum-no-norm&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L76** <code>    ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L77** <code>    if loss_agg_mode not in valid_modes:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L78** <code>        raise ValueError(f&quot;Invalid loss_agg_mode: {loss_agg_mode}. &quot; f&quot;Supported modes: {valid_modes}&quot;)</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L79** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L80** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L81** <code>class AdaptiveKLController:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L82** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L83** <code>    Adaptive KL controller described in the paper:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L84** <code>    https://arxiv.org/pdf/1909.08593.pdf</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L85** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L86** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L87** <code>    def __init__(self, init_kl_coef, target_kl, horizon):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L88** <code>        self.value = init_kl_coef</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.value`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L89** <code>        self.target = target_kl</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.target`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L90** <code>        self.horizon = horizon</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.horizon`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L91** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L92** <code>    def update(self, current_kl, n_steps):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L93** <code>        target = self.target</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `target`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L94** <code>        proportional_error = np.clip(current_kl / target - 1, -0.2, 0.2)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `proportional_error`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L95** <code>        mult = 1 + proportional_error * n_steps / self.horizon</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mult`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L96** <code>        self.value *= mult</code>
+  - 语法与作用：属性/变量赋值（`*=`）；计算右侧表达式并更新 `self.value`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L97** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L98** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L99** <code>class FixedKLController:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L100** <code>    &quot;&quot;&quot;Fixed KL controller.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L101** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L102** <code>    def __init__(self, kl_coef):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L103** <code>        self.value = kl_coef</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.value`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L104** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L105** <code>    def update(self, current_kl, n_steps):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L106** <code>        # Fixed KL controller doesn&#x27;t update</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L107** <code>        _ = current_kl  # Mark as intentionally unused</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `_`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L108** <code>        _ = n_steps  # Mark as intentionally unused</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `_`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L109** <code>        pass</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L110** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L111** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L112** <code>def agg_loss(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L113** <code>    loss_mat: torch.Tensor, loss_mask: torch.Tensor, loss_agg_mode: str, scale_factor: float = 1.0</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `loss_mat: torch.Tensor, loss_mask: torch.Tensor, loss_agg_mode: str, scale_factor: float`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L114** <code>) -&gt; torch.Tensor:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L115** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L116** <code>    Aggregate the loss matrix into a scalar using different aggregation strategies.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L117** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L118** <code>    This function provides flexible loss aggregation modes that can significantly impact</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L119** <code>    training dynamics, especially for algorithms like DrGRPO that require specific</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L120** <code>    normalization strategies.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L121** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L122** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L123** <code>        loss_mat: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `loss_mat: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L124** <code>            Loss values per token, shape: (batch_size, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Loss values per token, shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L125** <code>        loss_mask: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `loss_mask: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L126** <code>            Binary mask indicating valid tokens, shape: (batch_size, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Binary mask indicating valid tokens, shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L127** <code>        loss_agg_mode: (str) Loss aggregation strategy. Choices:</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `loss_agg_mode:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L128** <code>            - &quot;token-mean&quot;: Average across all valid tokens in the batch (length-biased)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "token-mean": Average across all valid tokens in the batch`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L129** <code>            - &quot;seq-mean-token-sum&quot;: Sum tokens per sequence, then average across sequences (REINFORCE-aligned, recommended)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "seq-mean-token-sum": Sum tokens per sequence, then average across sequences`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L130** <code>            - &quot;seq-mean-token-mean&quot;: Mean tokens per sequence, then average across sequences (length-biased)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "seq-mean-token-mean": Mean tokens per sequence, then average across sequences`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L131** <code>            - &quot;seq-mean-token-sum-norm&quot;: Sum tokens per sequence, normalize by max_seq_length (constant scaling)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "seq-mean-token-sum-norm": Sum tokens per sequence, normalize by max_seq_length`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L132** <code>            - &quot;seq-sum-no-norm&quot;: Sum all tokens across all sequences (no normalization)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "seq-sum-no-norm": Sum all tokens across all sequences`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L133** <code>        scale_factor: (float) Optional scaling factor to divide the final loss by.</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `scale_factor:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L134** <code>            Useful for controlling gradient magnitude with very long sequences.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L135** <code>            Default: 1.0 (no scaling)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Default: 1.0`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L136** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L137** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L138** <code>        loss: `torch.Tensor`</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L139** <code>            Aggregated scalar loss</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L140** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L141** <code>    Mathematical Details:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L142** <code>        token-mean:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L143** <code>            loss = Σ(loss_mat * loss_mask) / Σ(loss_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L144** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L145** <code>        seq-mean-token-sum:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L146** <code>            seq_losses[i] = Σ_j(loss_mat[i,j] * loss_mask[i,j])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_losses[i]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L147** <code>            loss = mean(seq_losses)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L148** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L149** <code>        seq-mean-token-mean:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L150** <code>            seq_losses[i] = Σ_j(loss_mat[i,j] * loss_mask[i,j]) / Σ_j(loss_mask[i,j])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_losses[i]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L151** <code>            loss = mean(seq_losses)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L152** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L153** <code>        seq-mean-token-sum-norm:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L154** <code>            seq_losses[i] = Σ_j(loss_mat[i,j] * loss_mask[i,j])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_losses[i]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L155** <code>            loss = Σ(seq_losses) / max_seq_length</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L156** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L157** <code>        seq-sum-no-norm:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L158** <code>            loss = Σ(loss_mat * loss_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L159** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L160** <code>    Notes:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L161** <code>        - &quot;token-mean&quot; treats all tokens equally, regardless of sequence boundaries</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L162** <code>        - &quot;seq-mean-*&quot; modes ensure each sequence contributes equally to the final loss</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L163** <code>        - &quot;seq-mean-token-sum-norm&quot; maintains constant normalization for DrGRPO replication</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L164** <code>        - &quot;seq-sum-no-norm&quot; provides raw unnormalized loss sum across all tokens</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L165** <code>        - Use scale_factor parameter to control gradient magnitude for long sequences</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L166** <code>        - The choice of aggregation mode can affect convergence and bias in RL training</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L167** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L168** <code>    # Validate the aggregation mode</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L169** <code>    validate_loss_agg_mode(loss_agg_mode)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `validate_loss_agg_mode`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L170** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L171** <code>    if loss_agg_mode == &quot;token-mean&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L172** <code>        # Standard token-level averaging across the entire batch</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L173** <code>        loss = verl_F.masked_mean(loss_mat, loss_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L174** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L175** <code>    elif loss_agg_mode == &quot;seq-mean-token-sum&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L176** <code>        # Sum loss per sequence, then average across sequences</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L177** <code>        seq_losses = torch.sum(loss_mat * loss_mask, dim=-1)  # (batch_size,)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_losses`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L178** <code>        seq_mask = (torch.sum(loss_mask, dim=-1) &gt; 0).float()  # (batch_size,) 1 if seq has valid tokens</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_mask`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L179** <code>        loss = verl_F.masked_mean(seq_losses, seq_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L180** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L181** <code>    elif loss_agg_mode == &quot;seq-mean-token-mean&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L182** <code>        # Mean loss per sequence (length-normalized), then average across sequences</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L183** <code>        # Compute per-sequence token-mean, then average over valid sequences</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L184** <code>        seq_losses = verl_F.masked_mean(loss_mat, loss_mask, axis=-1)  # (batch_size,) token-mean per seq</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_losses`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L185** <code>        seq_mask = (torch.sum(loss_mask, dim=-1) &gt; 0).float()  # (batch_size,) 1 if seq has valid tokens</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_mask`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L186** <code>        loss = verl_F.masked_mean(seq_losses, seq_mask)  # seq-mean over valid seqs</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L187** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L188** <code>    elif loss_agg_mode == &quot;seq-mean-token-sum-norm&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L189** <code>        # Sum loss per sequence, normalize by maximum sequence length</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L190** <code>        # This mode is designed for DrGRPO paper replication where the divisor</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L191** <code>        # should remain constant throughout training</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L192** <code>        # NOTE: Rejected sequences (with all tokens masked) contribute 0 to the sum,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L193** <code>        # which is the intended behavior for constant normalization</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L194** <code>        seq_losses = torch.sum(loss_mat * loss_mask, dim=-1)  # (batch_size,)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_losses`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L195** <code>        max_seq_length = loss_mask.shape[-1]  # Maximum possible sequence length</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_seq_length`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L196** <code>        loss = torch.sum(seq_losses) / max_seq_length</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L197** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L198** <code>    elif loss_agg_mode == &quot;seq-sum-no-norm&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L199** <code>        # Sum all valid tokens across all sequences without any normalization</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L200** <code>        # This gives the raw total loss across the entire batch</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L201** <code>        # Formula: loss = Σ(loss_mat * loss_mask)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L202** <code>        loss = torch.sum(loss_mat * loss_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L203** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L204** <code>    # Apply optional scaling factor to control gradient magnitude</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L205** <code>    if scale_factor != 1.0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L206** <code>        loss = loss / scale_factor</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L207** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L208** <code>    return loss</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L209** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L210** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L211** <code>def get_kl_controller(kl_ctrl):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L212** <code>    if kl_ctrl.type == &#x27;fixed&#x27;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L213** <code>        return FixedKLController(kl_coef=kl_ctrl.kl_coef)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L214** <code>    elif kl_ctrl.type == &#x27;adaptive&#x27;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L215** <code>        assert kl_ctrl.horizon &gt; 0, f&#x27;horizon must be larger than 0. Got {kl_ctrl.horizon}&#x27;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L216** <code>        return AdaptiveKLController(init_kl_coef=kl_ctrl.kl_coef, target_kl=kl_ctrl.target_kl, horizon=kl_ctrl.horizon)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L217** <code>    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L218** <code>        raise NotImplementedError</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L219** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L220** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L221** <code>def compute_gae_advantage_return(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L222** <code>    token_level_rewards: torch.Tensor,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L223** <code>    values: torch.Tensor,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L224** <code>    eos_mask: torch.Tensor,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L225** <code>    gamma: torch.Tensor,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L226** <code>    lam: torch.Tensor,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L227** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L228** <code>    &quot;&quot;&quot;Adapted from https://github.com/huggingface/trl/blob/main/trl/trainer/ppo_trainer.py</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L229** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L230** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L231** <code>        token_level_rewards: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `token_level_rewards: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L232** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L233** <code>        values: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `values: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L234** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L235** <code>        eos_mask: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `eos_mask: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L236** <code>            shape: (bs, response_length). [EOS] mask. The token after [EOS] have mask zero.</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L237** <code>        gamma: `(float)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `gamma: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L238** <code>            discounted factor used in RL</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L239** <code>        lam: `(float)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `lam: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L240** <code>            lambda value when computing Generalized Advantage Estimation (https://arxiv.org/abs/1506.02438)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `lambda value when computing Generalized Advantage Estimation`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L241** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L242** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L243** <code>        advantages: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `advantages: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L244** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L245** <code>        Returns: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Returns: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L246** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L247** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L248** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L249** <code>    with torch.no_grad():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L250** <code>        lastgaelam = 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lastgaelam`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L251** <code>        advantages_reversed = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages_reversed`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L252** <code>        gen_len = token_level_rewards.shape[-1]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `gen_len`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L253** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L254** <code>        for t in reversed(range(gen_len)):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L255** <code>            nextvalues = values[:, t + 1] if t &lt; gen_len - 1 else 0.0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `nextvalues`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L256** <code>            delta = token_level_rewards[:, t] + gamma * nextvalues - values[:, t]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `delta`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L257** <code>            lastgaelam = delta + gamma * lam * lastgaelam</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lastgaelam`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L258** <code>            advantages_reversed.append(lastgaelam)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `advantages_reversed.append`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L259** <code>        advantages = torch.stack(advantages_reversed[::-1], dim=1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L260** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L261** <code>        returns = advantages + values</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L262** <code>        advantages = verl_F.masked_whiten(advantages, eos_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L263** <code>    return advantages, returns</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L264** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L265** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L266** <code># NOTE(sgm): this implementation only consider outcome supervision, where the reward is a scalar.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L267** <code>def compute_grpo_outcome_advantage(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L268** <code>    token_level_rewards: torch.Tensor, eos_mask: torch.Tensor, index: np.ndarray, epsilon: float = 1e-6</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `token_level_rewards: torch.Tensor, eos_mask: torch.Tensor, index: np.ndarray, epsilon: float`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L269** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L270** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L271** <code>    Compute advantage for GRPO using trajectory-level baseline.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L272** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L273** <code>    Mathematical formulation:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L274** <code>    A_t^(i) = (R_t^(i) - mean) / std</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `A_t^(i)`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L275** <code>    where R_t is reward-to-go from position t, and mean/std are computed</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L276** <code>    from total trajectory rewards within each prompt group.</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L277** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L278** <code>    This correctly implements the decoupled policy gradient with trajectory-level</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L279** <code>    baseline, since we only sample complete trajectories from the initial state.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L280** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L281** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L282** <code>        token_level_rewards: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `token_level_rewards: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L283** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L284** <code>        eos_mask: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `eos_mask: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L285** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L286** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L287** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L288** <code>        advantages: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `advantages: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L289** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L290** <code>        Returns: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Returns: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L291** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L292** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L293** <code>    # Compute returns (reward-to-go from each position)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L294** <code>    returns = (token_level_rewards * eos_mask).flip(dims=[-1]).cumsum(dim=-1).flip(dims=[-1])</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L295** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L296** <code>    with torch.no_grad():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L297** <code>        # Extract total trajectory rewards (R^(i) = R_1^(i))</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L298** <code>        trajectory_rewards = returns[:, 0] if returns.shape[0] &gt; 0 else returns</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trajectory_rewards`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L299** <code>        bsz = trajectory_rewards.shape[0]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `bsz`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L300** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L301** <code>        # Group trajectories by prompt and compute normalization parameters</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L302** <code>        id2rewards = defaultdict(list)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2rewards`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L303** <code>        id2mean = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2mean`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L304** <code>        id2std = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2std`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L305** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L306** <code>        for i in range(bsz):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L307** <code>            id2rewards[index[i]].append(trajectory_rewards[i])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `id2rewards[index[i]].append`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L308** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L309** <code>        for idx in id2rewards:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L310** <code>            if len(id2rewards[idx]) == 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L311** <code>                # Single trajectory: use standard normalization</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L312** <code>                id2mean[idx] = torch.tensor(0.0, device=trajectory_rewards.device)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2mean[idx]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L313** <code>                id2std[idx] = torch.tensor(1.0, device=trajectory_rewards.device)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2std[idx]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L314** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L315** <code>                rewards_tensor = torch.stack(id2rewards[idx])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rewards_tensor`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L316** <code>                id2mean[idx] = rewards_tensor.mean()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2mean[idx]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L317** <code>                id2std[idx] = rewards_tensor.std()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2std[idx]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L318** <code>                if id2std[idx] &lt; epsilon:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L319** <code>                    id2std[idx] = torch.tensor(1.0, device=trajectory_rewards.device)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2std[idx]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L320** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L321** <code>        # Apply normalization to reward-to-go at each position</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L322** <code>        # A_t^(i) = (R_t^(i) - mean) / std</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L323** <code>        advantages = torch.zeros_like(returns)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L324** <code>        for i in range(bsz):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L325** <code>            mean = id2mean[index[i]]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mean`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L326** <code>            std = id2std[index[i]]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `std`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L327** <code>            advantages[i] = (returns[i] - mean) / (std + epsilon)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages[i]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L328** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L329** <code>        # Apply mask</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L330** <code>        advantages = advantages * eos_mask</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L331** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L332** <code>    return advantages, returns</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L333** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L334** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L335** <code>def compute_rloo_outcome_advantage(token_level_rewards: torch.Tensor, eos_mask: torch.Tensor, index: np.ndarray):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L336** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L337** <code>    Compute advantage for RLOO based on https://arxiv.org/abs/2402.14740</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L338** <code>    using trajectory-level leave-one-out baseline.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L339** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L340** <code>    Mathematical formulation:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L341** <code>    A_t^(i) = R_t^(i) - b_LOO^(i)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `A_t^(i)`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L342** <code>    where R_t is reward-to-go from position t, and b_LOO is the leave-one-out</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L343** <code>    mean of total trajectory rewards from the same prompt group.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L344** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L345** <code>    This correctly implements the decoupled policy gradient with trajectory-level</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L346** <code>    leave-one-out baseline, since we only sample complete trajectories.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L347** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L348** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L349** <code>        token_level_rewards: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `token_level_rewards: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L350** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L351** <code>        eos_mask: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `eos_mask: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L352** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L353** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L354** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L355** <code>        advantages: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `advantages: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L356** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L357** <code>        Returns: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Returns: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L358** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L359** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L360** <code>    # Compute returns (reward-to-go from each position)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L361** <code>    returns = (token_level_rewards * eos_mask).flip(dims=[-1]).cumsum(dim=-1).flip(dims=[-1])</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L362** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L363** <code>    with torch.no_grad():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L364** <code>        # Extract total trajectory rewards</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L365** <code>        trajectory_rewards = returns[:, 0] if returns.shape[0] &gt; 0 else returns</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trajectory_rewards`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L366** <code>        bsz = trajectory_rewards.shape[0]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `bsz`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L367** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L368** <code>        # Group trajectories by prompt</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L369** <code>        id2rewards = defaultdict(list)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2rewards`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L370** <code>        id2indices = defaultdict(list)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `id2indices`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L371** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L372** <code>        for i in range(bsz):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L373** <code>            id2rewards[index[i]].append(trajectory_rewards[i])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `id2rewards[index[i]].append`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L374** <code>            id2indices[index[i]].append(i)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `id2indices[index[i]].append`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L375** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L376** <code>        # Compute leave-one-out baselines for each trajectory</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L377** <code>        trajectory_baselines = torch.zeros_like(trajectory_rewards)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trajectory_baselines`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L378** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L379** <code>        for idx in id2rewards:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L380** <code>            rewards_list = id2rewards[idx]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rewards_list`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L381** <code>            indices_list = id2indices[idx]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `indices_list`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L382** <code>            n_traj = len(rewards_list)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `n_traj`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L383** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L384** <code>            if n_traj == 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L385** <code>                # Single trajectory: no baseline (keep original score)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L386** <code>                trajectory_baselines[indices_list[0]] = 0.0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trajectory_baselines[indices_list[0]]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L387** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L388** <code>                # Multiple trajectories: compute LOO baseline for each</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L389** <code>                rewards_tensor = torch.stack(rewards_list)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rewards_tensor`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L390** <code>                total_sum = rewards_tensor.sum()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_sum`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L391** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L392** <code>                for i, traj_idx in enumerate(indices_list):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L393** <code>                    # Leave-one-out mean: (sum - current) / (n - 1)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L394** <code>                    loo_baseline = (total_sum - rewards_tensor[i]) / (n_traj - 1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loo_baseline`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L395** <code>                    trajectory_baselines[traj_idx] = loo_baseline</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trajectory_baselines[traj_idx]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L396** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L397** <code>        # Compute advantages: A_t = R_t - b_LOO</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L398** <code>        # Expand baselines to match token dimension</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L399** <code>        baselines_expanded = trajectory_baselines.unsqueeze(-1).expand_as(returns)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `baselines_expanded`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L400** <code>        advantages = (returns - baselines_expanded) * eos_mask</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L401** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L402** <code>    return advantages, returns</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L403** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L404** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+#### 原始行 476–654
+- **L476** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L477** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L478** <code>def apply_batch_standardization(advantages: torch.Tensor, response_mask: torch.Tensor, epsilon: float = 1e-6):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L479** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L480** <code>    Apply batch-level standardization to advantages using the correct method based on advantage structure.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L481** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L482** <code>    This function automatically detects the modeling perspective and applies appropriate standardization:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L483** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L484** <code>    **Modeling Perspectives:**</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L485** <code>    - **Sequence-Level Modeling**: GRPO/RLOO (uniform advantages within sequences)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- **Sequence-Level Modeling**: GRPO/RLOO`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L486** <code>      → Uses sequence-level standardization to avoid length bias</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L487** <code>    - **Token-Level Modeling**: GAE (variable advantages) OR post-constraint advantages</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- **Token-Level Modeling**: GAE`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L488** <code>      → Uses token-level standardization for proper credit assignment</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L489** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L490** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L491** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L492** <code>        advantages: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `advantages: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L493** <code>            shape: (bs, response_length) - Token-level advantages</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L494** <code>        response_mask: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `response_mask: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L495** <code>            shape: (bs, response_length) - Mask indicating valid tokens</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L496** <code>        epsilon: (float) Small value to prevent division by zero</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `epsilon:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L497** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L498** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L499** <code>        standardized_advantages: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `standardized_advantages: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L500** <code>            shape: (bs, response_length) - Standardized advantages</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L501** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L502** <code>    with torch.no_grad():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L503** <code>        if advantages.numel() == 0 or response_mask.sum() == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L504** <code>            return advantages</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L505** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L506** <code>        # Check if advantages are uniform within sequences (sequence-level modeling)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L507** <code>        is_uniform_within_sequences = _check_uniform_within_sequences(advantages, response_mask, epsilon)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_uniform_within_sequences`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L508** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L509** <code>        if is_uniform_within_sequences:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L510** <code>            # Sequence-level standardization for GRPO/RLOO (avoids length bias)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L511** <code>            # Compute sequence-level advantages (mean per sequence)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L512** <code>            sequence_lengths = response_mask.sum(dim=-1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sequence_lengths`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L513** <code>            valid_sequences = sequence_lengths &gt; 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_sequences`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L514** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L515** <code>            if not valid_sequences.any():</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L516** <code>                return advantages</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L517** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L518** <code>            # Compute mean advantage per sequence using masked_mean</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L519** <code>            sequence_advantages = verl_F.masked_mean(advantages, response_mask, axis=-1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sequence_advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L520** <code>            valid_seq_advantages = sequence_advantages[valid_sequences]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_seq_advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L521** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L522** <code>            # Standardize across sequences (not tokens!)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L523** <code>            seq_mean = torch.mean(valid_seq_advantages)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_mean`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L524** <code>            seq_std = torch.std(valid_seq_advantages)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_std`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L525** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L526** <code>            if seq_std &lt; epsilon:  # All sequences have same advantage</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L527** <code>                return advantages</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L528** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L529** <code>            # Apply standardization uniformly to all tokens in each sequence</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L530** <code>            standardized_seq_advantages = (sequence_advantages - seq_mean) / seq_std</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `standardized_seq_advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L531** <code>            standardized_advantages = standardized_seq_advantages.unsqueeze(-1) * response_mask</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `standardized_advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L532** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L533** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L534** <code>            # Token-level standardization for GAE or post-constraint advantages</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L535** <code>            valid_mask = response_mask.bool()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_mask`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L536** <code>            valid_advantages = advantages[valid_mask]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L537** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L538** <code>            # Standardize across all valid tokens</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L539** <code>            token_mean = torch.mean(valid_advantages)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_mean`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L540** <code>            token_std = torch.std(valid_advantages)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_std`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L541** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L542** <code>            if token_std &lt; epsilon:  # All tokens have same advantage</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L543** <code>                return advantages</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L544** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L545** <code>            standardized_advantages = torch.zeros_like(advantages)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `standardized_advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L546** <code>            standardized_advantages[valid_mask] = (valid_advantages - token_mean) / token_std</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `standardized_advantages[valid_mask]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L547** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L548** <code>    return standardized_advantages</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L549** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L550** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L551** <code>def _check_uniform_within_sequences(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L552** <code>    advantages: torch.Tensor, response_mask: torch.Tensor, epsilon: float = 1e-6</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `advantages: torch.Tensor, response_mask: torch.Tensor, epsilon: float`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L553** <code>) -&gt; bool:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L554** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L555** <code>    Check if advantages are uniform within each sequence (indicating sequence-level modeling).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Check if advantages are uniform within each sequence`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L556** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L557** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L558** <code>        advantages: Token-level advantages [batch_size, response_length]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L559** <code>        response_mask: Valid token mask [batch_size, response_length]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L560** <code>        epsilon: Threshold for considering values as uniform</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L561** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L562** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L563** <code>        bool: True if advantages are uniform within sequences (GRPO/RLOO), False if variable (GAE)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `bool: True if advantages are uniform within sequences`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L564** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L565** <code>    batch_size = advantages.shape[0]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_size`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L566** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L567** <code>    for i in range(batch_size):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L568** <code>        seq_mask = response_mask[i].bool()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_mask`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L569** <code>        valid_seq_length = seq_mask.sum().item()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_seq_length`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L570** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L571** <code>        if valid_seq_length &lt;= 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L572** <code>            continue  # Skip sequences with 0 or 1 tokens</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L573** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L574** <code>        seq_advantages = advantages[i][seq_mask]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L575** <code>        seq_variance = torch.var(seq_advantages).item()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seq_variance`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L576** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L577** <code>        # If any sequence has non-uniform advantages, it&#x27;s token-level modeling</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L578** <code>        if seq_variance &gt; epsilon:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L579** <code>            return False</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L580** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L581** <code>    return True</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L582** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L583** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L584** <code>def compute_reinforce_plus_plus_outcome_advantage(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L585** <code>    token_level_rewards: torch.Tensor, eos_mask: torch.Tensor, gamma: torch.Tensor</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L586** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L587** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L588** <code>    Compute advantage for REINFORCE++.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L589** <code>    This implementation is based on the paper: https://arxiv.org/abs/2501.03262</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L590** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L591** <code>        token_level_rewards: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `token_level_rewards: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L592** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L593** <code>        eos_mask: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `eos_mask: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L594** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L595** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L596** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L597** <code>        advantages: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `advantages: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L598** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L599** <code>        Returns: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Returns: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L600** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L601** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L602** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L603** <code>    with torch.no_grad():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L604** <code>        returns = torch.zeros_like(token_level_rewards)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L605** <code>        running_return = 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `running_return`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L606** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L607** <code>        for t in reversed(range(token_level_rewards.shape[1])):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L608** <code>            running_return = token_level_rewards[:, t] + gamma * running_return</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `running_return`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L609** <code>            returns[:, t] = running_return</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L610** <code>            # Reset after EOS</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L611** <code>            running_return = running_return * eos_mask[:, t]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `running_return`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L612** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L613** <code>        advantages = verl_F.masked_whiten(returns, eos_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L614** <code>        advantages = advantages * eos_mask</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L615** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L616** <code>    return advantages, returns</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L617** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L618** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L619** <code>def compute_remax_outcome_advantage(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L620** <code>    token_level_rewards: torch.Tensor, reward_baselines: torch.Tensor, eos_mask: torch.Tensor</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L621** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L622** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L623** <code>    Compute advantage for ReMax, operating only on Outcome reward</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L624** <code>    This implementation is based on the paper: https://arxiv.org/abs/2310.10505</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L625** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L626** <code>    (with only one scalar reward for each response).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L627** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L628** <code>        token_level_rewards: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `token_level_rewards: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L629** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L630** <code>        reward_baselines: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `reward_baselines: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L631** <code>            shape: (bs,)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L632** <code>        eos_mask: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `eos_mask: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L633** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L634** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L635** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L636** <code>        advantages: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `advantages: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L637** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L638** <code>        Returns: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Returns: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L639** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L640** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L641** <code>    response_length = token_level_rewards.shape[-1]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_length`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L642** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L643** <code>    with torch.no_grad():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L644** <code>        returns = (token_level_rewards * eos_mask).flip(dims=[-1]).cumsum(dim=-1).flip(dims=[-1])</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L645** <code>        advantages = returns - reward_baselines.unsqueeze(-1).tile([1, response_length]) * eos_mask</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `advantages`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L646** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L647** <code>    return advantages, returns</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L648** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L649** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L650** <code>def compute_rewards(token_level_scores, old_log_prob, ref_log_prob, kl_ratio):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L651** <code>    kl = old_log_prob - ref_log_prob</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kl`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L652** <code>    return token_level_scores - kl * kl_ratio</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L653** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L654** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+#### 原始行 925–1171
+- **L925** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L926** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L927** <code>def compute_policy_loss_with_rollout_correction(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L928** <code>    rollout_log_prob,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L929** <code>    log_prob,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L930** <code>    advantages,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L931** <code>    eos_mask,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L932** <code>    loss_agg_mode=&quot;seq-mean-token-sum&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss_agg_mode`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L933** <code>    loss_scale_factor=1.0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss_scale_factor`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L934** <code>    rollout_is: Optional[str] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is: Optional[str]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L935** <code>    rollout_is_threshold: float = 2.0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is_threshold: float`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L936** <code>    rollout_rs: Optional[str] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_rs: Optional[str]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L937** <code>    rollout_rs_threshold: Optional[float] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_rs_threshold: Optional[float]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L938** <code>    rollout_rs_threshold_lower: Optional[float] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_rs_threshold_lower: Optional[float]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L939** <code>    rollout_token_veto_threshold: Optional[float] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_token_veto_threshold: Optional[float]`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L940** <code>    max_turns: int = 1,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_turns: int`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L941** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L942** <code>    &quot;&quot;&quot;Compute policy loss with pure rollout correction (no PPO clipping).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `"""Compute policy loss with pure rollout correction`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L943** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L944** <code>    This function implements policy gradient with importance sampling correction</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L945** <code>    for rollout-training policy mismatch, without PPO&#x27;s clipping mechanism.</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L946** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L947** <code>    Mathematical formulation:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L948** <code>        Without IS (rollout_is=None):</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `Without IS (rollout_is`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L949** <code>            L = -E[log π(a|s) * A(s,a)]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `L`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L950** <code>            Gradient: ∇_θ L = -E[∇log π(a|s) * A] (standard REINFORCE)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `Gradient: ∇_θ L`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L951** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L952** <code>        With IS (rollout_is enabled):</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `With IS`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L953** <code>            L = -E_π_rollout[w * log π(a|s) * A(s,a)]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `L`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L954** <code>            where w = π_current / π_rollout (truncated IS weight)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `where w`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L955** <code>            Gradient: ∇_θ L = -E[w * ∇log π(a|s) * A] (IS-corrected policy gradient)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `Gradient: ∇_θ L`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L956** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L957** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L958** <code>        rollout_log_prob: Log probabilities from rollout policy (e.g., vLLM BF16).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rollout_log_prob: Log probabilities from rollout policy`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L959** <code>            Shape: (batch_size, seq_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L960** <code>        log_prob: Log probabilities from current training policy.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L961** <code>            Shape: (batch_size, seq_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L962** <code>        advantages: Advantage estimates for each token.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L963** <code>            Shape: (batch_size, seq_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L964** <code>        eos_mask: Mask indicating valid tokens (1 for valid, 0 for padding).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `eos_mask: Mask indicating valid tokens`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L965** <code>            Shape: (batch_size, seq_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L966** <code>        loss_agg_mode: Loss aggregation strategy (see agg_loss for details).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `loss_agg_mode: Loss aggregation strategy`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L967** <code>        loss_scale_factor: Multiplicative scaling factor applied to final loss.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L968** <code>        rollout_is: IS aggregation level (&quot;token&quot;, &quot;turn&quot;, &quot;sequence&quot;, or None).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rollout_is: IS aggregation level`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L969** <code>        rollout_is_threshold: Upper threshold for truncating IS weights.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L970** <code>        rollout_rs: Rejection sampling aggregation level (or None to disable).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rollout_rs: Rejection sampling aggregation level`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L971** <code>        rollout_rs_threshold: Upper threshold for rejection sampling.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L972** <code>        rollout_rs_threshold_lower: Lower threshold for rejection sampling.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L973** <code>        rollout_token_veto_threshold: Per-token veto threshold for catastrophic outliers.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L974** <code>        max_turns: Maximum number of conversation turns (for multi-turn aggregation).</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `max_turns: Maximum number of conversation turns`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L975** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L976** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L977** <code>        PolicyOutput containing:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L978** <code>            - loss: Policy gradient loss with IS correction</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L979** <code>            - kl_divergence: KL between current and rollout policy</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L980** <code>            - clip_fraction: Always 0.0 (no clipping in this mode)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- clip_fraction: Always 0.0`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L981** <code>            - algorithm: &quot;pure_rollout_correction&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L982** <code>            - algorithm_metrics: IS/RS statistics and mismatch metrics</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L983** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L984** <code>    Note:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L985** <code>        Unlike compute_policy_loss (PPO), this function:</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Unlike compute_policy_loss`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L986** <code>        - Does NOT use PPO clipping (no old_log_prob needed)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- Does NOT use PPO clipping`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L987** <code>        - Directly applies IS correction computed from current vs rollout</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L988** <code>        - Computes IS/RS on-the-fly during training</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L989** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L990** <code>    Usage:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L991** <code>        This function is called by the actor when:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L992** <code>        - bypass_old_logprob_for_rollout=True (trainer uses rollout_log_prob as old_log_prob)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `- bypass_old_logprob_for_rollout`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L993** <code>        - use_pure_rollout_correction=True (actor uses this function instead of compute_policy_loss)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `- use_pure_rollout_correction`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L994** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L995** <code>    Example config:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L996** <code>        algorithm:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L997** <code>          bypass_old_logprob_for_rollout: true</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L998** <code>          use_pure_rollout_correction: true</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L999** <code>          rollout_is: &quot;token&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1000** <code>          rollout_is_kwargs: {upper: 2.0}</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1001** <code>          rollout_rs: &quot;token&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1002** <code>          rollout_rs_kwargs: {upper: 2.0, lower: 0.5}</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1003** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1004** <code>    Performance:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1005** <code>        - Memory: Avoids storing old_log_prob tensors</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1006** <code>        - Speed: Skips expensive actor.compute_log_prob() forward pass</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- Speed: Skips expensive actor.compute_log_prob`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1007** <code>        - Variance: Higher than PPO (no clipping safety net)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- Variance: Higher than PPO`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1008** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1009** <code>    # Import rollout correction helper</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1010** <code>    from verl_patch.trainer.code.ppo.mismatch_helper import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1011** <code>        compute_rollout_importance_weights_and_rejection_mask,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1012** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1013** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1014** <code>    # Compute IS weights and rejection mask on-the-fly</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1015** <code>    rollout_is_weights, modified_response_mask, rollout_metrics = compute_rollout_importance_weights_and_rejection_mask(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is_weights, modified_response_mask, rollout_metrics`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1016** <code>        old_log_prob=log_prob,  # Current policy</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `old_log_prob`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1017** <code>        rollout_log_prob=rollout_log_prob,  # Rollout policy</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_log_prob`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1018** <code>        response_mask=eos_mask,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_mask`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1019** <code>        max_turns=max_turns,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_turns`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1020** <code>        rollout_is=rollout_is,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1021** <code>        rollout_is_threshold=rollout_is_threshold,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_is_threshold`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1022** <code>        rollout_rs=rollout_rs,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_rs`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1023** <code>        rollout_rs_threshold=rollout_rs_threshold,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_rs_threshold`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1024** <code>        rollout_rs_threshold_lower=rollout_rs_threshold_lower,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_rs_threshold_lower`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1025** <code>        rollout_token_veto_threshold=rollout_token_veto_threshold,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_token_veto_threshold`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1026** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1027** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1028** <code>    # Apply rejection mask (if RS is enabled)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1029** <code>    effective_mask = modified_response_mask if rollout_rs is not None else eos_mask</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `effective_mask`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1030** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1031** <code>    # Compute pure policy gradient loss with IS correction</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1032** <code>    # Standard REINFORCE: L = -E[log π(a|s) * A]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1033** <code>    # With IS: L = -E[w * log π(a|s) * A] where w = π_current / π_rollout</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1034** <code>    #</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1035** <code>    # Note: rollout_is_weights already contains w = π_current / π_rollout</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1036** <code>    # So we apply it to the standard log-prob trick formula</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1037** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1038** <code>    if rollout_is_weights is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1039** <code>        # With IS correction: weight the log-prob trick by IS weight</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1040** <code>        # w = exp(log_prob - rollout_log_prob).clamp(max=threshold)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1041** <code>        # L = -E[w * log π * A]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1042** <code>        # Gradient: ∇L = -E[w * ∇log π * A] = -E[w * A]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1043** <code>        pg_losses = -advantages * log_prob * rollout_is_weights</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pg_losses`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1044** <code>    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1045** <code>        # No IS correction: standard REINFORCE with log-prob trick</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1046** <code>        # L = -E[log π(a|s) * A]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1047** <code>        # Gradient: ∇L = -E[∇log π * A] = -E[A]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1048** <code>        pg_losses = -advantages * log_prob</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pg_losses`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1049** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1050** <code>    # Aggregate loss</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1051** <code>    pg_loss = agg_loss(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pg_loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1052** <code>        loss_mat=pg_losses,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss_mat`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1053** <code>        loss_mask=effective_mask,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss_mask`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1054** <code>        loss_agg_mode=loss_agg_mode,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss_agg_mode`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1055** <code>        scale_factor=loss_scale_factor,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `scale_factor`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1056** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1057** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1058** <code>    # Compute KL divergence between current and rollout policy</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1059** <code>    negative_approx_kl = log_prob - rollout_log_prob</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `negative_approx_kl`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1060** <code>    kl_divergence = verl_F.masked_mean(-negative_approx_kl, effective_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kl_divergence`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1061** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1062** <code>    # Prepare algorithm metrics (include all rollout correction metrics)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1063** <code>    algorithm_metrics = dict(rollout_metrics)  # Contains IS/RS/mismatch metrics</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `algorithm_metrics`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1064** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1065** <code>    return PolicyOutput(</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1066** <code>        loss=pg_loss,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1067** <code>        kl_divergence=kl_divergence,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kl_divergence`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1068** <code>        clip_fraction=torch.tensor(0.0),  # No clipping in this mode</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `clip_fraction`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1069** <code>        clip_fraction_lower=torch.tensor(0.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `clip_fraction_lower`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1070** <code>        clip_fraction_upper=torch.tensor(0.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `clip_fraction_upper`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1071** <code>        clip_fraction_dual=torch.tensor(0.0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `clip_fraction_dual`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1072** <code>        algorithm=&quot;pure_rollout_correction&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `algorithm`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1073** <code>        algorithm_metrics=algorithm_metrics,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `algorithm_metrics`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1074** <code>        loss_config={</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss_config`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1075** <code>            &quot;loss_agg_mode&quot;: loss_agg_mode,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1076** <code>            &quot;loss_scale_factor&quot;: loss_scale_factor,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1077** <code>            &quot;rollout_is&quot;: rollout_is,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1078** <code>            &quot;rollout_is_threshold&quot;: rollout_is_threshold,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1079** <code>            &quot;rollout_rs&quot;: rollout_rs,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1080** <code>            &quot;rollout_rs_threshold&quot;: rollout_rs_threshold,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1081** <code>            &quot;rollout_token_veto_threshold&quot;: rollout_token_veto_threshold,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1082** <code>        },</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1083** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1084** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1085** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1086** <code>def compute_entropy_loss(logits, eos_mask, loss_agg_mode=&quot;seq-mean-token-sum&quot;, loss_scale_factor=1.0):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1087** <code>    &quot;&quot;&quot;Compute Categorical entropy loss</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1088** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1089** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1090** <code>        logits: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `logits: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1091** <code>            shape: (bs, response_length, vocab_size)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1092** <code>        eos_mask: `(torch.Tensor)`</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `eos_mask: ``，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1093** <code>            shape: (bs, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `shape:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1094** <code>        loss_agg_mode: (str) Loss aggregation strategy. Choices:</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `loss_agg_mode:`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1095** <code>            - &quot;token-mean&quot;: Average across all valid tokens in the batch (length-biased)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "token-mean": Average across all valid tokens in the batch`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1096** <code>            - &quot;seq-mean-token-sum&quot;: Sum tokens per sequence, then average across sequences (REINFORCE-aligned, recommended)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "seq-mean-token-sum": Sum tokens per sequence, then average across sequences`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1097** <code>            - &quot;seq-mean-token-mean&quot;: Mean tokens per sequence, then average across sequences (length-biased)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "seq-mean-token-mean": Mean tokens per sequence, then average across sequences`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1098** <code>            - &quot;seq-mean-token-sum-norm&quot;: Sum tokens per sequence, normalize by max_seq_length (constant scaling)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "seq-mean-token-sum-norm": Sum tokens per sequence, normalize by max_seq_length`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1099** <code>            - &quot;seq-sum-no-norm&quot;: Sum all tokens across all sequences (no normalization)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `- "seq-sum-no-norm": Sum all tokens across all sequences`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1100** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1101** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1102** <code>        entropy_loss: a scalar torch.Tensor</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1103** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1104** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1105** <code>    # compute entropy</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1106** <code>    entropy = verl_F.entropy_from_logits(logits)  # (bs, response_len)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1107** <code>    entropy_loss = agg_loss(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy_loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1108** <code>        loss_mat=entropy, loss_mask=eos_mask, loss_agg_mode=loss_agg_mode, scale_factor=loss_scale_factor</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loss_mat`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1109** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1110** <code>    return entropy_loss</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1111** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1112** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1113** <code>def compute_value_loss(vpreds, returns, values, eos_mask, cliprange_value):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1114** <code>    &quot;&quot;&quot;Compute the value loss. Copied from https://github.com/huggingface/trl/blob/main/trl/trainer/ppo_trainer.py#L1151</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1115** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1116** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1117** <code>        vpreds (`torch.FloatTensor`):</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `vpreds`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1118** <code>            Predicted values of the value head, shape (`batch_size`, `response_length`)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Predicted values of the value head, shape`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1119** <code>        values (`torch.FloatTensor`):</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `values`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1120** <code>            Old values of value head, shape (`batch_size`, `response_length`)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Old values of value head, shape`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1121** <code>        returns: (`torch.FloatTensor`):</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1122** <code>            Ground truth returns, shape (`batch_size`, `response_length`)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Ground truth returns, shape`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1123** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1124** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1125** <code>        vf_loss: a scalar (`torch.FloatTensor`):</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `vf_loss: a scalar`，产生返回值或副作用。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1126** <code>            value function loss</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1127** <code>        vf_clipfrac: a float</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1128** <code>            The ratio of vf being clipped</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1129** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1130** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1131** <code>    vpredclipped = verl_F.clip_by_value(vpreds, values - cliprange_value, values + cliprange_value)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vpredclipped`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1132** <code>    vf_losses1 = (vpreds - returns) ** 2</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vf_losses1`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1133** <code>    vf_losses2 = (vpredclipped - returns) ** 2</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vf_losses2`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1134** <code>    vf_loss = 0.5 * verl_F.masked_mean(torch.max(vf_losses1, vf_losses2), eos_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vf_loss`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1135** <code>    vf_clipfrac = verl_F.masked_mean(torch.gt(vf_losses2, vf_losses1).float(), eos_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vf_clipfrac`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1136** <code>    return vf_loss, vf_clipfrac</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1137** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1138** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1139** <code>def kl_penalty(logprob: torch.FloatTensor, ref_logprob: torch.FloatTensor, kl_penalty) -&gt; torch.FloatTensor:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1140** <code>    &quot;&quot;&quot;Compute KL divergence given logprob and ref_logprob.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1141** <code>    Copied from https://github.com/huggingface/trl/blob/main/trl/trainer/ppo_trainer.py#L1104</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1142** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1143** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1144** <code>        logprob:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1145** <code>        ref_logprob:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1146** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1147** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1148** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1149** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1150** <code>    if kl_penalty == &quot;kl&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1151** <code>        return logprob - ref_logprob</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1152** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1153** <code>    if kl_penalty == &quot;abs&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1154** <code>        return (logprob - ref_logprob).abs()</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1155** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1156** <code>    if kl_penalty == &quot;mse&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1157** <code>        return 0.5 * (logprob - ref_logprob).square()</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1158** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1159** <code>    # J. Schulman. Approximating kl divergence, 2020.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1160** <code>    # # URL http://joschu.net/blog/kl-approx.html.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1161** <code>    if kl_penalty == &#x27;low_var_kl&#x27;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1162** <code>        kl = ref_logprob - logprob</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kl`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1163** <code>        ratio = torch.exp(kl)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ratio`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1164** <code>        kld = (ratio - kl - 1).contiguous()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kld`。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1165** <code>        return torch.clamp(kld, min=-10, max=10)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1166** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1167** <code>    if kl_penalty == &quot;full&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1168** <code>        # so, here logprob and ref_logprob should contain the logits for every token in vocabulary</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1169** <code>        raise NotImplementedError</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1170** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+- **L1171** <code>    raise NotImplementedError</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：包含模块导入、loss aggregation、GAE/GRPO/RLOO 等其他算法与 rollout-correction helper；当前 TRLOO + legacy PPO 只调用其中标注的相应函数。
+
+
+
+---
+
+**导航**：[上一附录](08-trainer-fit-update.md) · [附录目录](index.md) · [下一附录](10-actor-update.md)

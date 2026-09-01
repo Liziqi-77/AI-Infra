@@ -1,0 +1,5502 @@
+# Async manager 与 vLLM engine 初始化
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+### 16.1 `async_server.py`：多 engine manager
+源码：`drkernel/kernel/workers/rollout/async_server.py`；以下逐行列出所选范围，状态说明：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。。
+
+#### 原始行 1–58
+- **L1** <code># Copyright 2024 Bytedance Ltd. and/or its affiliates</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L2** <code>#</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L3** <code># Licensed under the Apache License, Version 2.0 (the "License");</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L4** <code># you may not use this file except in compliance with the License.</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L5** <code># You may obtain a copy of the License at</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L6** <code>#</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L7** <code>#     http://www.apache.org/licenses/LICENSE-2.0</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L8** <code>#</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L9** <code># Unless required by applicable law or agreed to in writing, software</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L10** <code># distributed under the License is distributed on an "AS IS" BASIS,</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L11** <code># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L12** <code># See the License for the specific language governing permissions and</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L13** <code># limitations under the License.</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L14** <code>import asyncio</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L15** <code>import copy</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L16** <code>import heapq</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L17** <code>import importlib</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L18** <code>import logging</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L19** <code>import os</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L20** <code>import random</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L21** <code>import socket</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L22** <code>import threading</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L23** <code>import time</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L24** <code>from abc import ABC, abstractmethod</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L25** <code>from contextlib import asynccontextmanager</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L26** <code>from typing import Any, Callable, Dict, List, Optional, Tuple, Type</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L27** <code>from urllib.parse import urlparse</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L28** <code>from uuid import uuid4</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L29** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L30** <code>import aiohttp</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L31** <code>import fastapi</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L32** <code>import httpx</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L33** <code>import numpy as np</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L34** <code>import ray</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L35** <code>import torch</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L36** <code>import uvicorn</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L37** <code>from cachetools import LRUCache</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L38** <code>from omegaconf import DictConfig</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L39** <code>from openai import AsyncOpenAI</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L40** <code>from openai.types.chat.chat_completion import ChatCompletion</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L41** <code>from starlette.requests import Request</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L42** <code>from verl.protocol import DataProto</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L43** <code>from verl.single_controller.ray.base import RayWorkerGroup</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L44** <code>from verl.utils import hf_tokenizer</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L45** <code>from verl.utils.fs import copy_to_local</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L46** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L47** <code>from kernel.workers.rollout.vllm_rollout.vllm_async_engine import (</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L48** <code>    AsyncvLLMEngine,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L49** <code>    MultiTurnAsyncvLLMEngine,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L50** <code>)</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L51** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L52** <code>from kernel.workers.rollout.vllm_rollout.vllm_async_engine_multi_iter import (</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L53** <code>    MultiIterAsyncvLLMEngine</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L54** <code>)</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L55** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L56** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L57** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L58** <code>logger = logging.getLogger(__file__)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `logger`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+
+#### 原始行 61–192
+- **L61** <code>class AsyncLLMEngineManager:</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L62** <code>    """AsyncLLMEngineManager manage a group of vllm instances, i.e AsyncvLLMEngine."""</code>
+  - 语法与作用：文档字符串；在模块、函数或类定义中保存说明文本，不作为控制流执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L63** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L64** <code>    def __init__(</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L65** <code>        self,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L66** <code>        config: DictConfig,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L67** <code>        worker_group: RayWorkerGroup,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L68** <code>        tokenizer,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L69** <code>        reward_fn=None,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `reward_fn`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L70** <code>        val_reward_fn=None,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `val_reward_fn`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L71** <code>        *,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L72** <code>        scheduler_kwargs: Dict[str, Any] = None,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `scheduler_kwargs: Dict[str, Any]`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L73** <code>    ):</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L74** <code>        """Initialize AsyncLLMEngineManager.</code>
+  - 语法与作用：文档字符串；在模块、函数或类定义中保存说明文本，不作为控制流执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L75** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L76** <code>        Args:</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L77** <code>            config: DictConfig, actor_rollout_ref config.</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L78** <code>            worker_group: RayWorkerGroup, worker group of AsyncActorRolloutRefWorker.</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L79** <code>            scheduler_kwargs: Dict[str, Any], kwargs for chat scheduler.</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L80** <code>        """</code>
+  - 语法与作用：文档字符串；在模块、函数或类定义中保存说明文本，不作为控制流执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L81** <code>        self.config = config</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.config`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L82** <code>        self.worker_group = worker_group</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.worker_group`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L83** <code>        self.scheduler_kwargs = scheduler_kwargs if scheduler_kwargs else {}</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.scheduler_kwargs`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L84** <code>        self.tokenizer = tokenizer</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.tokenizer`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L85** <code>        self.rollout_tp_size = self.config.rollout.tensor_model_parallel_size</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.rollout_tp_size`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L86** <code>        self.rollout_dp_size = self.worker_group.world_size // self.rollout_tp_size</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.rollout_dp_size`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L87** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L88** <code>        # Simple configuration for overall safety timeout</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L89** <code>        self.max_timeout = 86400  # Maximum timeout in seconds (~24 hours) as safety net</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.max_timeout`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L90** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L91** <code>        # Simple configuration for overall safety timeout</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L92** <code>        self.max_timeout = 86400  # Maximum timeout in seconds (~24 hours) as safety net</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.max_timeout`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L93** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L94** <code>        workers_info = ray.get(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `workers_info`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L95** <code>            [</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L96** <code>                worker.__ray_call__.remote(lambda self: ray.get_runtime_context().get_node_id())</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L97** <code>                for worker in self.worker_group.workers</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L98** <code>            ]</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L99** <code>        )</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L100** <code>        assert len(workers_info) == self.worker_group.world_size</code>
+  - 语法与作用：异常/断言语句；条件不满足时中止当前路径。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L101** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L102** <code>        self.async_llm_servers = [None] * self.rollout_dp_size</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.async_llm_servers`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L103** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L104** <code>        rollout_backend = self.config.rollout.get("backend", "vllm")</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `rollout_backend`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L105** <code>        if rollout_backend in ("openai", "openai_sdk"):</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L106** <code>            from kernel.workers.rollout.vllm_rollout.openai_async_engine_multi_iter import (</code>
+  - 语法与作用：导入语句；加载依赖并把名称绑定到当前模块。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L107** <code>                AsyncvLLMEngine as OpenAIAsyncEngine,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L108** <code>                MultiIterAsyncvLLMEngine as OpenAIMultiIterEngine,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L109** <code>            )</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L110** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L111** <code>            engine_class = OpenAIMultiIterEngine if self.config.rollout.multi_turn.enable else OpenAIAsyncEngine</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `engine_class`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L112** <code>        else:</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L113** <code>            engine_class = MultiTurnAsyncvLLMEngine if self.config.rollout.multi_turn.enable else AsyncvLLMEngine</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `engine_class`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L114** <code>            if self.config.rollout.multi_turn.multi_iteration.enable:</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L115** <code>                engine_class = MultiIterAsyncvLLMEngine</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `engine_class`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L116** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L117** <code>        config.rollout.max_model_len = (</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `config.rollout.max_model_len`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L118** <code>            config.rollout.max_model_len</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L119** <code>            if config.rollout.max_model_len</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L120** <code>            else config.rollout.prompt_length + config.rollout.response_length</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L121** <code>        )</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L122** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L123** <code>        # Start all server instances, restart if address already in use.</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L124** <code>        unready_dp_ranks = set(range(self.rollout_dp_size))</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `unready_dp_ranks`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L125** <code>        while len(unready_dp_ranks) &gt; 0:</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L126** <code>            servers = {</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `servers`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L127** <code>                rollout_dp_rank: engine_class.options(</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L128** <code>                    # make sure AsyncvLLMEngine colocates with its corresponding workers</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L129** <code>                    scheduling_strategy=ray.util.scheduling_strategies.NodeAffinitySchedulingStrategy(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `scheduling_strategy`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L130** <code>                        node_id=workers_info[rollout_dp_rank * self.rollout_tp_size],</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `node_id`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L131** <code>                        soft=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `soft`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L132** <code>                    ),</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L133** <code>                    name=f"async_llm_server_{rollout_dp_rank}",</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `name`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L134** <code>                ).remote(</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L135** <code>                    config,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L136** <code>                    self.rollout_dp_size,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L137** <code>                    rollout_dp_rank,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L138** <code>                    self.worker_group.name_prefix,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L139** <code>                    self.tokenizer,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L140** <code>                    reward_fn,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L141** <code>                    val_reward_fn,</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L142** <code>                )</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L143** <code>                for rollout_dp_rank in unready_dp_ranks</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L144** <code>            }</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L145** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L146** <code>            for rollout_dp_rank, server in servers.items():</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L147** <code>                try:</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L148** <code>                    # address = ray.get(server.get_server_address.remote())</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L149** <code>                    self.async_llm_servers[rollout_dp_rank] = server</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.async_llm_servers[rollout_dp_rank]`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L150** <code>                    unready_dp_ranks.remove(rollout_dp_rank)</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L151** <code>                except Exception:</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L152** <code>                    ray.kill(server)</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L153** <code>                    print(f"rollout server {rollout_dp_rank} failed, maybe address already in use, restarting...")</code>
+  - 语法与作用：日志/输出调用；向控制台或日志系统写入运行信息。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L154** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L155** <code>        # All server instances are ready, init AsyncLLM engine.</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L156** <code>        ray.get([server.init_engine.remote() for server in self.async_llm_servers])</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L157** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L158** <code>        assert self.config.rollout.free_cache_engine, "Only free cache engine is supported for now."</code>
+  - 语法与作用：异常/断言语句；条件不满足时中止当前路径。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L159** <code>        if self.config.rollout.free_cache_engine:</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L160** <code>            self.sleep()</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L161** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L162** <code>    def wake_up(self):</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L163** <code>        """Wake up all vllm instances."""</code>
+  - 语法与作用：文档字符串；在模块、函数或类定义中保存说明文本，不作为控制流执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L164** <code>        ray.get([server.wake_up.remote() for server in self.async_llm_servers])</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L165** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L166** <code>    def sleep(self):</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L167** <code>        """Sleep all vllm instances."""</code>
+  - 语法与作用：文档字符串；在模块、函数或类定义中保存说明文本，不作为控制流执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L168** <code>        ray.get([server.sleep.remote() for server in self.async_llm_servers])</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L169** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L170** <code>    def generate_sequences(self, prompts: DataProto, **sampling_params) -&gt; DataProto:</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L171** <code>        """Generate multiple sequences in parallel via chat scheduler."""</code>
+  - 语法与作用：文档字符串；在模块、函数或类定义中保存说明文本，不作为控制流执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L172** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L173** <code>        assert self.config.rollout.free_cache_engine, "Only free cache engine is supported for now."</code>
+  - 语法与作用：异常/断言语句；条件不满足时中止当前路径。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L174** <code>        if self.config.rollout.free_cache_engine:</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L175** <code>            self.wake_up()</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L176** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L177** <code>        chunkes = prompts.chunk(len(self.async_llm_servers))</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `chunkes`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L178** <code>        outputs = ray.get(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `outputs`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L179** <code>            [</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L180** <code>                worker.generate_sequences.remote(chunk)</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L181** <code>                for worker, chunk in zip(self.async_llm_servers, chunkes, strict=True)</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L182** <code>            ]</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L183** <code>        )</code>
+  - 语法与作用：普通语句；按 Python 语法执行当前表达式。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L184** <code>        # filter out output which is None</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L185** <code>        outputs = [output for output in outputs if output is not None]</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `outputs`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L186** <code>        if len(outputs) == 0:</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L187** <code>            return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回结果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L188** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L189** <code>        output = DataProto.concat(outputs)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `output`，可能更新对象状态。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L190** <code>        if self.config.rollout.free_cache_engine:</code>
+  - 语法与作用：控制流/上下文管理语法；根据条件、迭代、异常或资源上下文决定代码执行。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L191** <code>            self.sleep()</code>
+  - 语法与作用：调用表达式；向项目函数或外部依赖传入参数，并使用返回值或副作用。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+- **L192** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并向调用者返回结果。
+  - 执行状态：文件加载时导入；`AsyncLLMEngineManager` 在 async rollout 初始化时执行，backend 选择和 engine 创建按配置条件执行。
+
+### 17.3 多轮 engine 初始化与 request 容器
+源码：`drkernel/kernel/workers/rollout/vllm_rollout/vllm_async_engine.py`；所列每行均保留，执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。。
+
+#### 原始行 884–1000
+- **L884** <code>class MultiTurnStats(BaseModel):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L885** <code>    &quot;&quot;&quot;Statistics for multi-turn conversations.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L886** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L887** <code>    num_turns: int = 0  # Total number of turns</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `num_turns: int`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L888** <code>    contain_void_turn: int = 0  # Whether any turn had no tool call (void turn)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `contain_void_turn: int`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L889** <code>    finish_reason: str = &quot;&quot;  # How the conversation ended (e.g., &quot;stop&quot;, &quot;length&quot;, &quot;error&quot;, etc.)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `finish_reason: str`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L890** <code>    cache_hits: int = 0  # Number of turns where results were retrieved from cache</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `cache_hits: int`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L891** <code>    cache_misses: int = 0  # Number of turns where results had to be computed</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `cache_misses: int`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L892** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L893** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L894** <code>class MultiTurnRequest(BaseModel):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L895** <code>    &quot;&quot;&quot;Agent request for multi-turn interactions.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L896** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L897** <code>    messages: list[dict[str, str]]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L898** <code>    # store the response token id corresponding to each turn</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L899** <code>    response_token_ids: list[list[int]]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L900** <code>    # how many messages are used as the prefix for this response</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L901** <code>    response_turns: list[int]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L902** <code>    # Multi-turn statistics</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L903** <code>    stats: MultiTurnStats = Field(default_factory=MultiTurnStats)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `stats: MultiTurnStats`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L904** <code>    # Configuration for masking void turns</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L905** <code>    mask_void_turn: bool = True</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `mask_void_turn: bool`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L906** <code>    # Extra information from dataset</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L907** <code>    extra_info: dict = Field(default_factory=dict)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `extra_info: dict`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L908** <code>    # Ground truth from dataset</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L909** <code>    ground_truth: str = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `ground_truth: str`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L910** <code>    # Entry point from dataset</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L911** <code>    entry_point: str = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `entry_point: str`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L912** <code>    # Unique request id for this multi-turn request</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L913** <code>    uuid: str = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `uuid: str`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L914** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L915** <code>    def add_message(self, message: str, is_tool_call: bool = False, response_token_ids: List[int] = None):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L916** <code>        &quot;&quot;&quot;Add a message to the conversation history.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L917** <code>        role = &quot;assistant&quot; if not is_tool_call else &quot;user&quot;</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `role`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L918** <code>        # For assistant messages, store the index BEFORE adding the message</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L919** <code>        # This ensures the prompt doesn&#x27;t include the response itself</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L920** <code>        if not is_tool_call and response_token_ids is not None:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L921** <code>            # Turns are decided based on x-th assistant messages</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L922** <code>            self.response_turns.append(len(self.messages))</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L923** <code>            self.response_token_ids.append(response_token_ids)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L924** <code>        elif not is_tool_call:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L925** <code>            # response_token_ids is None</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L926** <code>            assert False, &quot;response_token_ids must be provided for assistant messages&quot;</code>
+  - 语法与作用：assert；验证运行时不变量，失败时抛出 AssertionError。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L927** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L928** <code>        # Add message after storing the index</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L929** <code>        self.messages.append({&quot;role&quot;: role, &quot;content&quot;: message})</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L930** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L931** <code>    def get_num_turns(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L932** <code>        return len(self.response_turns)</code>
+  - 语法与作用：return；结束当前函数并返回结果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L933** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L934** <code>    def finalize(self, reward_scores: List[float], finish_reason_type: str):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L935** <code>        contain_void_turn = False</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `contain_void_turn`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L936** <code>        if finish_reason_type == FinishReasonTypeEnum.NO_TOOL_CALL:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L937** <code>            contain_void_turn = True</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `contain_void_turn`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L938** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L939** <code>        if finish_reason_type == FinishReasonTypeEnum.ERROR or finish_reason_type == FinishReasonTypeEnum.ASYNC_TIMEOUT:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L940** <code>            contain_error = True</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `contain_error`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L941** <code>        else:</code>
+  - 语法与作用：else 分支；前面的条件都不成立时执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L942** <code>            contain_error = False</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `contain_error`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L943** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L944** <code>        is_meaningful_turn = [True]</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `is_meaningful_turn`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L945** <code>        max_rewards = reward_scores[0]</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `max_rewards`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L946** <code>        for turn_idx in range(1, len(reward_scores)):</code>
+  - 语法与作用：循环头；按可迭代对象或布尔条件重复执行缩进块。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L947** <code>            if max_rewards &gt; 0.0:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L948** <code>                if reward_scores[turn_idx] &gt; 0.0:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L949** <code>                    is_meaningful_turn.append(True)</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L950** <code>                else:</code>
+  - 语法与作用：else 分支；前面的条件都不成立时执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L951** <code>                    is_meaningful_turn.append(False)</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L952** <code>            else:</code>
+  - 语法与作用：else 分支；前面的条件都不成立时执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L953** <code>                is_meaningful_turn.append(True)</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L954** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L955** <code>            max_rewards = max(max_rewards, reward_scores[turn_idx])</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `max_rewards`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L956** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L957** <code>        # Update stats before finalizing</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L958** <code>        self.stats.num_turns = len(self.response_turns)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L959** <code>        self.stats.contain_void_turn = 1 if contain_void_turn else 0</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.stats.contain_void_turn`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L960** <code>        self.stats.finish_reason = finish_reason_type</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.stats.finish_reason`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L961** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L962** <code>        # Determine loss_mask based on the finalization logic</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L963** <code>        # For now, mask out responses if contain_void_turn is True</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L964** <code>        # This can be customized based on other criteria</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L965** <code>        loss_mask: list[int] = []</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `loss_mask: list[int]`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L966** <code>        for turn_idx in range(len(self.response_turns)):</code>
+  - 语法与作用：循环头；按可迭代对象或布尔条件重复执行缩进块。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L967** <code>            # Only mask if mask_void_turn is enabled AND contain_void_turn is True</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L968** <code>            # should_mask = (self.mask_void_turn and contain_void_turn) or contain_error</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L969** <code>            should_mask = (self.mask_void_turn and not is_meaningful_turn[turn_idx]) or contain_error</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `should_mask`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L970** <code>            # 1 for keep, 0 for mask out</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L971** <code>            should_keep = 1 if not should_mask else 0</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `should_keep`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L972** <code>            loss_mask.append(should_keep)</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L973** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L974** <code>        &quot;&quot;&quot;Finalize the agent request.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L975** <code>        return {</code>
+  - 语法与作用：return；结束当前函数并返回结果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L976** <code>            &quot;messages&quot;: self.messages,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L977** <code>            &quot;response_token_ids&quot;: self.response_token_ids,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L978** <code>            &quot;response_turns&quot;: self.response_turns,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L979** <code>            &quot;reward_scores&quot;: reward_scores,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L980** <code>            &quot;finish_reason_type&quot;: finish_reason_type,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L981** <code>            &quot;loss_mask&quot;: loss_mask,  # Per-turn loss mask</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L982** <code>            &quot;stats&quot;: self.stats,  # Return the stats object</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L983** <code>        }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L984** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L985** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L986** <code>class MultiTurnOutput(BaseModel):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L987** <code>    multi_prompt_ids: list[list[int]]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L988** <code>    multi_response_ids: list[list[int]]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L989** <code>    multi_logprobs: list[list[float]]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L990** <code>    multi_loss_mask: list[int]  # Per-turn loss mask from finalization</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L991** <code>    multi_rewards: list[float] = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `multi_rewards: list[float]`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L992** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L993** <code>    # Multi-turn statistics</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L994** <code>    stats: MultiTurnStats</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L995** <code>    # Unique request id for this multi-turn request</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L996** <code>    request_id: str</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L997** <code>    # Complete multi-turn conversation messages for logging</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L998** <code>    messages: list[dict] = None  # Contains the complete conversation messages</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `messages: list[dict]`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L999** <code>    # Extra info to keep for each turn (per-sample)</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1000** <code>    multi_reward_extra_info: list[dict] = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `multi_reward_extra_info: list[dict]`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+
+#### 原始行 1003–1116
+- **L1003** <code>@ray.remote(num_cpus=1)</code>
+  - 语法与作用：装饰器；在下方类/方法定义时注册 Ray、dispatch、profiling 等行为。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1004** <code>class MultiTurnAsyncvLLMEngine:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1005** <code>    &quot;&quot;&quot;MultiTurnAsyncLLMEngine extends AsyncvLLMEngine with multi-turn agent capabilities.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1006** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1007** <code>    This engine supports multiple conversation turns with tool usage.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1008** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1009** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1010** <code>    def __init__(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1011** <code>        self,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1012** <code>        config: DictConfig,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1013** <code>        vllm_dp_size: int,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1014** <code>        vllm_dp_rank: int,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1015** <code>        wg_prefix: str,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1016** <code>        tokenizer,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1017** <code>        reward_fn,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1018** <code>        val_reward_fn,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1019** <code>    ):</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1020** <code>        &quot;&quot;&quot;Initialize MultiTurnAsyncLLMEngine.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1021** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1022** <code>        Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1023** <code>            config: DictConfig, actor_rollout_ref config.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1024** <code>            vllm_dp_size: int, vllm data parallel size.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1025** <code>            vllm_dp_rank: int, vllm data parallel rank.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1026** <code>            wg_prefix: str, worker group prefix, used to lookup actors.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1027** <code>            tokenizer: The tokenizer for encoding/decoding text.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1028** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1029** <code>        # Initialize AsyncLLM engine attributes</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1030** <code>        self.config = config</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.config`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1031** <code>        self.vllm_dp_size = vllm_dp_size</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.vllm_dp_size`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1032** <code>        self.vllm_dp_rank = vllm_dp_rank</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.vllm_dp_rank`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1033** <code>        self.wg_prefix = wg_prefix</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.wg_prefix`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1034** <code>        self.tokenizer = tokenizer</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.tokenizer`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1035** <code>        self.engine = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.engine`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1036** <code>        self.pad_token_id = tokenizer.pad_token_id</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.pad_token_id`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1037** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1038** <code>        self.reward_fn = reward_fn</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.reward_fn`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1039** <code>        self.val_reward_fn = val_reward_fn</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.val_reward_fn`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1040** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1041** <code>        self.use_async_reward = True    # in kernel grading, we use the async reward manager</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.use_async_reward`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1042** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1043** <code>        # if hasattr(reward_fn, &quot;score_raw_responses_async&quot;) and hasattr(val_reward_fn, &quot;score_raw_responses_async&quot;):</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1044** <code>        #     self.use_async_reward = True</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1045** <code>        # else:</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1046** <code>        #     self.use_async_reward = False</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1047** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1048** <code>        # Initialize Logfire with run_name as service name</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1049** <code>        run_name = config.rollout.get(&quot;experiment_name&quot;, &quot;vllm-async-engine&quot;)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `run_name`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1050** <code>        self.logfire_logger = _create_logfire_logger(service_name=run_name)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1051** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1052** <code>        # Store configuration for agent and environment</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1053** <code>        self.max_agent_turns = config.rollout.multi_turn.max_user_turns</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.max_agent_turns`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1054** <code>        self.mask_void_turn = config.rollout.multi_turn.mask_void_turn</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.mask_void_turn`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1055** <code>        # self.mask_void_turn = False    # in kernel grading, we do not have exact definition of void turn</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1056** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1057** <code>        # Agent and environment configuration</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1058** <code>        self.agent_type = config.rollout.multi_turn.get(&quot;agent_type&quot;, &quot;MathAgent&quot;)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1059** <code>        self.env_type = config.rollout.multi_turn.get(&quot;env_type&quot;, &quot;MathSandboxEnv&quot;)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1060** <code>        self.per_turn_prompts = self.load_per_turn_prompts()</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1061** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1062** <code>        # Calculate expected environment max timeout, this is for final timeout handling, which includes max_retry and timeout</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1063** <code>        self.env_max_timeout = 60.0</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.env_max_timeout`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1064** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1065** <code>        # Track the slowest request</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1066** <code>        self.slowest_request_info = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.slowest_request_info`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1067** <code>        # Initialize or get the shared tracker</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1068** <code>        try:</code>
+  - 语法与作用：异常控制结构；捕获、处理或清理异常路径。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1069** <code>            self.slowest_tracker = ray.get_actor(&quot;SlowestRequestTracker&quot;)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1070** <code>        except ValueError:</code>
+  - 语法与作用：异常控制结构；捕获、处理或清理异常路径。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1071** <code>            # If the tracker doesn&#x27;t exist, create it</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1072** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获、处理或清理异常路径。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1073** <code>                self.slowest_tracker = SlowestRequestTracker.options(name=&quot;SlowestRequestTracker&quot;).remote()</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1074** <code>            except ValueError:</code>
+  - 语法与作用：异常控制结构；捕获、处理或清理异常路径。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1075** <code>                # Another instance may have created it concurrently</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1076** <code>                try:</code>
+  - 语法与作用：异常控制结构；捕获、处理或清理异常路径。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1077** <code>                    self.slowest_tracker = ray.get_actor(&quot;SlowestRequestTracker&quot;)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1078** <code>                except ValueError:</code>
+  - 语法与作用：异常控制结构；捕获、处理或清理异常路径。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1079** <code>                    logging.warning(&quot;Failed to create or get SlowestRequestTracker, disabling slowest request tracking&quot;)</code>
+  - 语法与作用：日志/输出调用；把调试、状态或错误信息写入输出系统。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1080** <code>                    self.slowest_tracker = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.slowest_tracker`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1081** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1082** <code>        # Timeout handling configuration</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1083** <code>        self.slowest_tracker_timeout = config.rollout.multi_turn.get(&quot;slowest_tracker_timeout&quot;, 2.0)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1084** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1085** <code>        # Timeout handling configuration (track train/validation separately)</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1086** <code>        self.token_rate_history_train = deque(maxlen=1000)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1087** <code>        self.token_rate_history_val = deque(maxlen=1000)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1088** <code>        self.timeout_buffer = 2.0  # Fixed buffer factor</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.timeout_buffer`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1089** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1090** <code>        # Track request deadlines for cleanup</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1091** <code>        self.request_deadlines = {}  # Map request_id to deadline timestamp</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.request_deadlines`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1092** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1093** <code>    def load_per_turn_prompts(self) -&gt; dict[str, dict[str, Any]]:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1094** <code>        &quot;&quot;&quot;Load turn selection rules for the multi-turn agent loop.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1095** <code>        per_turn_prompts = {}</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `per_turn_prompts`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1096** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1097** <code>        # Get prompt config path from config, with fallback to default</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1098** <code>        prompt_config_path = self.config.rollout.multi_turn.get(&quot;prompt_config_path&quot;, None)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `prompt_config_path`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1099** <code>        if prompt_config_path is None:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1100** <code>            return None</code>
+  - 语法与作用：return；结束当前函数并返回结果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1101** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1102** <code>        # Load from configured path</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1103** <code>        with open(prompt_config_path, encoding=&#x27;utf-8&#x27;) as fp:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开块时执行清理。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1104** <code>            prompt_cfg = OmegaConf.create(fp.read())</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `prompt_cfg`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1105** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1106** <code>        for prompt_config in prompt_cfg.per_turn_prompts:</code>
+  - 语法与作用：循环头；按可迭代对象或布尔条件重复执行缩进块。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1107** <code>            per_turn_prompts[prompt_config.name] = {</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `per_turn_prompts[prompt_config.name]`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1108** <code>                &quot;condition&quot;: prompt_config.condition,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1109** <code>                &quot;history_mode&quot;: prompt_config.history_mode,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1110** <code>                &quot;skip_env&quot;: prompt_config.skip_env,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1111** <code>                &quot;response_truncation&quot;: prompt_config.get(&quot;response_truncation&quot;, None),</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1112** <code>                &quot;update_memory&quot;: prompt_config.get(&quot;update_memory&quot;, False),</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1113** <code>                &quot;template&quot;: prompt_config.template,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1114** <code>            }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1115** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1116** <code>        return per_turn_prompts</code>
+  - 语法与作用：return；结束当前函数并返回结果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+
+#### 原始行 1305–1450
+- **L1305** <code>    def init_engine(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1306** <code>        &quot;&quot;&quot;Initialize vLLM engine and agent components.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1307** <code>        # Initialize vLLM AsyncLLM engine - replicating AsyncvLLMEngine init_engine method</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1308** <code>        config = self.config</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `config`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1309** <code>        model_path = config.model.path</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model_path`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1310** <code>        model_name = &quot;/&quot;.join(model_path.split(&quot;/&quot;)[-2:])</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model_name`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1311** <code>        local_path = copy_to_local(model_path)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `local_path`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1312** <code>        trust_remote_code = config.model.get(&quot;trust_remote_code&quot;, False)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `trust_remote_code`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1313** <code>        config = config.rollout</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `config`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1314** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1315** <code>        tensor_parallel_size = config.get(&quot;tensor_model_parallel_size&quot;, 1)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `tensor_parallel_size`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1316** <code>        max_num_batched_tokens = config.get(&quot;max_num_batched_tokens&quot;, 8192)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `max_num_batched_tokens`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1317** <code>        max_model_len = config.max_model_len if config.max_model_len else config.prompt_length + config.response_length</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `max_model_len`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1318** <code>        self.max_model_len = int(max_model_len)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1319** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1320** <code>        # Override default generation config from hugging face model config,</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1321** <code>        # user can still override them by passing kwargs in each request.</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1322** <code>        kwargs = dict(</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `kwargs`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1323** <code>            n=1,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `n`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1324** <code>            max_tokens=config.response_length,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `max_tokens`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1325** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1326** <code>        for k in config.keys():</code>
+  - 语法与作用：循环头；按可迭代对象或布尔条件重复执行缩进块。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1327** <code>            if hasattr(SamplingParams(), str(k)):</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1328** <code>                value = config.get(k)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `value`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1329** <code>                # Convert OmegaConf types to native Python types</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1330** <code>                if isinstance(value, ListConfig):</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1331** <code>                    value = list(value)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `value`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1332** <code>                elif isinstance(value, DictConfig):</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1333** <code>                    value = OmegaConf.to_container(value, resolve=True)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `value`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1334** <code>                kwargs[k] = value</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `kwargs[k]`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1335** <code>        print(f&quot;override_generation_config: {kwargs}&quot;)</code>
+  - 语法与作用：日志/输出调用；把调试、状态或错误信息写入输出系统。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1336** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1337** <code>        self.sampling_params = SamplingParams(**kwargs)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1338** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1339** <code>        backend = os.environ.get(&quot;VERL_VLLM_DISTRIBUTED_BACKEND&quot;, &quot;ray&quot;)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `backend`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1340** <code>        if backend == &quot;zeromq&quot;:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1341** <code>            distributed_executor_backend = ExternalZeroMQDistributedExecutor</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `distributed_executor_backend`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1342** <code>        elif backend == &quot;ray&quot;:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1343** <code>            distributed_executor_backend = ExternalRayDistributedExecutor</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `distributed_executor_backend`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1344** <code>        else:</code>
+  - 语法与作用：else 分支；前面的条件都不成立时执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1345** <code>            distributed_executor_backend = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `distributed_executor_backend`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1346** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1347** <code>        engine_args = AsyncEngineArgs(</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `engine_args`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1348** <code>            model=local_path,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1349** <code>            enable_sleep_mode=True,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `enable_sleep_mode`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1350** <code>            override_generation_config=kwargs,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `override_generation_config`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1351** <code>            tensor_parallel_size=tensor_parallel_size,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `tensor_parallel_size`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1352** <code>            distributed_executor_backend=distributed_executor_backend,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `distributed_executor_backend`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1353** <code>            dtype=config.dtype,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `dtype`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1354** <code>            enforce_eager=config.enforce_eager,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `enforce_eager`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1355** <code>            gpu_memory_utilization=config.gpu_memory_utilization,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `gpu_memory_utilization`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1356** <code>            disable_custom_all_reduce=True,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `disable_custom_all_reduce`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1357** <code>            # Qian: this is a known issue of verl, see PR: https://github.com/volcengine/verl/pull/2068/files</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1358** <code>            # disable_mm_preprocessor_cache=False,</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1359** <code>            skip_tokenizer_init=False,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `skip_tokenizer_init`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1360** <code>            max_model_len=max_model_len,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `max_model_len`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1361** <code>            load_format=&quot;auto&quot;,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `load_format`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1362** <code>            # disable_log_stats=config.disable_log_stats,</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1363** <code>            disable_log_stats=False,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `disable_log_stats`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1364** <code>            max_num_batched_tokens=max_num_batched_tokens,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `max_num_batched_tokens`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1365** <code>            enable_chunked_prefill=config.enable_chunked_prefill,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `enable_chunked_prefill`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1366** <code>            enable_prefix_caching=True,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `enable_prefix_caching`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1367** <code>            trust_remote_code=trust_remote_code,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `trust_remote_code`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1368** <code>            seed=config.get(&quot;seed&quot;, 0),</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `seed`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1369** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1370** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1371** <code>        # init async llm engine</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1372** <code>        vllm_config = self._create_engine_config(engine_args)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `vllm_config`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1373** <code>        self.vllm_config = vllm_config</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.vllm_config`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1374** <code>        self.engine = AsyncLLM.from_vllm_config(vllm_config)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1375** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1376** <code>    def _create_engine_config(self, engine_args: AsyncEngineArgs):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1377** <code>        &quot;&quot;&quot;Create engine configuration for vLLM AsyncLLM.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1378** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1379** <code>        Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1380** <code>            engine_args: AsyncEngineArgs for configuring the engine.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1381** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1382** <code>        Returns:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1383** <code>            Engine configuration object.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1384** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1385** <code>        vllm_config = engine_args.create_engine_config()</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `vllm_config`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1386** <code>        namespace = ray.get_runtime_context().namespace</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `namespace`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1387** <code>        vllm_config.instance_id = f&quot;{namespace}:{self.wg_prefix}:{self.vllm_dp_size}:{self.vllm_dp_rank}&quot;</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `vllm_config.instance_id`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1388** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1389** <code>        # VERL_VLLM_ZMQ_ADDRESSES</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1390** <code>        if engine_args.distributed_executor_backend == ExternalZeroMQDistributedExecutor:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1391** <code>            workers = _get_model_runner_workers(vllm_config=vllm_config, init_ray=False)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `workers`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1392** <code>            zmq_addresses = ray.get([worker.get_zeromq_address.remote() for worker in workers])</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `zmq_addresses`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1393** <code>            print(f&quot;VERL_VLLM_ZMQ_ADDRESSES: {zmq_addresses}&quot;)</code>
+  - 语法与作用：日志/输出调用；把调试、状态或错误信息写入输出系统。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1394** <code>            os.environ[&quot;VERL_VLLM_ZMQ_ADDRESSES&quot;] = &quot;,&quot;.join(zmq_addresses)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `os.environ["VERL_VLLM_ZMQ_ADDRESSES"]`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1395** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1396** <code>        return vllm_config</code>
+  - 语法与作用：return；结束当前函数并返回结果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1397** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1398** <code>    def _resolve_multi_turn_rewards(self, turn_rewards: list[float], turn_speedups: list[float], turn_correctness: list[bool]) -&gt; list[float]:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1399** <code>        &quot;&quot;&quot;Resolve multi-turn rewards according to turn speedups and correctness.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1400** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1401** <code>        We follow the design:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1402** <code>        The later turn must be better than the earlier turn.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1403** <code>        1. If previous turn is correct, the later turn must be faster than the previous turn.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1404** <code>        2. If previous turn is incorrect, the later turn must be at least correct.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1405** <code>        Match one of the above two conditions, the reward could be the original reward, otherwise the reward is 0.0.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1406** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1407** <code>        Args:</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1408** <code>            turn_rewards: List of turn rewards.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1409** <code>            turn_speedups: List of turn speedups.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1410** <code>            turn_correctness: List of turn correctness.</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1411** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1412** <code>        #TODO weiliu: I am not sure whether we should use the speedups and correctness to resolve the rewards, </code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1413** <code>        # but I think it is not necessary for now.</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1414** <code>        # Since we already used the per-turn advantage computations</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1415** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1416** <code>        finlized_turn_rewards = turn_rewards</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `finlized_turn_rewards`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1417** <code>        # max_speedup = -1.0</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1418** <code>        # max_correctness = False</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1419** <code>        # for turn_idx in range(len(turn_rewards)):</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1420** <code>        #     if not max_correctness:</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1421** <code>        #         if turn_correctness[turn_idx]:</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1422** <code>        #             max_correctness = True</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1423** <code>        #             max_speedup = turn_speedups[turn_idx]</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1424** <code>        #             finlized_turn_rewards.append(turn_rewards[turn_idx])</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1425** <code>        #         else:</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1426** <code>        #             finlized_turn_rewards.append(0.0)</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1427** <code>        #     else:</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1428** <code>        #         if turn_speedups[turn_idx] &gt; max_speedup:</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1429** <code>        #             max_speedup = turn_speedups[turn_idx]</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1430** <code>        #             finlized_turn_rewards.append(turn_rewards[turn_idx])</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1431** <code>        #         else:</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1432** <code>        #             finlized_turn_rewards.append(0.0)</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1433** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1434** <code>        return finlized_turn_rewards</code>
+  - 语法与作用：return；结束当前函数并返回结果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1435** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1436** <code>    async def wake_up(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1437** <code>        &quot;&quot;&quot;Wake up the engine from sleep mode.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1438** <code>        await self.engine.wake_up()</code>
+  - 语法与作用：await；暂停当前协程，等待异步调用完成后继续。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1439** <code>        if not hasattr(self, &quot;_watchdog_task&quot;) or self._watchdog_task is None or self._watchdog_task.done():</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1440** <code>            self._watchdog_task = asyncio.create_task(self._deadline_watchdog())</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1441** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1442** <code>    async def sleep(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1443** <code>        &quot;&quot;&quot;Put the engine into sleep mode.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1444** <code>        # TODO: https://github.com/vllm-project/vllm/issues/17103</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1445** <code>        await self.engine.reset_prefix_cache()</code>
+  - 语法与作用：await；暂停当前协程，等待异步调用完成后继续。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1446** <code>        await self.engine.sleep()</code>
+  - 语法与作用：await；暂停当前协程，等待异步调用完成后继续。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1447** <code>        if getattr(self, &quot;_watchdog_task&quot;, None):</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1448** <code>            self._watchdog_task.cancel()</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1449** <code>            self._watchdog_task = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self._watchdog_task`，可能创建或更新状态。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+- **L1450** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 `MultiTurnAsyncvLLMEngine` 会执行构造、prompt 配置加载和 `init_engine`；其中 vLLM/Ray/Pydantic 实现是依赖边界。
+
+### 19.1 `async_server.py` 的未覆盖区间
+源码：`drkernel/kernel/workers/rollout/async_server.py`；以下为补全区间，执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。。
+
+#### 原始行 59–60
+- **L59** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L60** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+#### 原始行 193–299
+- **L193** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L194** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L195** <code>class StandaloneVLLMEngineManager:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L196** <code>    &quot;&quot;&quot;Standalone vLLM manager that does not rely on FSDP rollout workers.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L197** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L198** <code>    def __init__(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L199** <code>        self,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L200** <code>        config: DictConfig,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L201** <code>        tokenizer,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L202** <code>        reward_fn=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_fn`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L203** <code>        val_reward_fn=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `val_reward_fn`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L204** <code>        *,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L205** <code>        total_gpus: int,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L206** <code>    ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L207** <code>        self.config = config</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L208** <code>        self.tokenizer = tokenizer</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L209** <code>        self.rollout_tp_size = self.config.rollout.tensor_model_parallel_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.rollout_tp_size`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L210** <code>        if total_gpus &lt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L211** <code>            raise ValueError(&quot;standalone_vllm requires total_gpus &gt;= 1&quot;)</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L212** <code>        if total_gpus % self.rollout_tp_size != 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L213** <code>            raise ValueError(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L214** <code>                f&quot;standalone_vllm requires total_gpus ({total_gpus}) divisible by tensor_model_parallel_size &quot;</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `f"standalone_vllm requires total_gpus`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L215** <code>                f&quot;({self.rollout_tp_size})&quot;</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `f"`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L216** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L217** <code>        self.rollout_dp_size = total_gpus // self.rollout_tp_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.rollout_dp_size`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L218** <code>        self.world_size = self.rollout_dp_size * self.rollout_tp_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.world_size`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L219** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L220** <code>        rollout_backend = self.config.rollout.get(&quot;backend&quot;, &quot;vllm&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_backend`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L221** <code>        if rollout_backend in (&quot;openai&quot;, &quot;openai_sdk&quot;):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L222** <code>            from kernel.workers.rollout.vllm_rollout.openai_async_engine_multi_iter import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L223** <code>                AsyncvLLMEngine as OpenAIAsyncEngine,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L224** <code>                MultiIterAsyncvLLMEngine as OpenAIMultiIterEngine,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L225** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L226** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L227** <code>            engine_class = OpenAIMultiIterEngine if self.config.rollout.multi_turn.enable else OpenAIAsyncEngine</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `engine_class`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L228** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L229** <code>            engine_class = MultiTurnAsyncvLLMEngine if self.config.rollout.multi_turn.enable else AsyncvLLMEngine</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `engine_class`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L230** <code>            if self.config.rollout.multi_turn.multi_iteration.enable:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L231** <code>                engine_class = MultiIterAsyncvLLMEngine</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `engine_class`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L232** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L233** <code>        self.config.rollout.max_model_len = (</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.rollout.max_model_len`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L234** <code>            self.config.rollout.max_model_len</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L235** <code>            if self.config.rollout.max_model_len</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L236** <code>            else self.config.rollout.prompt_length + self.config.rollout.response_length</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L237** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L238** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L239** <code>        user = os.environ.get(&quot;USER&quot;, &quot;user&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `user`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L240** <code>        cache_root = f&quot;/tmp/{user}&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cache_root`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L241** <code>        runtime_env = {</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `runtime_env`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L242** <code>            &quot;env_vars&quot;: {</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L243** <code>                &quot;VERL_VLLM_DISTRIBUTED_BACKEND&quot;: &quot;local&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L244** <code>                &quot;XDG_CACHE_HOME&quot;: f&quot;{cache_root}/.cache&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L245** <code>                &quot;TORCHINDUCTOR_CACHE_DIR&quot;: f&quot;{cache_root}/torchinductor&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L246** <code>            }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L247** <code>        }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L248** <code>        self.async_llm_servers = [</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.async_llm_servers`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L249** <code>            engine_class.options(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `engine_class.options`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L250** <code>                num_gpus=self.rollout_tp_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_gpus`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L251** <code>                runtime_env=runtime_env,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `runtime_env`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L252** <code>                name=f&quot;standalone_async_llm_server_{rollout_dp_rank}&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `name`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L253** <code>            ).remote(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `).remote`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L254** <code>                self.config,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L255** <code>                self.rollout_dp_size,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L256** <code>                rollout_dp_rank,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L257** <code>                &quot;standalone_vllm&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L258** <code>                self.tokenizer,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L259** <code>                reward_fn,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L260** <code>                val_reward_fn,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L261** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L262** <code>            for rollout_dp_rank in range(self.rollout_dp_size)</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L263** <code>        ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L264** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L265** <code>        ray.get([server.init_engine.remote() for server in self.async_llm_servers])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `ray.get`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L266** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L267** <code>        assert self.config.rollout.free_cache_engine, &quot;Only free cache engine is supported for now.&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L268** <code>        if self.config.rollout.free_cache_engine:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L269** <code>            self.sleep()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.sleep`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L270** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L271** <code>    def wake_up(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L272** <code>        &quot;&quot;&quot;Wake up all vllm instances.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L273** <code>        ray.get([server.wake_up.remote() for server in self.async_llm_servers])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `ray.get`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L274** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L275** <code>    def sleep(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L276** <code>        &quot;&quot;&quot;Sleep all vllm instances.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L277** <code>        ray.get([server.sleep.remote() for server in self.async_llm_servers])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `ray.get`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L278** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L279** <code>    def generate_sequences(self, prompts: DataProto, **sampling_params) -&gt; DataProto:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L280** <code>        &quot;&quot;&quot;Generate multiple sequences in parallel via chat scheduler.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L281** <code>        assert self.config.rollout.free_cache_engine, &quot;Only free cache engine is supported for now.&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L282** <code>        if self.config.rollout.free_cache_engine:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L283** <code>            self.wake_up()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.wake_up`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L284** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L285** <code>        chunkes = prompts.chunk(len(self.async_llm_servers))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `chunkes`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L286** <code>        outputs = ray.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L287** <code>            [</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L288** <code>                worker.generate_sequences.remote(chunk)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `worker.generate_sequences.remote`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L289** <code>                for worker, chunk in zip(self.async_llm_servers, chunkes, strict=True)</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L290** <code>            ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L291** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L292** <code>        outputs = [output for output in outputs if output is not None]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L293** <code>        if len(outputs) == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L294** <code>            return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L295** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L296** <code>        output = DataProto.concat(outputs)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L297** <code>        if self.config.rollout.free_cache_engine:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L298** <code>            self.sleep()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.sleep`，产生返回值或副作用。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+- **L299** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：Standalone manager 由配置选择；这些定义/分支当前 `async_vllm + FSDP` recipe 不执行，但仍是项目代码。
+
+### 19.2 async engine 的其余源码
+源码：`drkernel/kernel/workers/rollout/vllm_rollout/vllm_async_engine.py`；以下为补全区间，执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。。
+
+#### 原始行 1–883
+- **L1** <code>import asyncio</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2** <code>import json</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L3** <code>import logging</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L4** <code>import os</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L5** <code>import pickle</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L6** <code>import random</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L7** <code>from collections import deque</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L8** <code>from collections.abc import AsyncGenerator</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L9** <code>from contextlib import contextmanager</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L10** <code>from copy import deepcopy</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L11** <code>from typing import Any, Callable, Dict, List, Optional, Tuple, Union</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L12** <code>from uuid import uuid4</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L13** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L14** <code>import cloudpickle</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L15** <code>import numpy as np</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L16** <code>import ray</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L17** <code>import torch</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L18** <code>import zmq</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L19** <code>from omegaconf import DictConfig, ListConfig, OmegaConf</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L20** <code>from pydantic import BaseModel, ConfigDict, Field</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L21** <code>from starlette.requests import Request</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L22** <code>from starlette.responses import JSONResponse, StreamingResponse</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L23** <code>from tensordict import TensorDict</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L24** <code>from torch.nn.utils.rnn import pad_sequence</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L25** <code>from verl import DataProto</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L26** <code>from verl.utils.fs import copy_to_local</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L27** <code>from verl.utils.model import compute_position_id_with_mask</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L28** <code>from verl.utils.torch_functional import pad_sequence_to_length</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L29** <code>from verl.workers.rollout.async_server import AsyncServerBase</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L30** <code>from verl.workers.rollout.schemas import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L31** <code>    AsyncRolloutRequest,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L32** <code>    AsyncRolloutRequestStateEnum,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L33** <code>    FinishReasonTypeEnum,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L34** <code>    Message,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L35** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L36** <code>from vllm import SamplingParams</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L37** <code>from vllm.engine.arg_utils import AsyncEngineArgs</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L38** <code>from vllm.entrypoints.logger import RequestLogger</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L39** <code>from vllm.entrypoints.openai.protocol import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L40** <code>    ChatCompletionRequest,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L41** <code>    ChatCompletionResponse,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L42** <code>    ErrorResponse,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L43** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L44** <code>from vllm.entrypoints.openai.serving_chat import OpenAIServingChat</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L45** <code>from vllm.entrypoints.openai.serving_models import BaseModelPath, OpenAIServingModels</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L46** <code>from vllm.inputs import TokensPrompt</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L47** <code>from vllm.outputs import RequestOutput</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L48** <code>from vllm.v1.engine.async_llm import AsyncLLM</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L49** <code>from vllm.v1.executor.abstract import Executor</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L50** <code>from vllm.worker.worker_base import WorkerWrapperBase</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L51** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L52** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L53** <code>from kernel.workers.agent import BaseAgent, KernelAgent</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L54** <code>from verl_patch.workers.code.agent_env import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L55** <code>    BaseEnv,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L56** <code>    FinishReasonTypeEnum,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L57** <code>    create_environment,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L58** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L59** <code>from verl_patch.workers.code.agent import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L60** <code>    MathAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L61** <code>    CodeAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L62** <code>    SearchAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L63** <code>    FileSearchAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L64** <code>    MathNeuralInterpreterAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L65** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L66** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L67** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L68** <code>def create_agent(agent_type: str, tokenizer) -&gt; BaseAgent:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L69** <code>    &quot;&quot;&quot;Factory function to create agent instances based on configuration.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L70** <code>    agent_map = {</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `agent_map`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L71** <code>        &#x27;MathAgent&#x27;: MathAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L72** <code>        &#x27;MathNeuralInterpreterAgent&#x27;: MathNeuralInterpreterAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L73** <code>        &#x27;CodeAgent&#x27;: CodeAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L74** <code>        &#x27;SearchAgent&#x27;: SearchAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L75** <code>        &#x27;FileSearchAgent&#x27;: FileSearchAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L76** <code>        &#x27;KernelAgent&#x27;: KernelAgent,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L77** <code>    }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L78** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L79** <code>    if agent_type not in agent_map:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L80** <code>        raise ValueError(f&quot;Unsupported agent type: {agent_type}. Supported types: {list(agent_map.keys())}&quot;)</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L81** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L82** <code>    return agent_map[agent_type](tokenizer)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L83** <code># from verl_patch.workers.code.reward_manager import CodeRewardManager, MathRewardManager</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L84** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L85** <code># from verl_patch.workers.code.rollout.schemas import AsyncRolloutRequestWithLogProbs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L86** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L87** <code>from collections import defaultdict</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L88** <code>import re</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L89** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L90** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L91** <code>@ray.remote</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L92** <code>class SlowestRequestTracker:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L93** <code>    &quot;&quot;&quot;Ray actor to track the slowest request across all workers.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L94** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L95** <code>    def __init__(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L96** <code>        self.slowest_request_time = 0.0</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.slowest_request_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L97** <code>        self.current_step = -1</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.current_step`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L98** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L99** <code>    def update_slowest_time(self, request_time: float, global_step: int) -&gt; bool:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L100** <code>        &quot;&quot;&quot;Update the slowest request time if this is slower.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L101** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L102** <code>        Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L103** <code>            request_time: The time taken for the current request</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L104** <code>            global_step: The current global step</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L105** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L106** <code>        Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L107** <code>            bool: True if this is the new slowest request, False otherwise</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L108** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L109** <code>        # Reset tracking every 10 steps</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L110** <code>        if global_step % 10 == 0 and global_step &gt; self.current_step:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L111** <code>            self.slowest_request_time = 0.0</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.slowest_request_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L112** <code>            self.current_step = global_step</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.current_step`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L113** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L114** <code>        # Check if this is the slowest request</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L115** <code>        if request_time &gt; self.slowest_request_time + 5.0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L116** <code>            self.slowest_request_time = request_time</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.slowest_request_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L117** <code>            return True</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L118** <code>        return False</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L119** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L120** <code>    def get_slowest_time(self) -&gt; float:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L121** <code>        &quot;&quot;&quot;Get the current slowest request time.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L122** <code>        return self.slowest_request_time</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L123** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L124** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L125** <code>def _create_logfire_logger(service_name: str = &quot;vllm-async-engine&quot;):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L126** <code>    &quot;&quot;&quot;Create and configure a logfire logger instance.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L127** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L128** <code>    Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L129** <code>        service_name: The service name for logfire configuration</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L130** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L131** <code>    Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L132** <code>        logfire logger instance or None if initialization failed</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L133** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L134** <code>    try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L135** <code>        LOGFIRE_KEY = os.getenv(&#x27;LOGFIRE_KEY&#x27;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `LOGFIRE_KEY`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L136** <code>        if LOGFIRE_KEY:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L137** <code>            import logfire</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L138** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L139** <code>            # get all workers&#x27; ip address and log them into logfire as tag</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L140** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L141** <code>            logfire.configure(token=LOGFIRE_KEY, service_name=service_name, service_version=&quot;v1.0.0&quot;, scrubbing=False)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `logfire.configure(token`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L142** <code>            logging.info(f&quot;Logfire initialized successfully with service_name: {service_name}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L143** <code>            return logfire</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L144** <code>    except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L145** <code>        logging.warning(f&quot;Failed to initialize Logfire: {e}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L146** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L147** <code>    return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L148** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L149** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L150** <code>def _get_model_runner_workers(vllm_config, init_ray: bool = True):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L151** <code>    assert vllm_config.instance_id is not None, &quot;instance_id must be set for external ray actors.&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L152** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L153** <code>    fields = vllm_config.instance_id.split(&quot;:&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fields`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L154** <code>    assert len(fields) == 4, (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L155** <code>        f&quot;instance_id: {vllm_config.instance_id} must be in the format of &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L156** <code>        f&quot;&lt;namespace&gt;:&lt;wg_prefix&gt;:&lt;vllm_dp_size&gt;:&lt;vllm_dp_rank&gt;.&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L157** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L158** <code>    namespace, wg_prefix, vllm_dp_size, vllm_dp_rank = fields[0], fields[1], int(fields[2]), int(fields[3])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `namespace, wg_prefix, vllm_dp_size, vllm_dp_rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L159** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L160** <code>    # Make sure subprocess in same namespace as parent actor.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L161** <code>    # actor name format: {name_prefix}WorkerDict_{pg_idx}:{local_rank}</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L162** <code>    if init_ray:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L163** <code>        print(&quot;initializing ray ...&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L164** <code>        runtime_environment = {</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `runtime_environment`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L165** <code>            &quot;env_vars&quot;: {&quot;VLLM_USE_V1&quot;: &quot;1&quot;, &quot;FLASH_ATTENTION_DETERMINISTIC&quot;: &quot;1&quot;, &quot;VERL_AUTO_PADDING&quot;: &quot;1&quot;}</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L166** <code>        }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L167** <code>        ray.init(namespace=namespace, runtime_env=runtime_environment, address=&#x27;auto&#x27;)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `ray.init(namespace`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L168** <code>    actor_names = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_names`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L169** <code>        actor_name for actor_name in ray.util.list_named_actors() if actor_name.startswith(f&quot;{wg_prefix}WorkerDict&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `actor_name for actor_name in ray.util.list_named_actors`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L170** <code>    ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L171** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L172** <code>    vllm_tp_size = vllm_config.parallel_config.tensor_parallel_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vllm_tp_size`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L173** <code>    assert len(actor_names) == vllm_dp_size * vllm_tp_size, (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L174** <code>        f&quot;instance_id: {vllm_config.instance_id} has {len(actor_names)} actors, but vllm_dp_size: &quot;</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `f"instance_id: {vllm_config.instance_id} has {len`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L175** <code>        f&quot;{vllm_dp_size} * vllm_tp_size: {vllm_tp_size} = {vllm_dp_size * vllm_tp_size} is expected.&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `f"{vllm_dp_size} * vllm_tp_size: {vllm_tp_size}`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L176** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L177** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L178** <code>    def get_pg_index_and_local_rank(actor_name) -&gt; Tuple[int, int]:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L179** <code>        fields = actor_name.split(&quot;:&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fields`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L180** <code>        assert len(fields) == 2, f&quot;invalid actor name: {actor_name}&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L181** <code>        pg_index, local_rank = int(fields[0].split(&quot;_&quot;)[-1]), int(fields[1])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pg_index, local_rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L182** <code>        return pg_index, local_rank</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L183** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L184** <code>    # sort actor names by pg_index and local_rank</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L185** <code>    actor_names = sorted(actor_names, key=get_pg_index_and_local_rank)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_names`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L186** <code>    actor_names = actor_names[vllm_dp_rank * vllm_tp_size : (vllm_dp_rank + 1) * vllm_tp_size]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_names`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L187** <code>    workers: List[WorkerWrapperBase] = [ray.get_actor(actor_name) for actor_name in actor_names]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `workers: List[WorkerWrapperBase]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L188** <code>    print(f&quot;instance_id: {vllm_config.instance_id} initializes with external actors: {actor_names}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L189** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L190** <code>    return workers</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L191** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L192** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L193** <code>class ExternalRayDistributedExecutor(Executor):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L194** <code>    &quot;&quot;&quot;An executor that engines are launched by external ray actors.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L195** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L196** <code>    uses_ray: bool = False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uses_ray: bool`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L197** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L198** <code>    def _init_executor(self) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L199** <code>        assert self.vllm_config.instance_id is not None, &quot;instance_id must be set for external ray actors.&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L200** <code>        self.workers = _get_model_runner_workers(vllm_config=self.vllm_config, init_ray=True)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.workers`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L201** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L202** <code>        kwargs = dict(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L203** <code>            vllm_config=self.vllm_config,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vllm_config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L204** <code>            local_rank=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L205** <code>            rank=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L206** <code>            distributed_init_method=&quot;env://&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `distributed_init_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L207** <code>            is_driver_worker=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_driver_worker`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L208** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L209** <code>        self.collective_rpc(&quot;init_worker&quot;, args=([kwargs],))</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.collective_rpc("init_worker", args`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L210** <code>        self.collective_rpc(&quot;init_device&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.collective_rpc`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L211** <code>        self.collective_rpc(&quot;load_model&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.collective_rpc`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L212** <code>        print(f&quot;instance_id: {self.vllm_config.instance_id} intializes finished.&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L213** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L214** <code>    def collective_rpc(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L215** <code>        self,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L216** <code>        method: Union[str, Callable],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L217** <code>        timeout: Optional[float] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timeout: Optional[float]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L218** <code>        args: Tuple = (),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `args: Tuple`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L219** <code>        kwargs: Optional[Dict[str, Any]] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs: Optional[Dict[str, Any]]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L220** <code>    ) -&gt; List[Any]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L221** <code>        # TODO(wuxibin): support ray compiled graph</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L222** <code>        if isinstance(method, str):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L223** <code>            sent_method = method</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sent_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L224** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L225** <code>            sent_method = cloudpickle.dumps(method)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sent_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L226** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L227** <code>        del method</code>
+  - 语法与作用：del；删除名称、字典键、列表元素或对象属性的引用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L228** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L229** <code>        outputs = ray.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L230** <code>            [worker.execute_method.remote(sent_method, *args, **(kwargs or {})) for worker in self.workers]</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `[worker.execute_method.remote`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L231** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L232** <code>        return outputs</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L233** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L234** <code>    def check_health(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L235** <code>        return</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L236** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L237** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L238** <code>class ExternalZeroMQDistributedExecutor(Executor):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L239** <code>    &quot;&quot;&quot;An executor that engines are launched by external ray actors.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L240** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L241** <code>    uses_ray: bool = False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uses_ray: bool`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L242** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L243** <code>    def _init_executor(self) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L244** <code>        addresses = os.environ[&quot;VERL_VLLM_ZMQ_ADDRESSES&quot;].split(&quot;,&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `addresses`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L245** <code>        self.context = zmq.Context()</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.context`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L246** <code>        self.sockets = []</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.sockets`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L247** <code>        for address in addresses:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L248** <code>            socket = self.context.socket(zmq.REQ)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `socket`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L249** <code>            socket.connect(address)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `socket.connect`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L250** <code>            self.sockets.append(socket)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.sockets.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L251** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L252** <code>        kwargs = dict(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L253** <code>            vllm_config=self.vllm_config,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vllm_config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L254** <code>            local_rank=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L255** <code>            rank=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L256** <code>            distributed_init_method=&quot;env://&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `distributed_init_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L257** <code>            is_driver_worker=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_driver_worker`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L258** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L259** <code>        self.collective_rpc(&quot;init_worker&quot;, args=([kwargs],))</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.collective_rpc("init_worker", args`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L260** <code>        self.collective_rpc(&quot;init_device&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.collective_rpc`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L261** <code>        self.collective_rpc(&quot;load_model&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.collective_rpc`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L262** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L263** <code>    def collective_rpc(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L264** <code>        self,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L265** <code>        method: Union[str, Callable],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L266** <code>        timeout: Optional[float] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timeout: Optional[float]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L267** <code>        args: Tuple = (),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `args: Tuple`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L268** <code>        kwargs: Optional[Dict[str, Any]] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs: Optional[Dict[str, Any]]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L269** <code>    ) -&gt; List[Any]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L270** <code>        if isinstance(method, str):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L271** <code>            sent_method = method</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sent_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L272** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L273** <code>            sent_method = pickle.dumps(method)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sent_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L274** <code>        del method</code>
+  - 语法与作用：del；删除名称、字典键、列表元素或对象属性的引用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L275** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L276** <code>        message = pickle.dumps((sent_method, args, kwargs or {}))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `message`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L277** <code>        for socket in self.sockets:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L278** <code>            socket.send(message, zmq.DONTWAIT)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `socket.send`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L279** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L280** <code>        outputs = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L281** <code>        for socket in self.sockets:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L282** <code>            outputs.append(pickle.loads(socket.recv()))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `outputs.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L283** <code>        return outputs</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L284** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L285** <code>    def check_health(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L286** <code>        return</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L287** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L288** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L289** <code>class AgentLoopOutput(BaseModel):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L290** <code>    &quot;&quot;&quot;Agent loop output.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L291** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L292** <code>    prompt_ids: list[int]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L293** <code>    response_ids: list[int]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L294** <code>    response_mask: list[int]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L295** <code>    logprobs: list[float]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L296** <code>    num_turns: int = 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_turns: int`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L297** <code>    reward: float = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward: float`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L298** <code>    reward_extra_info: dict = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info: dict`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L299** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L300** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L301** <code>def infer_entry_point(ground_truth: str, default: str = &quot;Model&quot;) -&gt; str:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L302** <code>    if not ground_truth:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L303** <code>        return default</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L304** <code>    match = re.search(r&quot;\bclass\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:\(|:)&quot;, ground_truth)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `match`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L305** <code>    return match.group(1) if match else default</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L306** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L307** <code>def _get_model_runner_workers(vllm_config, init_ray: bool = True):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L308** <code>    assert vllm_config.instance_id is not None, &quot;instance_id must be set for external ray actors.&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L309** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L310** <code>    fields = vllm_config.instance_id.split(&quot;:&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fields`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L311** <code>    assert len(fields) == 4, (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L312** <code>        f&quot;instance_id: {vllm_config.instance_id} must be in the format of &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L313** <code>        f&quot;&lt;namespace&gt;:&lt;wg_prefix&gt;:&lt;vllm_dp_size&gt;:&lt;vllm_dp_rank&gt;.&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L314** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L315** <code>    namespace, wg_prefix, vllm_dp_size, vllm_dp_rank = fields[0], fields[1], int(fields[2]), int(fields[3])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `namespace, wg_prefix, vllm_dp_size, vllm_dp_rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L316** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L317** <code>    # Make sure subprocess in same namespace as parent actor.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L318** <code>    # actor name format: {name_prefix}WorkerDict_{pg_idx}:{local_rank}</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L319** <code>    if init_ray:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L320** <code>        ray.init(namespace=namespace, address=&#x27;auto&#x27;)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `ray.init(namespace`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L321** <code>    actor_names = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_names`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L322** <code>        actor_name for actor_name in ray.util.list_named_actors() if actor_name.startswith(f&quot;{wg_prefix}WorkerDict&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `actor_name for actor_name in ray.util.list_named_actors`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L323** <code>    ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L324** <code>    # Fallback for environments where RayWorkerGroup does not wrap workers in WorkerDict.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L325** <code>    if len(actor_names) == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L326** <code>        actor_names = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_names`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L327** <code>            actor_name</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L328** <code>            for actor_name in ray.util.list_named_actors()</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L329** <code>            if actor_name.startswith(f&quot;{wg_prefix}AsyncActorRolloutRefWorker&quot;)</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L330** <code>        ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L331** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L332** <code>    vllm_tp_size = vllm_config.parallel_config.tensor_parallel_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vllm_tp_size`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L333** <code>    assert len(actor_names) == vllm_dp_size * vllm_tp_size, (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L334** <code>        f&quot;instance_id: {vllm_config.instance_id} has {len(actor_names)} actors, but vllm_dp_size: &quot;</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `f"instance_id: {vllm_config.instance_id} has {len`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L335** <code>        f&quot;{vllm_dp_size} * vllm_tp_size: {vllm_tp_size} = {vllm_dp_size * vllm_tp_size} is expected.&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `f"{vllm_dp_size} * vllm_tp_size: {vllm_tp_size}`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L336** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L337** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L338** <code>    def get_pg_index_and_local_rank(actor_name) -&gt; Tuple[int, int]:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L339** <code>        fields = actor_name.split(&quot;:&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fields`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L340** <code>        assert len(fields) == 2, f&quot;invalid actor name: {actor_name}&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L341** <code>        pg_index, local_rank = int(fields[0].split(&quot;_&quot;)[-1]), int(fields[1])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pg_index, local_rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L342** <code>        return pg_index, local_rank</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L343** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L344** <code>    # sort actor names by pg_index and local_rank</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L345** <code>    actor_names = sorted(actor_names, key=get_pg_index_and_local_rank)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_names`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L346** <code>    actor_names = actor_names[vllm_dp_rank * vllm_tp_size : (vllm_dp_rank + 1) * vllm_tp_size]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_names`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L347** <code>    workers: List[WorkerWrapperBase] = [ray.get_actor(actor_name) for actor_name in actor_names]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `workers: List[WorkerWrapperBase]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L348** <code>    print(f&quot;instance_id: {vllm_config.instance_id} initializes with external actors: {actor_names}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L349** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L350** <code>    return workers</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L351** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L352** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L353** <code>class ExternalRayDistributedExecutor(Executor):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L354** <code>    &quot;&quot;&quot;An executor that engines are launched by external ray actors.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L355** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L356** <code>    uses_ray: bool = False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uses_ray: bool`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L357** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L358** <code>    def _init_executor(self) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L359** <code>        assert self.vllm_config.instance_id is not None, &quot;instance_id must be set for external ray actors.&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L360** <code>        self.workers = _get_model_runner_workers(vllm_config=self.vllm_config, init_ray=True)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.workers`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L361** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L362** <code>        kwargs = dict(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L363** <code>            vllm_config=self.vllm_config,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vllm_config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L364** <code>            local_rank=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L365** <code>            rank=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L366** <code>            distributed_init_method=&quot;env://&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `distributed_init_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L367** <code>            is_driver_worker=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_driver_worker`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L368** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L369** <code>        self.collective_rpc(&quot;init_worker&quot;, args=([kwargs],))</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.collective_rpc("init_worker", args`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L370** <code>        self.collective_rpc(&quot;init_device&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.collective_rpc`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L371** <code>        self.collective_rpc(&quot;load_model&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.collective_rpc`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L372** <code>        print(f&quot;instance_id: {self.vllm_config.instance_id} intializes finished.&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L373** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L374** <code>    def collective_rpc(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L375** <code>        self,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L376** <code>        method: Union[str, Callable],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L377** <code>        timeout: Optional[float] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timeout: Optional[float]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L378** <code>        args: Tuple = (),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `args: Tuple`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L379** <code>        kwargs: Optional[Dict[str, Any]] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs: Optional[Dict[str, Any]]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L380** <code>    ) -&gt; List[Any]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L381** <code>        # TODO(wuxibin): support ray compiled graph</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L382** <code>        if isinstance(method, str):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L383** <code>            sent_method = method</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sent_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L384** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L385** <code>            sent_method = cloudpickle.dumps(method)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sent_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L386** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L387** <code>        del method</code>
+  - 语法与作用：del；删除名称、字典键、列表元素或对象属性的引用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L388** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L389** <code>        outputs = ray.get(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L390** <code>            [worker.execute_method.remote(sent_method, *args, **(kwargs or {})) for worker in self.workers]</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `[worker.execute_method.remote`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L391** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L392** <code>        return outputs</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L393** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L394** <code>    def check_health(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L395** <code>        return</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L396** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L397** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L398** <code>class ExternalZeroMQDistributedExecutor(Executor):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L399** <code>    &quot;&quot;&quot;An executor that engines are launched by external ray actors.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L400** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L401** <code>    uses_ray: bool = False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uses_ray: bool`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L402** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L403** <code>    def _init_executor(self) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L404** <code>        addresses = os.environ[&quot;VERL_VLLM_ZMQ_ADDRESSES&quot;].split(&quot;,&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `addresses`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L405** <code>        self.context = zmq.Context()</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.context`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L406** <code>        self.sockets = []</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.sockets`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L407** <code>        for address in addresses:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L408** <code>            socket = self.context.socket(zmq.REQ)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `socket`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L409** <code>            socket.connect(address)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `socket.connect`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L410** <code>            self.sockets.append(socket)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.sockets.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L411** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L412** <code>        kwargs = dict(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L413** <code>            vllm_config=self.vllm_config,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vllm_config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L414** <code>            local_rank=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L415** <code>            rank=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L416** <code>            distributed_init_method=&quot;env://&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `distributed_init_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L417** <code>            is_driver_worker=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_driver_worker`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L418** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L419** <code>        self.collective_rpc(&quot;init_worker&quot;, args=([kwargs],))</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.collective_rpc("init_worker", args`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L420** <code>        self.collective_rpc(&quot;init_device&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.collective_rpc`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L421** <code>        self.collective_rpc(&quot;load_model&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.collective_rpc`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L422** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L423** <code>    def collective_rpc(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L424** <code>        self,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L425** <code>        method: Union[str, Callable],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L426** <code>        timeout: Optional[float] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timeout: Optional[float]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L427** <code>        args: Tuple = (),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `args: Tuple`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L428** <code>        kwargs: Optional[Dict[str, Any]] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs: Optional[Dict[str, Any]]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L429** <code>    ) -&gt; List[Any]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L430** <code>        if isinstance(method, str):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L431** <code>            sent_method = method</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sent_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L432** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L433** <code>            sent_method = pickle.dumps(method)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sent_method`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L434** <code>        del method</code>
+  - 语法与作用：del；删除名称、字典键、列表元素或对象属性的引用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L435** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L436** <code>        message = pickle.dumps((sent_method, args, kwargs or {}))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `message`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L437** <code>        for socket in self.sockets:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L438** <code>            socket.send(message, zmq.DONTWAIT)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `socket.send`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L439** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L440** <code>        outputs = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L441** <code>        for socket in self.sockets:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L442** <code>            outputs.append(pickle.loads(socket.recv()))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `outputs.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L443** <code>        return outputs</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L444** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L445** <code>    def check_health(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L446** <code>        return</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L447** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L448** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L449** <code>class AgentLoopOutput(BaseModel):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L450** <code>    &quot;&quot;&quot;Agent loop output.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L451** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L452** <code>    model_config = ConfigDict(arbitrary_types_allowed=True)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model_config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L453** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L454** <code>    prompt_ids: list[int]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L455** <code>    response_ids: list[int]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L456** <code>    response_mask: list[int]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L457** <code>    logprobs: list[float] = []  # Add log probabilities</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `logprobs: list[float]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L458** <code>    num_turns: int = 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_turns: int`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L459** <code>    reward_tensor: torch.Tensor</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L460** <code>    reward_extra_info: dict = defaultdict(list)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info: dict`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L461** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L462** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L463** <code>@ray.remote(num_cpus=1)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L464** <code>class AsyncvLLMEngine:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L465** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L466** <code>    AsyncvLLMEngine is a wrapper for AsyncLLM, it uses ExternalRayDistributedExecutor to launch engines</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L467** <code>    in hybrid rollout workers, i.e AsyncActorRolloutRefWorker.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L468** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L469** <code>    AsyncvLLMServer works as follows:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L470** <code>    1. Initialize AsyncLLM with ExternalRayDistributedExecutor.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L471** <code>    2. AsyncLLM spawn EngineCore in subprocess.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L472** <code>    3. EngineCore initialize ExternalRayDistributedExecutor.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L473** <code>    4. ExternalRayDistributedExecutor lookup its corresponding actors by name.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L474** <code>    5. ExternalRayDistributedExecutor init executor: init_worker, init_device, load_model.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L475** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L476** <code>    For vLLM AsyncLLM design, see: https://github.com/vllm-project/vllm/pull/9826</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L477** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L478** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L479** <code>    def __init__(self, config: DictConfig, vllm_dp_size: int, vllm_dp_rank: int, wg_prefix: str, tokenizer,</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L480** <code>                 reward_fn = None, val_reward_fn = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_fn`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L481** <code>                 ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L482** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L483** <code>        Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L484** <code>            config: DictConfig, actor_rollout_ref config.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L485** <code>            vllm_dp_size: int, vllm data parallel size.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L486** <code>            vllm_dp_rank: int, vllm data parallel rank.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L487** <code>            wg_prefix: str, worker group prefix, used to lookup actors.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L488** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L489** <code>        # super().__init__()</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L490** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L491** <code>        self.config = config</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L492** <code>        self.vllm_dp_size = vllm_dp_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.vllm_dp_size`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L493** <code>        self.vllm_dp_rank = vllm_dp_rank</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.vllm_dp_rank`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L494** <code>        self.wg_prefix = wg_prefix</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.wg_prefix`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L495** <code>        self.tokenizer = tokenizer</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L496** <code>        self.engine: AsyncLLM = None</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.engine: AsyncLLM`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L497** <code>        self.pad_token_id = self.tokenizer.pad_token_id</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.pad_token_id`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L498** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L499** <code>        self.ref_reward_fn = reward_fn</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ref_reward_fn`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L500** <code>        self.val_reward_fn = val_reward_fn  </code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.val_reward_fn`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L501** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L502** <code>    def init_engine(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L503** <code>        &quot;&quot;&quot;Init vLLM AsyncLLM engine.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L504** <code>        config = self.config</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L505** <code>        model_path = config.model.path</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model_path`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L506** <code>        model_name = &quot;/&quot;.join(model_path.split(&quot;/&quot;)[-2:])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model_name`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L507** <code>        local_path = copy_to_local(model_path)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_path`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L508** <code>        trust_remote_code = config.model.get(&quot;trust_remote_code&quot;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trust_remote_code`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L509** <code>        config = config.rollout</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L510** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L511** <code>        tensor_parallel_size = config.get(&quot;tensor_model_parallel_size&quot;, 1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tensor_parallel_size`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L512** <code>        max_num_batched_tokens = config.get(&quot;max_num_batched_tokens&quot;, 8192)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_num_batched_tokens`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L513** <code>        max_model_len = config.max_model_len if config.max_model_len else config.prompt_length + config.response_length</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_model_len`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L514** <code>        self.max_model_len = int(max_model_len)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.max_model_len`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L515** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L516** <code>        # Override default generation config from hugging face model config,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L517** <code>        # user can still override them by passing kwargs in each request.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L518** <code>        kwargs = dict(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L519** <code>            n=1,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `n`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L520** <code>            max_tokens=config.response_length,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_tokens`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L521** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L522** <code>        for k in config.keys():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L523** <code>            if hasattr(SamplingParams(), str(k)):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L524** <code>                value = config.get(k)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `value`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L525** <code>                if isinstance(value, ListConfig):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L526** <code>                    value = list(value)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `value`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L527** <code>                elif isinstance(value, DictConfig):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L528** <code>                    value = OmegaConf.to_container(value, resolve=True)  # need import OmegaConf</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `value`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L529** <code>                kwargs[k] = value</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `kwargs[k]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L530** <code>        print(f&quot;override_generation_config: {kwargs}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L531** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L532** <code>        self.sampling_params = SamplingParams(**kwargs)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.sampling_params`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L533** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L534** <code>        backend = os.environ.get(&quot;VERL_VLLM_DISTRIBUTED_BACKEND&quot;, &quot;zeromq&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `backend`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L535** <code>        if backend == &quot;zeromq&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L536** <code>            distributed_executor_backend = ExternalZeroMQDistributedExecutor</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `distributed_executor_backend`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L537** <code>        elif backend == &quot;ray&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L538** <code>            distributed_executor_backend = ExternalRayDistributedExecutor</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `distributed_executor_backend`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L539** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L540** <code>            distributed_executor_backend = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `distributed_executor_backend`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L541** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L542** <code>        engine_args = AsyncEngineArgs(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `engine_args`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L543** <code>            model=local_path,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L544** <code>            enable_sleep_mode=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `enable_sleep_mode`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L545** <code>            override_generation_config=kwargs,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `override_generation_config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L546** <code>            tensor_parallel_size=tensor_parallel_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tensor_parallel_size`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L547** <code>            distributed_executor_backend=distributed_executor_backend,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `distributed_executor_backend`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L548** <code>            dtype=config.dtype,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dtype`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L549** <code>            enforce_eager=config.enforce_eager,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `enforce_eager`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L550** <code>            gpu_memory_utilization=config.gpu_memory_utilization,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `gpu_memory_utilization`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L551** <code>            disable_custom_all_reduce=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `disable_custom_all_reduce`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L552** <code>            # Qian: this is a known issue of verl, see PR: https://github.com/volcengine/verl/pull/2068/files</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L553** <code>            # disable_mm_preprocessor_cache=False,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L554** <code>            skip_tokenizer_init=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `skip_tokenizer_init`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L555** <code>            max_model_len=max_model_len,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_model_len`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L556** <code>            load_format=&quot;auto&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `load_format`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L557** <code>            # disable_log_stats=config.disable_log_stats,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L558** <code>            disable_log_stats=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `disable_log_stats`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L559** <code>            max_num_batched_tokens=max_num_batched_tokens,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_num_batched_tokens`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L560** <code>            enable_chunked_prefill=config.enable_chunked_prefill,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `enable_chunked_prefill`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L561** <code>            enable_prefix_caching=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `enable_prefix_caching`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L562** <code>            trust_remote_code=trust_remote_code,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trust_remote_code`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L563** <code>            seed=config.get(&quot;seed&quot;, 0),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seed`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L564** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L565** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L566** <code>        # init async llm engine</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L567** <code>        vllm_config = self._create_engine_config(engine_args)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vllm_config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L568** <code>        self.engine = AsyncLLM.from_vllm_config(vllm_config)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.engine`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L569** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L570** <code>    def _create_engine_config(self, engine_args: AsyncEngineArgs):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L571** <code>        vllm_config = engine_args.create_engine_config()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `vllm_config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L572** <code>        namespace = ray.get_runtime_context().namespace</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `namespace`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L573** <code>        vllm_config.instance_id = f&quot;{namespace}:{self.wg_prefix}:{self.vllm_dp_size}:{self.vllm_dp_rank}&quot;</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `vllm_config.instance_id`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L574** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L575** <code>        # VERL_VLLM_ZMQ_ADDRESSES</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L576** <code>        if engine_args.distributed_executor_backend == ExternalZeroMQDistributedExecutor:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L577** <code>            workers = _get_model_runner_workers(vllm_config=vllm_config, init_ray=False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `workers`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L578** <code>            zmq_addresses = ray.get([worker.get_zeromq_address.remote() for worker in workers])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `zmq_addresses`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L579** <code>            print(f&quot;VERL_VLLM_ZMQ_ADDRESSES: {zmq_addresses}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L580** <code>            os.environ[&quot;VERL_VLLM_ZMQ_ADDRESSES&quot;] = &quot;,&quot;.join(zmq_addresses)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `os.environ["VERL_VLLM_ZMQ_ADDRESSES"]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L581** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L582** <code>        return vllm_config</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L583** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L584** <code>    async def wake_up(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L585** <code>        await self.engine.wake_up()</code>
+  - 语法与作用：await；暂停当前协程，等待异步操作完成后恢复。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L586** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L587** <code>    async def sleep(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L588** <code>        # TODO: https://github.com/vllm-project/vllm/issues/17103</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L589** <code>        await self.engine.reset_prefix_cache()</code>
+  - 语法与作用：await；暂停当前协程，等待异步操作完成后恢复。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L590** <code>        await self.engine.sleep()</code>
+  - 语法与作用：await；暂停当前协程，等待异步操作完成后恢复。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L591** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L592** <code>    async def _async_rollout_a_prompt(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L593** <code>        self, messages: list[dict[str, Any]],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L594** <code>         tokens, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L595** <code>         ground_truth,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L596** <code>         entry_point, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L597** <code>         uuid, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L598** <code>         sampling_params, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L599** <code>         is_validate: bool = False, </code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_validate: bool`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L600** <code>         **kwargs</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L601** <code>    ) -&gt; DataProto:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L602** <code>        loop = asyncio.get_running_loop()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `loop`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L603** <code>        request_id = uuid4().hex</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `request_id`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L604** <code>        prompt_ids = await loop.run_in_executor(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L605** <code>            None, lambda: self.tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=True)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `None, lambda: self.tokenizer.apply_chat_template(messages, add_generation_prompt`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L606** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L607** <code>        max_tokens = self.max_model_len - len(prompt_ids)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_tokens`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L608** <code>        sampling_params = SamplingParams(max_tokens=max_tokens, **sampling_params)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampling_params`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L609** <code>        prompt = TokensPrompt(prompt_token_ids=tokens)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L610** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L611** <code>        outputs = self.engine.generate(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L612** <code>            prompt=prompt,  # because we have already convert it to prompt token id</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L613** <code>            sampling_params=sampling_params,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampling_params`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L614** <code>            request_id=request_id,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `request_id`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L615** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L616** <code>        async for res in outputs:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L617** <code>            results = res</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `results`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L618** <code>        content = results.outputs[0].text</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `content`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L619** <code>        content_token_ids = results.outputs[0].token_ids</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `content_token_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L620** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L621** <code>        # Collect log probabilities for each sampled token</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L622** <code>        logprobs = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `logprobs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L623** <code>        if results.outputs[0].logprobs:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L624** <code>            for i, logprob_dict in enumerate(results.outputs[0].logprobs):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L625** <code>                # Get the logprob of the actual sampled token</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L626** <code>                sampled_token_id = content_token_ids[i]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampled_token_id`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L627** <code>                if sampled_token_id in logprob_dict:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L628** <code>                    logprobs.append(logprob_dict[sampled_token_id].logprob)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `logprobs.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L629** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L630** <code>                    # Fallback if the token is not in the logprobs dict</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L631** <code>                    logprobs.append(-1.0)  # Use -1.0 as default for missing logprobs</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `logprobs.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L632** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L633** <code>        response_ids = content_token_ids</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L634** <code>        response_mask = [1] * len(content_token_ids)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_mask`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L635** <code>        response_length = self.config.rollout.response_length</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_length`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L636** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L637** <code>        # TODO: Tianjian</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L638** <code>        # Add reward function</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L639** <code>        reward_fn = self.val_reward_fn if is_validate else self.ref_reward_fn</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_fn`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L640** <code>        # TODO: Wei</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L641** <code>        # reward_fn: compute_kernel_reward_batch(solution_strs, ground_truths, entry_points, **kwargs)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L642** <code>        reward_kwargs = {**kwargs, &quot;response_length&quot;: response_length}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_kwargs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L643** <code>        reward_dict = await loop.run_in_executor(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_dict`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L644** <code>            None,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L645** <code>            lambda: reward_fn(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `lambda: reward_fn`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L646** <code>                response_ids,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L647** <code>                content,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L648** <code>                ground_truth,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L649** <code>                entry_point,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L650** <code>                uuid,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L651** <code>                **reward_kwargs,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L652** <code>            ),</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L653** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L654** <code>        reward_tensor = reward_dict[&quot;reward_tensor&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L655** <code>        reward_extra_info = reward_dict[&quot;reward_extra_info&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L656** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L657** <code>        output = AgentLoopOutput(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L658** <code>            prompt_ids=prompt_ids,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L659** <code>            response_ids=response_ids[:response_length],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L660** <code>            response_mask=response_mask[:response_length],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_mask`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L661** <code>            logprobs=logprobs[:response_length],  # Add logprobs</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `logprobs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L662** <code>            num_turns=2,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_turns`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L663** <code>            reward_tensor=reward_tensor,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L664** <code>            reward_extra_info=reward_extra_info,  # Add extra info</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L665** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L666** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L667** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L668** <code>    async def generate_sequences(self, prompts: DataProto, **kwargs) -&gt; DataProto:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L669** <code>        do_sample = prompts.meta_info.get(&quot;do_sample&quot;, True)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `do_sample`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L670** <code>        is_validate = prompts.meta_info.get(&quot;validate&quot;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_validate`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L671** <code>        tgt_device = prompts.batch[&quot;input_ids&quot;].device</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tgt_device`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L672** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L673** <code>        # req_list = self._preprocess_prompt_to_async_rollout_requests(</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L674** <code>        #     prompts,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L675** <code>        #     n=1 if is_validate else self.config.rollout.n,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L676** <code>        # )</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L677** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L678** <code>        if not is_validate:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L679** <code>            if &quot;n&quot; in prompts.meta_info:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L680** <code>                n = prompts.meta_info[&quot;n&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `n`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L681** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L682** <code>                n = self.config.rollout.n</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `n`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L683** <code>            prompts = prompts.repeat(repeat_times=n, interleave=True)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompts`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L684** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L685** <code>        config = self.config.rollout</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L686** <code>        sampling_params = dict(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampling_params`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L687** <code>            temperature=config.temperature,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `temperature`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L688** <code>            top_p=config.top_p,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `top_p`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L689** <code>            repetition_penalty=1.0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `repetition_penalty`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L690** <code>            logprobs=1 if config.calculate_log_probs else None,  # Ensure logprobs are collected</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `logprobs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L691** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L692** <code>        # override sampling params for validation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L693** <code>        if prompts.meta_info.get(&quot;validate&quot;, False):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L694** <code>            sampling_params[&quot;top_p&quot;] = config.val_kwargs.top_p</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampling_params["top_p"]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L695** <code>            sampling_params[&quot;temperature&quot;] = config.val_kwargs.temperature</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampling_params["temperature"]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L696** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L697** <code>        stop_token_ids = config.stop_token_ids</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `stop_token_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L698** <code>        if stop_token_ids is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L699** <code>            sampling_params[&quot;stop_token_ids&quot;] = list(stop_token_ids)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampling_params["stop_token_ids"]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L700** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L701** <code>        if is_validate:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L702** <code>            val_stop_token_ids = config.val_kwargs.stop_token_ids</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `val_stop_token_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L703** <code>            if val_stop_token_ids is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L704** <code>                sampling_params[&quot;stop_token_ids&quot;] = list(val_stop_token_ids)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sampling_params["stop_token_ids"]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L705** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L706** <code>        raw_prompts = prompts.non_tensor_batch[&quot;raw_prompt&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `raw_prompts`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L707** <code>        tokens_ids = prompts.non_tensor_batch[&quot;raw_prompt_ids&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tokens_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L708** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L709** <code>        # ground_truths = prompts.non_tensor_batch[&quot;ground_truth&quot;]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L710** <code>        # entry_points = prompts.non_tensor_batch[&quot;entry_point&quot;]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L711** <code>        # uuids = prompts.non_tensor_batch[&quot;uuid&quot;]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L712** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L713** <code>        ground_truths = prompts.non_tensor_batch.get(&quot;ground_truth&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ground_truths`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L714** <code>        if ground_truths is None and &quot;reward_model&quot; in prompts.non_tensor_batch:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L715** <code>            ground_truths = [rm.get(&quot;ground_truth&quot;) for rm in prompts.non_tensor_batch[&quot;reward_model&quot;]]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ground_truths`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L716** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L717** <code>        entry_points = prompts.non_tensor_batch.get(&quot;entry_point&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entry_points`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L718** <code>        if entry_points is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L719** <code>            extra_info = prompts.non_tensor_batch.get(&quot;extra_info&quot;, [{}] * len(raw_prompts))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_info`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L720** <code>            entry_points = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entry_points`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L721** <code>                # info.get(&quot;entry_point&quot;, infer_entry_point(ground_truth))</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L722** <code>                info.get(&quot;entry_point&quot;, &quot;Model&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `info.get`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L723** <code>                for info, ground_truth in zip(extra_info, ground_truths, strict=True)</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L724** <code>            ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L725** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L726** <code>        uuids = prompts.non_tensor_batch.get(&quot;uuid&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uuids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L727** <code>        if uuids is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L728** <code>            extra_info = prompts.non_tensor_batch.get(&quot;extra_info&quot;, [{}] * len(raw_prompts))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_info`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L729** <code>            uuids = [info.get(&quot;uuid&quot;) or info.get(&quot;problem_id&quot;) or uuid4().hex for info in extra_info]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `uuids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L730** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L731** <code>        tasks = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tasks`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L732** <code>        for messages, tokens, ground_truth, entry_point, uuid in zip(raw_prompts, tokens_ids, ground_truths, entry_points, uuids):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L733** <code>            if not isinstance(messages, list):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L734** <code>                messages = messages.tolist()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `messages`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L735** <code>            if isinstance(tokens, np.ndarray):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L736** <code>                tokens = tokens.tolist()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tokens`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L737** <code>            elif hasattr(tokens, &quot;tolist&quot;):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L738** <code>                tokens = tokens.tolist()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tokens`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L739** <code>            tasks.append(asyncio.create_task(self._async_rollout_a_prompt(messages, </code>
+  - 语法与作用：函数/方法/构造器调用；调用 `tasks.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L740** <code>                                                                            tokens, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L741** <code>                                                                            ground_truth, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L742** <code>                                                                            entry_point, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L743** <code>                                                                            uuid, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L744** <code>                                                                            sampling_params, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L745** <code>                                                                            is_validate, </code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L746** <code>                                                                            **kwargs)))</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L747** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L748** <code>        outputs = await asyncio.gather(*tasks)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L749** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L750** <code>        return self._postprocess(outputs)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L751** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L752** <code>    def _postprocess(self, inputs: list[AgentLoopOutput]) -&gt; DataProto:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L753** <code>        # NOTE: consistent with batch version of generate_sequences in vllm_rollout_spmd.py</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L754** <code>        # prompts: left pad</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L755** <code>        # responses: right pad</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L756** <code>        # input_ids: prompt + response</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L757** <code>        # attention_mask: [0,0,0,0,1,1,1,1, | 1,1,1,0,0,0,0,0]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L758** <code>        # position_ids:   [0,0,0,0,0,1,2,3, | 4,5,6,7,8,9,10,11]</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L759** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L760** <code>        # TODO: Wei</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L761** <code>        # To pad reward tensor</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L762** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L763** <code>        # prompts</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L764** <code>        self.tokenizer.padding_side = &quot;left&quot;</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer.padding_side`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L765** <code>        outputs = self.tokenizer.pad(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L766** <code>            [{&quot;input_ids&quot;: input.prompt_ids} for input in inputs],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L767** <code>            padding=&quot;max_length&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `padding`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L768** <code>            max_length=self.config.rollout.prompt_length,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_length`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L769** <code>            return_tensors=&quot;pt&quot;,</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L770** <code>            return_attention_mask=True,</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L771** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L772** <code>        prompt_ids, prompt_attention_mask = outputs[&quot;input_ids&quot;], outputs[&quot;attention_mask&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt_ids, prompt_attention_mask`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L773** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L774** <code>        # responses</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L775** <code>        self.tokenizer.padding_side = &quot;right&quot;</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer.padding_side`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L776** <code>        outputs = self.tokenizer.pad(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L777** <code>            [{&quot;input_ids&quot;: input.response_ids} for input in inputs],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L778** <code>            padding=&quot;max_length&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `padding`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L779** <code>            max_length=self.config.rollout.response_length,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_length`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L780** <code>            return_tensors=&quot;pt&quot;,</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L781** <code>            return_attention_mask=True,</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L782** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L783** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L784** <code>        response_ids, response_attention_mask = outputs[&quot;input_ids&quot;], outputs[&quot;attention_mask&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_ids, response_attention_mask`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L785** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L786** <code>        # response_mask</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L787** <code>        outputs = self.tokenizer.pad(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `outputs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L788** <code>            [{&quot;input_ids&quot;: input.response_mask} for input in inputs],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L789** <code>            padding=&quot;max_length&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `padding`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L790** <code>            max_length=self.config.rollout.response_length,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_length`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L791** <code>            return_tensors=&quot;pt&quot;,</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L792** <code>            return_attention_mask=False,</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L793** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L794** <code>        response_mask = outputs[&quot;input_ids&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_mask`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L795** <code>        assert (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L796** <code>            response_ids.shape == response_mask.shape</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `response_ids.shape`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L797** <code>        ), f&quot;mismatch in response_ids and response_mask shape: {response_ids.shape} vs {response_mask.shape}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L798** <code>        response_mask = response_mask * response_attention_mask</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_mask`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L799** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L800** <code>        # pad reward tensor</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L801** <code>        reward_tensors = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensors`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L802** <code>        for input in inputs:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L803** <code>            reward = input.reward_tensor</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L804** <code>            if not isinstance(reward, torch.Tensor):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L805** <code>                reward = torch.as_tensor(reward, dtype=torch.float32)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L806** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L807** <code>                reward = reward.to(dtype=torch.float32)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L808** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L809** <code>            if reward.dim() == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L810** <code>                reward = reward.unsqueeze(0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L811** <code>            elif reward.dim() &gt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L812** <code>                reward = reward.view(-1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L813** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L814** <code>            reward_tensors.append(reward)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `reward_tensors.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L815** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L816** <code>        reward_tensor = pad_sequence(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L817** <code>            reward_tensors,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L818** <code>            batch_first=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_first`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L819** <code>            padding_value=0.0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `padding_value`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L820** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L821** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L822** <code>        max_reward_len = self.config.rollout.response_length</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_reward_len`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L823** <code>        if reward_tensor.shape[1] &lt; max_reward_len:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L824** <code>            pad_size = max_reward_len - reward_tensor.shape[1]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pad_size`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L825** <code>            reward_tensor = torch.nn.functional.pad(reward_tensor, (0, pad_size))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L826** <code>        elif reward_tensor.shape[1] &gt; max_reward_len:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L827** <code>            reward_tensor = reward_tensor[:, :max_reward_len]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_tensor`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L828** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L829** <code>        print(f&quot;reward_tensor: {reward_tensor.shape}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L830** <code>        print(f&quot;response length vs. reward tensor nonzero: {response_ids.shape[1]} vs. {reward_tensor.nonzero()}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L831** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L832** <code>        if self.config.rollout.calculate_log_probs:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L833** <code>            # rollout_log_probs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L834** <code>            # Pad and convert logprobs to float32 tensor</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L835** <code>            max_response_length = self.config.rollout.response_length</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_response_length`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L836** <code>            padded_logprobs = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `padded_logprobs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L837** <code>            for input in inputs:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L838** <code>                # Pad logprobs to max_response_length with -1.0 (same as vllm_rollout_spmd.py)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L839** <code>                padded_logprob = input.logprobs + [-1.0] * (max_response_length - len(input.logprobs))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `padded_logprob`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L840** <code>                padded_logprobs.append(padded_logprob[:max_response_length])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `padded_logprobs.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L841** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L842** <code>            # Convert to tensor</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L843** <code>            rollout_log_probs = torch.tensor(padded_logprobs, dtype=torch.float32, device=response_ids.device)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rollout_log_probs`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L844** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L845** <code>        input_ids = torch.cat([prompt_ids, response_ids], dim=1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L846** <code>        attention_mask = torch.cat([prompt_attention_mask, response_attention_mask], dim=1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attention_mask`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L847** <code>        position_ids = (attention_mask.cumsum(dim=1) - 1) * attention_mask</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L848** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L849** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L850** <code>        # TODO Tianjian</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L851** <code>        # rewards</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L852** <code>        # reward_tensor = torch.cat([torch.tensor([input.reward], dtype=torch.float32) for input in inputs], dim=0)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L853** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L854** <code>        # reward extra info (non tensor batch format)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L855** <code>        reward_extra_info_array = np.array(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_extra_info_array`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L856** <code>            [input.reward_extra_info for input in inputs], dtype=object</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `[input.reward_extra_info for input in inputs], dtype`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L857** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L858** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L859** <code>        batch = TensorDict(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L860** <code>            {</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L861** <code>                &quot;prompts&quot;: prompt_ids,  # [bsz, prompt_length]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L862** <code>                &quot;responses&quot;: response_ids,  # [bsz, response_length]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L863** <code>                &quot;response_mask&quot;: response_mask,  # [bsz, response_length]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L864** <code>                &quot;input_ids&quot;: input_ids,  # [bsz, prompt_length + response_length]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L865** <code>                &quot;attention_mask&quot;: attention_mask,  # [bsz, prompt_length + response_length]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L866** <code>                &quot;position_ids&quot;: position_ids,  # [bsz, prompt_length + response_length]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L867** <code>                &quot;reward_tensor&quot;: reward_tensor,  # [bsz, response_length]</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L868** <code>            },</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L869** <code>            batch_size=len(input_ids),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_size`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L870** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L871** <code>        if self.config.rollout.calculate_log_probs:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L872** <code>            # rollout_log_probs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L873** <code>            batch[&quot;rollout_log_probs&quot;] = rollout_log_probs</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch["rollout_log_probs"]`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L874** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L875** <code>        num_turns = np.array([input.num_turns for input in inputs], dtype=np.int32)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_turns`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L876** <code>        return DataProto(</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L877** <code>            batch=batch,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L878** <code>            non_tensor_batch={</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `non_tensor_batch`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L879** <code>                &quot;__num_turns__&quot;: num_turns,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L880** <code>                &quot;reward_extra_info&quot;: reward_extra_info_array,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L881** <code>            },</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L882** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L883** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+#### 原始行 1117–1304
+- **L1117** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1118** <code>    def log_multiturn_messages(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1119** <code>        self,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1120** <code>        step: int,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1121** <code>        request_id: str,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1122** <code>        logging_messages: list[str],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1123** <code>        turn_rewards: list[float],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1124** <code>        turn_infos: list[dict | None],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1125** <code>        stats: MultiTurnStats,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1126** <code>        finish_reason: str,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1127** <code>        multi_turn_output: MultiTurnOutput,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1128** <code>        is_slowest: bool = False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_slowest: bool`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1129** <code>    ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1130** <code>        &quot;&quot;&quot;Log multi-turn conversation to Logfire with structured spans.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1131** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1132** <code>        Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1133** <code>            run_name: Experiment or run name</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1134** <code>            request_id: Unique request identifier</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1135** <code>            logging_messages: List of formatted log messages from the conversation</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1136** <code>            turn_rewards: List of rewards for each turn</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1137** <code>            stats: Multi-turn statistics</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1138** <code>            finish_reason: How the conversation ended</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1139** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1140** <code>        if not self.logfire_logger:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1141** <code>            print(&quot;\n\n&quot;.join(logging_messages))</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1142** <code>            return</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1143** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1144** <code>        # Parse timing information from messages</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1145** <code>        timings = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timings`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1146** <code>        total_model_time = 0.0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_model_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1147** <code>        total_env_time = 0.0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_env_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1148** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1149** <code>        for msg in logging_messages:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1150** <code>            if &quot;Model time:&quot; in msg:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1151** <code>                parts = msg.split(&quot; | &quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `parts`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1152** <code>                if len(parts) &gt;= 2:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1153** <code>                    model_time_str = parts[1].replace(&quot;Model time: &quot;, &quot;&quot;).replace(&quot;s&quot;, &quot;&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model_time_str`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1154** <code>                    try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1155** <code>                        model_time = float(model_time_str)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1156** <code>                        total_model_time += model_time</code>
+  - 语法与作用：变量/容器赋值（`+=`）；计算右侧表达式并绑定或更新 `total_model_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1157** <code>                        timings.append((&quot;model&quot;, model_time))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `timings.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1158** <code>                    except:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1159** <code>                        pass</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1160** <code>            elif &quot;Env time:&quot; in msg:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1161** <code>                parts = msg.split(&quot; | &quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `parts`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1162** <code>                if len(parts) &gt;= 2:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1163** <code>                    env_time_str = parts[1].replace(&quot;Env time: &quot;, &quot;&quot;).replace(&quot;s&quot;, &quot;&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `env_time_str`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1164** <code>                    try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1165** <code>                        env_time = float(env_time_str)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `env_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1166** <code>                        total_env_time += env_time</code>
+  - 语法与作用：变量/容器赋值（`+=`）；计算右侧表达式并绑定或更新 `total_env_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1167** <code>                        timings.append((&quot;env&quot;, env_time))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `timings.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1168** <code>                    except:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1169** <code>                        pass</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1170** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1171** <code>        # Create async interaction bar</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1172** <code>        total_time = total_model_time + total_env_time</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1173** <code>        if total_time &gt; 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1174** <code>            # Dynamic bar width based on total time, max 20 chars</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1175** <code>            # Scale: 1 char per 0.5 seconds, minimum 5 chars, maximum 20 chars</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1176** <code>            bar_width = max(5, min(20, int(total_time)))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `bar_width`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1177** <code>            bar_segments = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `bar_segments`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1178** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1179** <code>            # Calculate segment widths proportionally</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1180** <code>            accumulated_width = 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `accumulated_width`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1181** <code>            for i, (type_, duration) in enumerate(timings):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1182** <code>                # Calculate raw width</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1183** <code>                raw_width = (duration / total_time) * bar_width</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `raw_width`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1184** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1185** <code>                # For the last segment, use remaining width to avoid rounding errors</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1186** <code>                if i == len(timings) - 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1187** <code>                    segment_width = bar_width - accumulated_width</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `segment_width`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1188** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1189** <code>                    segment_width = round(raw_width)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `segment_width`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1190** <code>                    accumulated_width += segment_width</code>
+  - 语法与作用：变量/容器赋值（`+=`）；计算右侧表达式并绑定或更新 `accumulated_width`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1191** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1192** <code>                if segment_width &gt; 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1193** <code>                    if type_ == &quot;model&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1194** <code>                        bar_segments.append(&quot;▓&quot; * segment_width)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `bar_segments.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1195** <code>                    elif type_ == &quot;env&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1196** <code>                        bar_segments.append(&quot;░&quot; * segment_width)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `bar_segments.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1197** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1198** <code>            interaction_bar = &quot;&quot;.join(bar_segments)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `interaction_bar`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1199** <code>            timing_summary = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timing_summary`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1200** <code>                f&quot;[{interaction_bar}] {total_time:.2f}s (▓ Model: {total_model_time:.2f}s ░ Env: {total_env_time:.2f}s)&quot;</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `f"[{interaction_bar}] {total_time:.2f}s`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1201** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1202** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1203** <code>            timing_summary = &quot;No timing data available&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timing_summary`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1204** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1205** <code>        # Create a span for the entire multi-turn conversation with enhanced preview</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1206** <code>        span_prefix = &#x27;🐌 SLOWEST &#x27; if is_slowest else &#x27;🎯 RANDOM&#x27;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `span_prefix`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1207** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1208** <code>        with self.logfire_logger.span(</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1209** <code>            &#x27;{prefix} - step {step} - {num_turns} turns - {finish_reason} - {timing_summary}&#x27;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1210** <code>            prefix=span_prefix,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prefix`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1211** <code>            step=step,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `step`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1212** <code>            num_turns=stats.num_turns,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_turns`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1213** <code>            finish_reason=finish_reason,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `finish_reason`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1214** <code>            timing_summary=timing_summary,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timing_summary`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1215** <code>            request_id=request_id,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `request_id`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1216** <code>            total_turns=stats.num_turns,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_turns`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1217** <code>            total_model_time=total_model_time,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_model_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1218** <code>            total_env_time=total_env_time,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_env_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1219** <code>            total_time=total_time,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1220** <code>            is_slowest=is_slowest,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_slowest`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1221** <code>        ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1222** <code>            # Parse and log each turn</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1223** <code>            current_turn = 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `current_turn`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1224** <code>            turn_info_index = 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `turn_info_index`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1225** <code>            for i, msg in enumerate(logging_messages):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1226** <code>                if &quot;Model Response:&quot; in msg:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1227** <code>                    # Extract turn number and timings from the message</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1228** <code>                    parts = msg.split(&quot; | &quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `parts`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1229** <code>                    model_time = parts[1] if len(parts) &gt; 1 else &quot;&quot;  # e.g., &quot;Model time: 1.23s&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1230** <code>                    model_response = parts[2].replace(&quot;Model Response: &quot;, &quot;&quot;) if len(parts) &gt; 2 else &quot;&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model_response`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1231** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1232** <code>                    # Create a span for this turn</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1233** <code>                    self.logfire_logger.info(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.logfire_logger.info`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1234** <code>                        &#x27;🔄 turn_{turn_number}: {response_preview} ...&#x27;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1235** <code>                        turn_number=current_turn + 1,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `turn_number`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1236** <code>                        response_preview=model_response[:50],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_preview`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1237** <code>                        timing=model_time,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timing`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1238** <code>                        response=model_response,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1239** <code>                        reward=turn_rewards[current_turn] if current_turn &lt; len(turn_rewards) else None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1240** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1241** <code>                elif &quot;Tool Response:&quot; in msg:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1242** <code>                    # Log tool response within the same turn</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1243** <code>                    parts = msg.split(&quot; | &quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `parts`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1244** <code>                    env_time = parts[1] if len(parts) &gt; 1 else &quot;&quot;  # e.g., &quot;Env time: 0.45s&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `env_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1245** <code>                    tool_response = parts[2].replace(&quot;Tool Response: &quot;, &quot;&quot;) if len(parts) &gt; 2 else &quot;&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tool_response`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1246** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1247** <code>                    # Get turn_info for this turn</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1248** <code>                    turn_info = turn_infos[turn_info_index] if turn_info_index &lt; len(turn_infos) else None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `turn_info`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1249** <code>                    turn_info_index += 1</code>
+  - 语法与作用：变量/容器赋值（`+=`）；计算右侧表达式并绑定或更新 `turn_info_index`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1250** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1251** <code>                    # Log all tool_info key-value pairs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1252** <code>                    if turn_info:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1253** <code>                        # Create a dictionary with all turn_info data for logging</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1254** <code>                        tool_info_data = {k: v for k, v in turn_info.items()}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tool_info_data`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1255** <code>                        self.logfire_logger.info(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.logfire_logger.info`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1256** <code>                            &#x27;🔧 tool_execution: {response_preview} ...&#x27;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1257** <code>                            response_preview=tool_response[:50],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_preview`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1258** <code>                            response=tool_response,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1259** <code>                            env_time=env_time,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `env_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1260** <code>                            **tool_info_data,  # Add all key-value pairs from turn_info</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1261** <code>                        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1262** <code>                    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1263** <code>                        self.logfire_logger.info(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.logfire_logger.info`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1264** <code>                            &#x27;🔧 tool_execution: {response_preview} ...&#x27;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1265** <code>                            response_preview=tool_response[:50],</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_preview`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1266** <code>                            response=tool_response,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1267** <code>                            env_time=env_time,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `env_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1268** <code>                        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1269** <code>                    current_turn += 1</code>
+  - 语法与作用：变量/容器赋值（`+=`）；计算右侧表达式并绑定或更新 `current_turn`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1270** <code>                elif &quot;Finalizing&quot; in msg:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1271** <code>                    # Log the final summary</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1272** <code>                    self.logfire_logger.info(&#x27;📋 conversation_summary&#x27;, message=msg)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.logfire_logger.info('📋 conversation_summary', message`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1273** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1274** <code>            # Log aggregated statistics</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1275** <code>            self.logfire_logger.info(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.logfire_logger.info`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1276** <code>                &#x27;📊 conversation_stats&#x27;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1277** <code>                total_turns=stats.num_turns,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_turns`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1278** <code>                has_void_turn=bool(stats.contain_void_turn),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `has_void_turn`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1279** <code>                all_rewards=turn_rewards,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `all_rewards`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1280** <code>                cache_hits=stats.cache_hits,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cache_hits`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1281** <code>                cache_misses=stats.cache_misses,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cache_misses`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1282** <code>                cache_hit_rate=(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cache_hit_rate`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1283** <code>                    stats.cache_hits / (stats.cache_hits + stats.cache_misses)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `stats.cache_hits /`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1284** <code>                    if (stats.cache_hits + stats.cache_misses) &gt; 0</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1285** <code>                    else 0.0</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1286** <code>                ),</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1287** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1288** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1289** <code>            # Log the full multi-turn output for reference</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1290** <code>            multi_turn_output_dict = multi_turn_output.dict()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `multi_turn_output_dict`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1291** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1292** <code>            # decode the raw prompt and response in text for viewing</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1293** <code>            decoded_prompts = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `decoded_prompts`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1294** <code>                self.tokenizer.decode(ids, skip_special_tokens=False, clean_up_tokenization_spaces=False)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer.decode(ids, skip_special_tokens`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1295** <code>                for ids in multi_turn_output.multi_prompt_ids</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1296** <code>            ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1297** <code>            decoded_responses = [</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `decoded_responses`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1298** <code>                self.tokenizer.decode(ids, skip_special_tokens=False, clean_up_tokenization_spaces=False)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer.decode(ids, skip_special_tokens`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1299** <code>                for ids in multi_turn_output.multi_response_ids</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1300** <code>            ]</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1301** <code>            multi_turn_output_dict[&#x27;decoded_prompts&#x27;] = decoded_prompts</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `multi_turn_output_dict['decoded_prompts']`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1302** <code>            multi_turn_output_dict[&#x27;decoded_responses&#x27;] = decoded_responses</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `multi_turn_output_dict['decoded_responses']`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1303** <code>            self.logfire_logger.info(&#x27;🗂️ multi_turn_output&#x27;, output=multi_turn_output_dict)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.logfire_logger.info('🗂️ multi_turn_output', output`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L1304** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+#### 原始行 2105–2134
+- **L2105** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2106** <code>    def _compute_adaptive_timeout(self, max_tokens: int, is_validate: bool) -&gt; float:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2107** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2108** <code>        Based on token generation rates, compute an adaptive timeout for LLM generation.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2109** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2110** <code>        history = self.token_rate_history_val if is_validate else self.token_rate_history_train</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `history`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2111** <code>        if len(history) &lt;= 1000:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2112** <code>            # If no history, use default timeout</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2113** <code>            return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2114** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2115** <code>        # Use a conservative (75th percentile) estimate of recent generation speed</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2116** <code>        rates = sorted(history)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rates`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2117** <code>        safe_rate = float(np.quantile(rates, 0.75))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `safe_rate`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2118** <code>        if safe_rate &lt;= 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2119** <code>            return None</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2120** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2121** <code>        # Predict time based on token rate</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2122** <code>        predicted_time = max_tokens / safe_rate</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `predicted_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2123** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2124** <code>        # Apply buffer</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2125** <code>        timeout = predicted_time * self.timeout_buffer</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timeout`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2126** <code>        return timeout</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2127** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2128** <code>    def _record_generation_stats(self, output_tokens: int, generation_time: float, is_validate: bool):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2129** <code>        &quot;&quot;&quot;Record the token generation rate for adaptive timeout computation.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2130** <code>        if generation_time &gt; 0 and output_tokens &gt; 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2131** <code>            rate = output_tokens / generation_time</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rate`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2132** <code>            history = self.token_rate_history_val if is_validate else self.token_rate_history_train</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `history`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2133** <code>            history.append(rate)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `history.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2134** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+#### 原始行 2595–2635
+- **L2595** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2596** <code>    def get_expired_requests(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2597** <code>        &quot;&quot;&quot;Get list of request IDs that have exceeded their deadline.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2598** <code>        current_time = asyncio.get_event_loop().time()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `current_time`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2599** <code>        expired = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `expired`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2600** <code>        for request_id, info in list(self.request_deadlines.items()):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2601** <code>            # Handle both old format (just deadline) and new format (dict with deadline and global_step)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2602** <code>            deadline = info[&quot;deadline&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `deadline`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2603** <code>            global_step = info[&quot;global_step&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `global_step`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2604** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2605** <code>            if current_time &gt; deadline:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2606** <code>                expired.append((request_id, global_step))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `expired.append`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2607** <code>        return expired</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2608** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2609** <code>    async def _deadline_watchdog(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2610** <code>        while True:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2611** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2612** <code>                expired = self.get_expired_requests()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `expired`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2613** <code>                if expired:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2614** <code>                    # Extract just the request IDs for aborting</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2615** <code>                    request_ids = [rid for rid, _ in expired]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `request_ids`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2616** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2617** <code>                    # Abort all expired requests</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2618** <code>                    await asyncio.gather(*[self.engine.abort(rid) for rid in request_ids], return_exceptions=True)</code>
+  - 语法与作用：await；暂停当前协程，等待异步操作完成后恢复。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2619** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2620** <code>                    # Clear tracking and log for all expired requests</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2621** <code>                    for rid, step in expired:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2622** <code>                        if self.logfire_logger:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2623** <code>                            self.logfire_logger.warning(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.logfire_logger.warning`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2624** <code>                                f&quot;Request timeout (watchdog) | request_id: {rid} | step {step}&quot;,</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `f"Request timeout`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2625** <code>                                request_id=rid,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `request_id`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2626** <code>                                global_step=step,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `global_step`。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2627** <code>                            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2628** <code>                        self.clear_request_tracking(rid)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.clear_request_tracking`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2629** <code>            except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2630** <code>                logging.warning(f&quot;watchdog error: {e}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2631** <code>            await asyncio.sleep(1.0)</code>
+  - 语法与作用：await；暂停当前协程，等待异步操作完成后恢复。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2632** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2633** <code>    def clear_request_tracking(self, request_id):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2634** <code>        &quot;&quot;&quot;Clear tracking for a completed or aborted request.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+- **L2635** <code>        self.request_deadlines.pop(request_id, None)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.request_deadlines.pop`，产生返回值或副作用。
+  - 执行状态：包含基础单轮 engine、日志和 watchdog；部分只在单轮/随机日志/超时条件下执行，当前多轮路径的边界调用仍按条件说明。
+
+
+
+#### async engine 边界行 1001–1002
+- **L1001** <code>&lt;空行&gt;</code>：空行；位于 `MultiTurnOutput` 字段与 `MultiTurnAsyncvLLMEngine` Ray actor 定义之间，不执行。
+- **L1002** <code>&lt;空行&gt;</code>：空行；仅用于排版，不执行。
+
+
+---
+
+**导航**：[上一附录](02-python-entry.md) · [附录目录](index.md) · [下一附录](04-multiturn-rollout.md)

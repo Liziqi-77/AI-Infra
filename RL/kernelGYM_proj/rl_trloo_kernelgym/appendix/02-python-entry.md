@@ -1,0 +1,930 @@
+# Python 主入口：main_kernel.py
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+### 15.4 `main_kernel.py`：Python 主入口
+源码文件：`drkernel/kernel/main_kernel.py`。以下保留指定范围内的每一行；`空行` 和 `注释` 也列出，分别标记为无运行时效果和不执行。该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+
+#### 原始行 1–304
+- **L1** 源码：<code># Copyright 2024 Bytedance Ltd. and/or its affiliates</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L2** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L3** 源码：<code># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L4** 源码：<code># you may not use this file except in compliance with the License.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L5** 源码：<code># You may obtain a copy of the License at</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L6** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L7** 源码：<code>#     http://www.apache.org/licenses/LICENSE-2.0</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L8** 源码：<code>#</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L9** 源码：<code># Unless required by applicable law or agreed to in writing, software</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L10** 源码：<code># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L11** 源码：<code># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L12** 源码：<code># See the License for the specific language governing permissions and</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L13** 源码：<code># limitations under the License.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L14** 源码：<code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L15** 源码：<code>Note that we don&#x27;t combine the main with ray_trainer as ray_trainer is used by other main.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L16** 源码：<code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L17** 源码：<code>import os</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L18** 源码：<code>from functools import partial</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L19** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L20** 源码：<code>import hydra</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L21** 源码：<code>import ray</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L22** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L23** 源码：<code>from .kernel_trainer import RayKernelTrainer</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L24** 源码：<code>from .constant import QWEN3CHATTEMPLATE</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L25** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L26** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L27** 源码：<code>def get_custom_reward_fn(config):</code>
+  - 语法与作用：函数定义语法；声明 `get_custom_reward_fn` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L28** 源码：<code>    import importlib.util</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L29** 源码：<code>    import os</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L30** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L31** 源码：<code>    reward_fn_config = config.get(&quot;custom_reward_function&quot;) or {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L32** 源码：<code>    file_path = reward_fn_config.get(&quot;path&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `file_path`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L33** 源码：<code>    if not file_path:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L34** 源码：<code>        return None</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L35** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L36** 源码：<code>    if not os.path.exists(file_path):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L37** 源码：<code>        raise FileNotFoundError(f&quot;Reward function file &#x27;{file_path}&#x27; not found.&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L38** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L39** 源码：<code>    spec = importlib.util.spec_from_file_location(&quot;custom_module&quot;, file_path)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `spec`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L40** 源码：<code>    module = importlib.util.module_from_spec(spec)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `module`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L41** 源码：<code>    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L42** 源码：<code>        spec.loader.exec_module(module)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `spec.loader.exec_module`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L43** 源码：<code>    except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L44** 源码：<code>        raise RuntimeError(f&quot;Error loading module from &#x27;{file_path}&#x27;: {e}&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L45** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L46** 源码：<code>    function_name = reward_fn_config.get(&quot;name&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `function_name`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L47** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L48** 源码：<code>    if not hasattr(module, function_name):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L49** 源码：<code>        raise AttributeError(f&quot;Reward function &#x27;{function_name}&#x27; not found in &#x27;{file_path}&#x27;.&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L50** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L51** 源码：<code>    print(f&quot;using customized reward function &#x27;{function_name}&#x27; from &#x27;{file_path}&#x27;&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L52** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L53** 源码：<code>    return getattr(module, function_name)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L54** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L55** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L56** 源码：<code>def _check_kernel_server_health(server_url: str) -&gt; None:</code>
+  - 语法与作用：函数定义语法；声明 `_check_kernel_server_health` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L57** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L58** 源码：<code>    检查 KernelServer 的健康状态</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L59** 源码：<code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L60** 源码：<code>    import asyncio</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L61** 源码：<code>    import httpx</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L62** 源码：<code>    import logging</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L63** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L64** 源码：<code>    logger = logging.getLogger(__name__)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `logger`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L65** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L66** 源码：<code>    async def check_health():</code>
+  - 语法与作用：函数定义语法；声明 `check_health` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L67** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L68** 源码：<code>            async with httpx.AsyncClient(timeout=10.0) as client:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L69** 源码：<code>                health_url = f&quot;{server_url}/health&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `health_url`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L70** 源码：<code>                logger.info(f&quot;Checking KernelServer health at: {health_url}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L71** 源码：<code>                response = await client.get(health_url)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L72** 源码：<code>                response.raise_for_status()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `response.raise_for_status`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L73** 源码：<code>                health_data = response.json()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `health_data`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L74** 源码：<code>                logger.info(f&quot;KernelServer health response: {health_data}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L75** 源码：<code>                if health_data.get(&quot;status&quot;) != &quot;healthy&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L76** 源码：<code>                    raise RuntimeError(f&quot;KernelServer is not healthy: {health_data}&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L77** 源码：<code>                logger.info(&quot;✅ KernelServer health check passed&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L78** 源码：<code>                return True</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L79** 源码：<code>        except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L80** 源码：<code>            logger.error(f&quot;❌ KernelServer health check failed: {e}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L81** 源码：<code>            raise RuntimeError(f&quot;KernelServer at {server_url} is not accessible: {e}&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L82** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L83** 源码：<code>    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L84** 源码：<code>        loop = asyncio.get_event_loop()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loop`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L85** 源码：<code>    except RuntimeError:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L86** 源码：<code>        loop = asyncio.new_event_loop()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loop`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L87** 源码：<code>        asyncio.set_event_loop(loop)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `asyncio.set_event_loop`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L88** 源码：<code>    loop.run_until_complete(check_health())</code>
+  - 语法与作用：函数/构造器调用语法；调用 `loop.run_until_complete`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L89** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L90** 源码：<code>@hydra.main(config_path=&#x27;config&#x27;, config_name=&#x27;kernel_trainer&#x27;, version_base=None)</code>
+  - 语法与作用：装饰器语法；在定义下面的函数/类时先调用该装饰器，替换或包装定义对象。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L91** 源码：<code>def main(config):</code>
+  - 语法与作用：函数定义语法；声明 `main` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L92** 源码：<code>    run_ppo(config)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `run_ppo`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L93** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L94** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L95** 源码：<code>def run_ppo(config) -&gt; None:</code>
+  - 语法与作用：函数定义语法；声明 `run_ppo` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L96** 源码：<code>    # TODO(linjunrong.ocss884): this ENV is left for resolving SGLang conflict with ray devices</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L97** 源码：<code>    # isolation, will solve in the future</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L98** 源码：<code>    os.environ[&quot;ENSURE_CUDA_VISIBLE_DEVICES&quot;] = os.environ.get(&#x27;CUDA_VISIBLE_DEVICES&#x27;, &#x27;&#x27;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `os.environ["ENSURE_CUDA_VISIBLE_DEVICES"]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L99** 源码：<code>    if not ray.is_initialized():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L100** 源码：<code>        # this is for local ray cluster</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L101** 源码：<code>        ray.init(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `ray.init`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L102** 源码：<code>            runtime_env={</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `runtime_env`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L103** 源码：<code>                &#x27;env_vars&#x27;: {&#x27;TOKENIZERS_PARALLELISM&#x27;: &#x27;true&#x27;, &#x27;NCCL_DEBUG&#x27;: &#x27;WARN&#x27;, &#x27;VLLM_LOGGING_LEVEL&#x27;: &#x27;WARN&#x27;}</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L104** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L105** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L106** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L107** 源码：<code>    runner = TaskRunner.remote()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `runner`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L108** 源码：<code>    ray.get(runner.run.remote(config))</code>
+  - 语法与作用：函数/构造器调用语法；调用 `ray.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L109** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L110** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L111** 源码：<code>@ray.remote(num_cpus=1)  # please make sure main_task is not scheduled on head</code>
+  - 语法与作用：装饰器语法；在定义下面的函数/类时先调用该装饰器，替换或包装定义对象。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L112** 源码：<code>class TaskRunner:</code>
+  - 语法与作用：类定义语法；声明 `TaskRunner`，类体在定义阶段执行一次并创建类型对象。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L113** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L114** 源码：<code>    def run(self, config):</code>
+  - 语法与作用：函数定义语法；声明 `run` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L115** 源码：<code>        # print initial config</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L116** 源码：<code>        from pprint import pprint</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L117** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L118** 源码：<code>        from omegaconf import OmegaConf</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L119** 源码：<code>        from verl.utils.fs import copy_to_local</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L120** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L121** 源码：<code>        pprint(OmegaConf.to_container(config, resolve=True))  # resolve=True will eval symbol values</code>
+  - 语法与作用：函数/构造器调用语法；调用 `pprint`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L122** 源码：<code>        OmegaConf.resolve(config)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `OmegaConf.resolve`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L123** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L124** 源码：<code>        # download the checkpoint from hdfs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L125** 源码：<code>        local_path = copy_to_local(config.actor_rollout_ref.model.path)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `local_path`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L126** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L127** 源码：<code>        # instantiate tokenizer</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L128** 源码：<code>        from verl.utils import hf_processor, hf_tokenizer</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L129** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L130** 源码：<code>        trust_remote_code = config.data.get(&#x27;trust_remote_code&#x27;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trust_remote_code`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L131** 源码：<code>        tokenizer = hf_tokenizer(local_path, trust_remote_code=trust_remote_code)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tokenizer`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L132** 源码：<code>        if config.trainer.get(&quot;fix_qwen3_chat_template&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L133** 源码：<code>            print(f&quot;Fixing Qwen3 chat template for {local_path}...&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L134** 源码：<code>            tokenizer.chat_template = QWEN3CHATTEMPLATE</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tokenizer.chat_template`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L135** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L136** 源码：<code>        processor = hf_processor(local_path, use_fast=True)  # used for multimodal LLM, could be none</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `processor`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L137** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L138** 源码：<code>        # define worker classes</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L139** 源码：<code>        if config.actor_rollout_ref.actor.strategy == &#x27;fsdp&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L140** 源码：<code>            assert config.actor_rollout_ref.actor.strategy == config.critic.strategy</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L141** 源码：<code>            from verl.single_controller.ray import RayWorkerGroup</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L142** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L143** 源码：<code>            from verl_patch.workers.code.fsdp_workers import (</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L144** 源码：<code>                ActorRolloutRefWorker,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L145** 源码：<code>                AsyncActorRolloutRefWorker,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L146** 源码：<code>                CriticWorker,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L147** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L148** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L149** 源码：<code>            actor_rollout_cls = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L150** 源码：<code>                AsyncActorRolloutRefWorker</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L151** 源码：<code>                if config.actor_rollout_ref.rollout.mode == &quot;async&quot;</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L152** 源码：<code>                else ActorRolloutRefWorker</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L153** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L154** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L155** 源码：<code>            if config.actor_rollout_ref.rollout.mode in (&quot;async_vllm&quot;, &quot;async_agent&quot;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L156** 源码：<code>                actor_rollout_cls = AsyncActorRolloutRefWorker</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L157** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L158** 源码：<code>            ray_worker_group_cls = RayWorkerGroup</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ray_worker_group_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L159** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L160** 源码：<code>        elif config.actor_rollout_ref.actor.strategy == &quot;megatron&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L161** 源码：<code>            assert config.actor_rollout_ref.actor.strategy == config.critic.strategy</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L162** 源码：<code>            from verl.single_controller.ray.megatron import NVMegatronRayWorkerGroup</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L163** 源码：<code>            from verl.workers.megatron_workers import (</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L164** 源码：<code>                ActorRolloutRefWorker,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L165** 源码：<code>                CriticWorker,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L166** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L167** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L168** 源码：<code>            actor_rollout_cls = ActorRolloutRefWorker</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_rollout_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L169** 源码：<code>            ray_worker_group_cls = NVMegatronRayWorkerGroup</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ray_worker_group_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L170** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L171** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L172** 源码：<code>            raise NotImplementedError</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L173** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L174** 源码：<code>        from verl.trainer.ppo.ray_trainer import ResourcePoolManager, Role</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L175** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L176** 源码：<code>        role_worker_mapping = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `role_worker_mapping`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L177** 源码：<code>            Role.ActorRollout: ray.remote(actor_rollout_cls),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L178** 源码：<code>            Role.Critic: ray.remote(CriticWorker),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L179** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L180** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L181** 源码：<code>        global_pool_id = &#x27;global_pool&#x27;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `global_pool_id`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L182** 源码：<code>        resource_pool_spec = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `resource_pool_spec`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L183** 源码：<code>            global_pool_id: [config.trainer.n_gpus_per_node] * config.trainer.nnodes,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L184** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L185** 源码：<code>        mapping = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `mapping`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L186** 源码：<code>            Role.ActorRollout: global_pool_id,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L187** 源码：<code>            Role.Critic: global_pool_id,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L188** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L189** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L190** 源码：<code>        # we should adopt a multi-source reward function here</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L191** 源码：<code>        # - for rule-based rm, we directly call a reward score</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L192** 源码：<code>        # - for model-based rm, we call a model</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L193** 源码：<code>        # - for code related prompt, we send to a sandbox if there are test cases</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L194** 源码：<code>        # - finally, we combine all the rewards together</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L195** 源码：<code>        # - The reward type depends on the tag of the data</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L196** 源码：<code>        if config.reward_model.enable:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L197** 源码：<code>            if config.reward_model.strategy == &#x27;fsdp&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L198** 源码：<code>                from verl.workers.fsdp_workers import RewardModelWorker</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L199** 源码：<code>            elif config.reward_model.strategy == &#x27;megatron&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L200** 源码：<code>                from verl.workers.megatron_workers import RewardModelWorker</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L201** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L202** 源码：<code>                raise NotImplementedError</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L203** 源码：<code>            role_worker_mapping[Role.RewardModel] = ray.remote(RewardModelWorker)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `role_worker_mapping[Role.RewardModel]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L204** 源码：<code>            mapping[Role.RewardModel] = global_pool_id</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `mapping[Role.RewardModel]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L205** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L206** 源码：<code>        # use reference model</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L207** 源码：<code>        if config.algorithm.use_kl_in_reward or config.actor_rollout_ref.actor.use_kl_loss:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L208** 源码：<code>            role_worker_mapping[Role.RefPolicy] = ray.remote(ActorRolloutRefWorker)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `role_worker_mapping[Role.RefPolicy]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L209** 源码：<code>            mapping[Role.RefPolicy] = global_pool_id</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `mapping[Role.RefPolicy]`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L210** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L211** 源码：<code>        reward_manager_name = config.reward_model.get(&quot;reward_manager&quot;, &quot;naive&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_manager_name`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L212** 源码：<code>        if reward_manager_name == &#x27;naive&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L213** 源码：<code>            from verl_patch.workers.code.reward_manager import NaiveRewardManager</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L214** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L215** 源码：<code>            reward_manager_cls = NaiveRewardManager</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_manager_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L216** 源码：<code>        elif reward_manager_name == &#x27;code&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L217** 源码：<code>            from verl_patch.workers.code.reward_manager import CodeRewardManager</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L218** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L219** 源码：<code>            reward_manager_cls = CodeRewardManager</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_manager_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L220** 源码：<code>        elif reward_manager_name == &#x27;sandbox&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L221** 源码：<code>            from verl_patch.workers.code.reward_manager import HttpSandboxRewardManager</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L222** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L223** 源码：<code>            reward_manager_cls = HttpSandboxRewardManager</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_manager_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L224** 源码：<code>        elif reward_manager_name == &#x27;math&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L225** 源码：<code>            from verl_patch.workers.code.reward_manager import MathRewardManager</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L226** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L227** 源码：<code>            reward_manager_cls = MathRewardManager</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_manager_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L228** 源码：<code>        elif reward_manager_name == &#x27;swe&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L229** 源码：<code>            from verl_patch.workers.code.reward_manager import SWERewardManager</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L230** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L231** 源码：<code>            reward_manager_cls = SWERewardManager</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_manager_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L232** 源码：<code>        elif reward_manager_name == &#x27;kernel&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L233** 源码：<code>            from verl_patch.workers.code.reward_manager import KernelRewardManager</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L234** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L235** 源码：<code>            reward_manager_cls = KernelRewardManager</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_manager_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L236** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L237** 源码：<code>        elif reward_manager_name == &#x27;kernel_async&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L238** 源码：<code>            from kernel.workers.reward_manager.kernel_async import AsyncKernelRewardManager</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L239** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L240** 源码：<code>            reward_manager_cls = AsyncKernelRewardManager</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_manager_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L241** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L242** 源码：<code>            raise NotImplementedError</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L243** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L244** 源码：<code>        compute_score = get_custom_reward_fn(config)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `compute_score`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L245** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L246** 源码：<code>        # Kernel server health check (optional but recommended)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L247** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L248** 源码：<code>            server_url = config.reward_model.server_url</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `server_url`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L249** 源码：<code>            if server_url:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L250** 源码：<code>                _check_kernel_server_health(server_url)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `_check_kernel_server_health`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L251** 源码：<code>        except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L252** 源码：<code>            raise RuntimeError(f&quot;Kernel server health check failed: {e}&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L253** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L254** 源码：<code>        # Reward Manager (Scheme A)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L255** 源码：<code>        reward_fn_kwargs = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn_kwargs`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L256** 源码：<code>            &#x27;tokenizer&#x27;: tokenizer,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L257** 源码：<code>            &#x27;num_examine&#x27;: 5,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L258** 源码：<code>            &#x27;compute_score&#x27;: compute_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L259** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L260** 源码：<code>        # Optional extended kwargs if supported by the manager</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L261** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L262** 源码：<code>            reward_fn = reward_manager_cls(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L263** 源码：<code>                **reward_fn_kwargs,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L264** 源码：<code>                reward_fn_key=config.data.get(&#x27;reward_fn_key&#x27;, None),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn_key`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L265** 源码：<code>                reward_config=config.reward_model,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L266** 源码：<code>                is_valid=False,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_valid`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L267** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L268** 源码：<code>        except TypeError:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L269** 源码：<code>            reward_fn = reward_manager_cls(**{**reward_fn_kwargs, &#x27;num_examine&#x27;: 0})</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L270** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L271** 源码：<code>        # Validation reward function</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L272** 源码：<code>        val_fn_kwargs = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `val_fn_kwargs`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L273** 源码：<code>            &#x27;tokenizer&#x27;: tokenizer,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L274** 源码：<code>            &#x27;num_examine&#x27;: 5,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L275** 源码：<code>            &#x27;compute_score&#x27;: compute_score,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L276** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L277** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L278** 源码：<code>            val_reward_fn = reward_manager_cls(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `val_reward_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L279** 源码：<code>                **val_fn_kwargs,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L280** 源码：<code>                reward_fn_key=config.data.get(&#x27;reward_fn_key&#x27;, None),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn_key`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L281** 源码：<code>                reward_config=config.reward_model,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L282** 源码：<code>                is_valid=True,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_valid`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L283** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L284** 源码：<code>        except TypeError:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L285** 源码：<code>            val_reward_fn = reward_manager_cls(**val_fn_kwargs)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `val_reward_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L286** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L287** 源码：<code>        resource_pool_manager = ResourcePoolManager(resource_pool_spec=resource_pool_spec, mapping=mapping)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `resource_pool_manager`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L288** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L289** 源码：<code>        trainer = RayKernelTrainer(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `trainer`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L290** 源码：<code>            config=config,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `config`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L291** 源码：<code>            tokenizer=tokenizer,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tokenizer`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L292** 源码：<code>            processor=processor,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `processor`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L293** 源码：<code>            role_worker_mapping=role_worker_mapping,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `role_worker_mapping`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L294** 源码：<code>            resource_pool_manager=resource_pool_manager,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `resource_pool_manager`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L295** 源码：<code>            ray_worker_group_cls=ray_worker_group_cls,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ray_worker_group_cls`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L296** 源码：<code>            reward_fn=reward_fn,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L297** 源码：<code>            val_reward_fn=val_reward_fn,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `val_reward_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L298** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L299** 源码：<code>        trainer.init_workers()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `trainer.init_workers`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L300** 源码：<code>        trainer.fit()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `trainer.fit`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L301** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L302** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L303** 源码：<code>if __name__ == &#x27;__main__&#x27;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+- **L304** 源码：<code>    main()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `main`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：该文件由 `python -m kernel.main_kernel` 加载；Hydra、Ray 和配置分支按最终 resolved config 条件执行。
+
+
+
+---
+
+**导航**：[上一附录](01-shell-launchers.md) · [附录目录](index.md) · [下一附录](03-async-bootstrap.md)

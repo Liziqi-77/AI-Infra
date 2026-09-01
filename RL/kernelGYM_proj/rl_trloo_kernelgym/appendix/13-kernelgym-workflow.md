@@ -1,0 +1,2148 @@
+# KernelGYM API 与 KernelBench workflow
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+### 15.12 KernelGYM API 边界
+源码文件：`kernelgym/server/api/server.py`。以下保留指定范围内的每一行；`空行` 和 `注释` 也列出，分别标记为无运行时效果和不执行。训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+
+#### 原始行 435–461
+- **L435** 源码：<code>@app.post(&quot;/evaluate&quot;, response_model=EvaluationResponse)</code>
+  - 语法与作用：装饰器语法；在定义下面的函数/类时先调用该装饰器，替换或包装定义对象。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L436** 源码：<code>async def evaluate_kernel(</code>
+  - 语法与作用：函数定义语法；声明 `evaluate_kernel` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L437** 源码：<code>    request: EvaluationRequest,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L438** 源码：<code>    background_tasks: BackgroundTasks,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L439** 源码：<code>    task_mgr: TaskManager = Depends(get_task_manager)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L440** 源码：<code>):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L441** 源码：<code>    &quot;&quot;&quot;Submit a kernel evaluation task.&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L442** 源码：<code>    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L443** 源码：<code>        _, result, status_value = await _execute_workflow(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L444** 源码：<code>            task_mgr=task_mgr,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `task_mgr`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L445** 源码：<code>            workflow_name=request.workflow or &quot;kernelbench&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `workflow_name`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L446** 源码：<code>            payload=request.dict(),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `payload`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L447** 源码：<code>            task_id=request.task_id,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `task_id`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L448** 源码：<code>            force_refresh=request.force_refresh,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `force_refresh`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L449** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L450** 源码：<code>        return EvaluationResponse(status=status_value, **_strip_status(result))</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L451** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L452** 源码：<code>    except HTTPException:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L453** 源码：<code>        raise</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L454** 源码：<code>    except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L455** 源码：<code>        logger.error(f&quot;Error submitting task {request.task_id}: {e}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L456** 源码：<code>        error_code = classify_error(str(e), &quot;system&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `error_code`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L457** 源码：<code>        raise HTTPException(</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L458** 源码：<code>            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `status_code`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L459** 源码：<code>            detail=f&quot;Failed to submit task: {str(e)}&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `detail`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L460** 源码：<code>            headers={&quot;X-Error-Code&quot;: error_code.value}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `headers`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L461** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+
+#### 原始行 592–640
+- **L592** 源码：<code>@app.get(&quot;/status/{task_id}&quot;, response_model=TaskStatusResponse)</code>
+  - 语法与作用：装饰器语法；在定义下面的函数/类时先调用该装饰器，替换或包装定义对象。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L593** 源码：<code>async def get_task_status(</code>
+  - 语法与作用：函数定义语法；声明 `get_task_status` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L594** 源码：<code>    task_id: str,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L595** 源码：<code>    task_mgr: TaskManager = Depends(get_task_manager)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L596** 源码：<code>):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L597** 源码：<code>    &quot;&quot;&quot;Get task status.&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L598** 源码：<code>    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L599** 源码：<code>        status_info = await task_mgr.get_task_status(task_id)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `status_info`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L600** 源码：<code>        if not status_info:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L601** 源码：<code>            raise HTTPException(</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L602** 源码：<code>                status_code=status.HTTP_404_NOT_FOUND,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `status_code`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L603** 源码：<code>                detail=f&quot;Task {task_id} not found&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `detail`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L604** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L605** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L606** 源码：<code>        return TaskStatusResponse(**status_info)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L607** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L608** 源码：<code>    except HTTPException:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L609** 源码：<code>        raise</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L610** 源码：<code>    except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L611** 源码：<code>        logger.error(f&quot;Error getting status for task {task_id}: {e}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L612** 源码：<code>        raise HTTPException(</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L613** 源码：<code>            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `status_code`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L614** 源码：<code>            detail=f&quot;Failed to get task status: {str(e)}&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `detail`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L615** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L616** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L617** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L618** 源码：<code>@app.get(&quot;/results/{task_id}&quot;, response_model=EvaluationResponse)</code>
+  - 语法与作用：装饰器语法；在定义下面的函数/类时先调用该装饰器，替换或包装定义对象。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L619** 源码：<code>async def get_task_results(</code>
+  - 语法与作用：函数定义语法；声明 `get_task_results` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L620** 源码：<code>    task_id: str,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L621** 源码：<code>    task_mgr: TaskManager = Depends(get_task_manager)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L622** 源码：<code>):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L623** 源码：<code>    &quot;&quot;&quot;Get task results.&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L624** 源码：<code>    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L625** 源码：<code>        result = await task_mgr.get_task_result(task_id)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `result`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L626** 源码：<code>        if not result:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L627** 源码：<code>            raise HTTPException(</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L628** 源码：<code>                status_code=status.HTTP_404_NOT_FOUND,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `status_code`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L629** 源码：<code>                detail=f&quot;Task {task_id} not found&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `detail`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L630** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L631** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L632** 源码：<code>        result = dict(result)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `result`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L633** 源码：<code>        result.setdefault(&quot;task_id&quot;, task_id)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `result.setdefault`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L634** 源码：<code>        status_value = _result_status(result)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `status_value`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L635** 源码：<code>        return EvaluationResponse(status=status_value, **_strip_status(result))</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L636** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L637** 源码：<code>    except HTTPException:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L638** 源码：<code>        raise</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L639** 源码：<code>    except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L640** 源码：<code>        logger.error(f&quot;Error getting results for task {task_id}: {e}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+
+#### 原始行 673–690
+- **L673** 源码：<code>@app.get(&quot;/health&quot;, response_model=SystemHealthResponse)</code>
+  - 语法与作用：装饰器语法；在定义下面的函数/类时先调用该装饰器，替换或包装定义对象。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L674** 源码：<code>async def health_check():</code>
+  - 语法与作用：函数定义语法；声明 `health_check` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L675** 源码：<code>    &quot;&quot;&quot;System health check.&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L676** 源码：<code>    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L677** 源码：<code>        health_info = await get_system_health()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `health_info`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L678** 源码：<code>        return SystemHealthResponse(**health_info)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L679** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L680** 源码：<code>    except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L681** 源码：<code>        logger.error(f&quot;Error getting system health: {e}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L682** 源码：<code>        raise HTTPException(</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L683** 源码：<code>            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `status_code`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L684** 源码：<code>            detail=f&quot;Failed to get system health: {str(e)}&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `detail`，可能创建、覆盖或累加状态。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L685** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L686** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L687** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L688** 源码：<code>@app.get(&quot;/metrics&quot;, response_model=MetricsResponse)</code>
+  - 语法与作用：装饰器语法；在定义下面的函数/类时先调用该装饰器，替换或包装定义对象。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L689** 源码：<code>async def get_metrics():</code>
+  - 语法与作用：函数定义语法；声明 `get_metrics` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+- **L690** 源码：<code>    &quot;&quot;&quot;Get system metrics.&quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：训练端通过 HTTP 进入这些 API；API 内部继续调度 workflow/Redis/GPU worker，但本附录在 KernelGYM 服务项目边界处说明输入输出。
+
+
+### 19.7 API endpoint 之间的源码
+源码：`kernelgym/server/api/server.py`；以下为补全区间，执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。。
+
+#### 原始行 462–591
+- **L462** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L463** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L464** <code>@app.post(&quot;/evaluate/batch&quot;, response_model=BatchEvaluationResponse)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L465** <code>async def evaluate_batch(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L466** <code>    request: BatchEvaluationRequest,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L467** <code>    background_tasks: BackgroundTasks,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L468** <code>    task_mgr: TaskManager = Depends(get_task_manager)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_mgr: TaskManager`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L469** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L470** <code>    &quot;&quot;&quot;Submit a batch of evaluation tasks.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L471** <code>    try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L472** <code>        batch_results = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_results`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L473** <code>        failed_tasks = 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `failed_tasks`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L474** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L475** <code>        for task_request in request.tasks:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L476** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L477** <code>                _, result, status_value = await _execute_workflow(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `_, result, status_value`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L478** <code>                    task_mgr=task_mgr,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_mgr`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L479** <code>                    workflow_name=task_request.workflow or &quot;kernelbench&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `workflow_name`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L480** <code>                    payload=task_request.dict(),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `payload`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L481** <code>                    task_id=task_request.task_id,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_id`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L482** <code>                    force_refresh=task_request.force_refresh,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `force_refresh`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L483** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L484** <code>                if status_value == TaskStatus.FAILED:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L485** <code>                    failed_tasks += 1</code>
+  - 语法与作用：变量/容器赋值（`+=`）；计算右侧表达式并绑定或更新 `failed_tasks`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L486** <code>                batch_results.append(EvaluationResponse(status=status_value, **_strip_status(result)))</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `batch_results.append(EvaluationResponse(status`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L487** <code>                </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L488** <code>            except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L489** <code>                logger.error(f&quot;Error processing task {task_request.task_id}: {e}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L490** <code>                error_code = classify_error(str(e), &quot;system&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `error_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L491** <code>                batch_results.append(EvaluationResponse(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `batch_results.append`，产生返回值或副作用。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L492** <code>                    task_id=task_request.task_id,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_id`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L493** <code>                    status=TaskStatus.FAILED,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L494** <code>                    error_message=str(e),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `error_message`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L495** <code>                    error_code=error_code,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `error_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L496** <code>                    submitted_at=format_timestamp(datetime.now())</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `submitted_at`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L497** <code>                ))</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L498** <code>                failed_tasks += 1</code>
+  - 语法与作用：变量/容器赋值（`+=`）；计算右侧表达式并绑定或更新 `failed_tasks`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L499** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L500** <code>        return BatchEvaluationResponse(</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L501** <code>            batch_id=request.batch_id,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_id`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L502** <code>            total_tasks=len(request.tasks),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_tasks`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L503** <code>            completed_tasks=len(batch_results) - failed_tasks,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `completed_tasks`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L504** <code>            failed_tasks=failed_tasks,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `failed_tasks`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L505** <code>            results=batch_results,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `results`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L506** <code>            batch_status=TaskStatus.COMPLETED,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_status`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L507** <code>            submitted_at=format_timestamp(datetime.now())</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `submitted_at`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L508** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L509** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L510** <code>    except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L511** <code>        logger.error(f&quot;Error processing batch {request.batch_id}: {e}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L512** <code>        raise HTTPException(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L513** <code>            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L514** <code>            detail=f&quot;Failed to process batch: {str(e)}&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `detail`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L515** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L516** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L517** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L518** <code>@app.post(&quot;/workflow/submit&quot;, response_model=WorkflowResponse)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L519** <code>async def submit_workflow(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L520** <code>    request: WorkflowRequest,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L521** <code>    task_mgr: TaskManager = Depends(get_task_manager),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_mgr: TaskManager`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L522** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L523** <code>    &quot;&quot;&quot;Submit a workflow task with generic payload.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L524** <code>    try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L525** <code>        task_id = request.task_id or request.payload.get(&quot;task_id&quot;) if isinstance(request.payload, dict) else None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_id`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L526** <code>        payload = request.payload</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `payload`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L527** <code>        if isinstance(payload, dict) and payload.get(&quot;resources&quot;) is None and request.resources is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L528** <code>            payload = dict(payload)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `payload`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L529** <code>            payload[&quot;resources&quot;] = request.resources</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `payload["resources"]`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L530** <code>        task_id, result, status_value = await _execute_workflow(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_id, result, status_value`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L531** <code>            task_mgr=task_mgr,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_mgr`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L532** <code>            workflow_name=request.workflow or &quot;kernelbench&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `workflow_name`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L533** <code>            payload=payload,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `payload`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L534** <code>            task_id=task_id,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_id`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L535** <code>            force_refresh=request.force_refresh,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `force_refresh`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L536** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L537** <code>        payload = _strip_status(result)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `payload`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L538** <code>        return WorkflowResponse(</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L539** <code>            task_id=task_id,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_id`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L540** <code>            status=status_value,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L541** <code>            result=payload,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `result`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L542** <code>            error_message=result.get(&quot;error_message&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `error_message`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L543** <code>            error_code=result.get(&quot;error_code&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `error_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L544** <code>            completed_at=payload.get(&quot;completed_at&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `completed_at`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L545** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L546** <code>    except HTTPException:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L547** <code>        raise</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L548** <code>    except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L549** <code>        logger.error(f&quot;Error submitting workflow {request.workflow}: {e}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L550** <code>        error_code = classify_error(str(e), &quot;system&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `error_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L551** <code>        raise HTTPException(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L552** <code>            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L553** <code>            detail=f&quot;Failed to submit workflow: {str(e)}&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `detail`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L554** <code>            headers={&quot;X-Error-Code&quot;: error_code.value},</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `headers`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L555** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L556** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L557** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L558** <code>@app.get(&quot;/workflow/results/{task_id}&quot;, response_model=WorkflowResponse)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L559** <code>async def get_workflow_results(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L560** <code>    task_id: str,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L561** <code>    task_mgr: TaskManager = Depends(get_task_manager),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_mgr: TaskManager`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L562** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L563** <code>    &quot;&quot;&quot;Get workflow result for a task.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L564** <code>    try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L565** <code>        result = await task_mgr.get_task_result(task_id)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `result`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L566** <code>        if not result:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L567** <code>            raise HTTPException(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L568** <code>                status_code=status.HTTP_404_NOT_FOUND,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L569** <code>                detail=f&quot;Task {task_id} not found&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `detail`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L570** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L571** <code>        result = dict(result)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `result`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L572** <code>        result.setdefault(&quot;task_id&quot;, task_id)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `result.setdefault`，产生返回值或副作用。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L573** <code>        status_value = _result_status(result)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status_value`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L574** <code>        payload = _strip_status(result)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `payload`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L575** <code>        return WorkflowResponse(</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L576** <code>            task_id=task_id,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_id`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L577** <code>            status=status_value,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L578** <code>            result=payload,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `result`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L579** <code>            error_message=result.get(&quot;error_message&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `error_message`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L580** <code>            error_code=result.get(&quot;error_code&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `error_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L581** <code>            completed_at=payload.get(&quot;completed_at&quot;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `completed_at`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L582** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L583** <code>    except HTTPException:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L584** <code>        raise</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L585** <code>    except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L586** <code>        logger.error(f&quot;Error getting workflow results for task {task_id}: {e}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L587** <code>        raise HTTPException(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L588** <code>            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L589** <code>            detail=f&quot;Failed to get workflow results: {str(e)}&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `detail`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L590** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L591** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+#### 原始行 641–672
+- **L641** <code>        raise HTTPException(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L642** <code>            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L643** <code>            detail=f&quot;Failed to get task results: {str(e)}&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `detail`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L644** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L645** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L646** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L647** <code>@app.delete(&quot;/tasks/{task_id}&quot;)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L648** <code>async def cancel_task(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L649** <code>    task_id: str,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L650** <code>    task_mgr: TaskManager = Depends(get_task_manager)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `task_mgr: TaskManager`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L651** <code>):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L652** <code>    &quot;&quot;&quot;Cancel a task.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L653** <code>    try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L654** <code>        success = await task_mgr.cancel_task(task_id)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `success`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L655** <code>        if not success:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L656** <code>            raise HTTPException(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L657** <code>                status_code=status.HTTP_404_NOT_FOUND,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L658** <code>                detail=f&quot;Task {task_id} not found or cannot be cancelled&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `detail`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L659** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L660** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L661** <code>        return {&quot;message&quot;: f&quot;Task {task_id} cancelled successfully&quot;}</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L662** <code>        </code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L663** <code>    except HTTPException:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L664** <code>        raise</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L665** <code>    except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L666** <code>        logger.error(f&quot;Error cancelling task {task_id}: {e}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L667** <code>        raise HTTPException(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L668** <code>            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `status_code`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L669** <code>            detail=f&quot;Failed to cancel task: {str(e)}&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `detail`。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L670** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L671** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+- **L672** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：批量评测和 API 辅助 endpoint；当前 reward client 主要访问单任务 `/evaluate`、`/status`、`/results`，其余 endpoint 按 HTTP 配置条件执行。
+
+### 19.10 KernelGYM API 到 workflow 的逐行边界
+
+`reward_client.py` 的 `POST /evaluate` 不会直接完成编译，它进入 KernelGYM 的 workflow。下面列出 API 入口之后的项目代码；其后的 scheduler、GPU worker 和 toolkit 继续属于 KernelGYM 服务项目，但不再展开外部执行器内部实现。
+
+#### `kernelgym/server/api/server.py:L325–L358`
+
+- **L325** `async def _execute_workflow(`：定义异步 workflow 调度函数；FastAPI endpoint 会 await 它。
+- **L326** `task_mgr: TaskManager,`：参数类型注解；接收任务管理器实例。
+- **L327** `workflow_name: str,`：接收 workflow 名称。
+- **L328** `payload: Dict[str, Any],`：接收从 HTTP request 转成的任务字典。
+- **L329** `task_id: Optional[str] = None,`：可选任务 ID；没有时从 payload 查找。
+- **L330** `force_refresh: bool = False,`：控制是否绕过已有结果缓存。
+- **L331** `) -> tuple[str, Dict[str, Any], TaskStatus]:`：结束参数列表并声明返回三元组。
+- **L332** `if task_id:`：如果调用者显式给出 ID，进入覆盖逻辑。
+- **L333** `payload = dict(payload)`：复制 payload，避免修改 endpoint 持有的原字典。
+- **L334** `payload["task_id"] = task_id`：把显式 ID 写入请求 payload。
+- **L335** `if isinstance(payload, dict) and payload.get("resources") is None:`：检查 payload 类型以及 resources 是否为空。
+- **L336** `payload["resources"] = None`：显式保留空资源字段，交给下游 workflow。
+- **L337** `task_id = task_id or payload.get("task_id")`：优先使用参数 ID，否则从 payload 取 ID。
+- **L338** `if not task_id:`：没有任务 ID 时进入请求错误分支。
+- **L339** `raise HTTPException(...)`：返回 400，因为服务端无法追踪没有 ID 的任务。
+- **L341** `if not force_refresh:`：未强制刷新时尝试复用历史结果。
+- **L342** `existing = await task_mgr.get_task_result(task_id)`：异步查询任务结果。
+- **L343** `if existing:`：若已有结果，跳过重新编译。
+- **L344** `existing = dict(existing)`：复制结果为普通字典。
+- **L345** `existing.setdefault("task_id", task_id)`：缺少 task_id 时补上。
+- **L346** `return task_id, existing, _result_status(existing)`：返回缓存结果及完成/失败状态。
+- **L348** `scheduler = TaskManagerScheduler(task_mgr)`：创建 workflow 使用的 scheduler 适配器。
+- **L349** `try:`：开始捕获 workflow 名称错误。
+- **L350** `controller = get_workflow_controller(workflow_name or "kernelbench")`：按名称取得控制器；默认是 kernelbench。
+- **L351** `except KeyError as exc:`：捕获未知 workflow。
+- **L352** `raise HTTPException(...) from exc`：将内部 KeyError 转成 HTTP 400，并保留异常链。
+- **L354** `result = await controller.handle_request(payload, scheduler)`：把任务交给 workflow 控制器；这里进入 `kernelgym/workflow/kernelbench.py`。
+- **L355** `if isinstance(result, dict):`：只有字典结果才补充任务 ID。
+- **L356** `result.setdefault("task_id", task_id)`：保证结果带原始任务 ID。
+- **L357** `await task_mgr.complete_task(task_id, result)`：把最终 workflow 结果写回任务管理器/Redis。
+- **L358** `return task_id, result, _result_status(result)`：把结果、ID、状态返回给 `/evaluate` endpoint。
+
+#### `kernelgym/workflow/kernelbench.py:L31–L182`
+
+该控制器的每行都参与以下决策：解析 evaluation task、校验输入、提交 kernel task、等待编译/正确性/性能结果；成功后创建或读取 reference timing，再用 `_combine_results()` 计算 speedup。逐行阅读时，`await scheduler.submit(...)` 是进入 GPU worker/队列的边界，`await scheduler.wait(...)` 是取回结果的边界；`EvaluationResult` 的字段才是 reward client 后续使用的 `compiled`、`correctness`、`speedup`、`metadata` 来源。
+
+完整源码行号范围：`kernelgym/workflow/kernelbench.py:1–300`。该文件属于服务端 workflow，其全部项目源码行已按同一规则保留在下方逐行索引中；校验/任务字段/异常处理的解释以上述边界说明为先。
+
+#### `kernelgym/workflow/kernelbench_helpers.py:L117–L127`
+
+- **L117** `def _combine_results(`：定义 reference 与 kernel 结果合并函数。
+- **L118–L120**：参数类型注解，分别接收 reference timing 和 kernel evaluation 结果，并声明返回 `EvaluationResult`。
+- **L121**：比较两个结果的 `base_task_id`，保护配对任务不会错配。
+- **L122–L124**：ID 不一致时抛出 `ValueError`，阻止错误 speedup。
+- **L125–L127**：调用 `EvaluationResult.from_paired_results(...)`，使用 reference runtime 与 kernel runtime 生成合并结果；这里是 speedup 计算的项目边界。
+
+
+## 20. KernelBench workflow 完整逐行解释
+
+这一节把 reward client 进入 KernelGYM 服务之后的项目 workflow 完整展开。每一行都来自当前 checkout；`await scheduler.submit()` 是进入 Redis/GPU worker 调度的边界，scheduler、worker 和 toolkit 的实现仍在 KernelGYM 项目内，但执行器内部不再向外展开。
+
+
+### 20.1 `kernelbench.py`：workflow 控制器
+源码：`kernelgym/workflow/kernelbench.py`；逐行范围 1–300，执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。。
+
+- **L1** <code>&quot;&quot;&quot;KernelBench workflow controller (server-side orchestration).&quot;&quot;&quot;</code>
+  - 语法与作用：文档字符串；保存模块/类/函数说明，不改变业务控制流。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L2** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L3** <code>from __future__ import annotations</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L4** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L5** <code>from typing import Any, Dict, Optional</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L6** <code>from pathlib import Path</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L7** <code>import json</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L8** <code>from datetime import datetime, timezone</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L9** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L10** <code>from kernelgym.common import ErrorCode</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L11** <code>from kernelgym.config import settings</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L12** <code>from .kernelbench_types import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L13** <code>    EvaluationTask,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L14** <code>    ReferenceTimingTask,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L15** <code>    ReferenceTimingResult,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L16** <code>    KernelEvaluationResult,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L17** <code>    EvaluationResult,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L18** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L19** <code>from .kernelbench_helpers import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L20** <code>    _combine_results,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L21** <code>    _create_paired_tasks,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L22** <code>    _get_cached_reference_runtime,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L23** <code>    _validate_code,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L24** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L25** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L26** <code>from ..core.types import TaskSpec</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L27** <code>from ..core.workflow import WorkflowController, WorkflowState</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L28** <code>from ..core.scheduler import SchedulerAPI</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L29** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L30** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L31** <code>class KernelBenchWorkflowController(WorkflowController):</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L32** <code>    &quot;&quot;&quot;Main controller for KernelBench evaluation workflow.&quot;&quot;&quot;</code>
+  - 语法与作用：文档字符串；保存模块/类/函数说明，不改变业务控制流。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L33** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L34** <code>    async def validate_request(self, input_data: Dict[str, Any]) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L35** <code>        eval_task = EvaluationTask.from_dict(input_data)</code>
+  - 语法与作用：调用数据模型工厂，把 HTTP payload 校验并转换为 EvaluationTask。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L36** <code>        validation = self._validate_inputs(eval_task)</code>
+  - 语法与作用：调用本类输入校验，返回 valid/errors/reference/kernel 等摘要。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L37** <code>        validation[&quot;task_id&quot;] = eval_task.task_id</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `validation["task_id"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L38** <code>        validation[&quot;workflow&quot;] = &quot;kernelbench&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `validation["workflow"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L39** <code>        return validation</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L40** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L41** <code>    async def handle_request(self, input_data: Dict[str, Any], scheduler: SchedulerAPI) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L42** <code>        eval_task = EvaluationTask.from_dict(input_data)</code>
+  - 语法与作用：调用数据模型工厂，把 HTTP payload 校验并转换为 EvaluationTask。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L43** <code>        state = WorkflowState({&quot;base_task_id&quot;: eval_task.task_id})</code>
+  - 语法与作用：创建 workflow 状态对象，并记录基础任务 ID。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L44** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L45** <code>        if eval_task.reference_backend:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L46** <code>            print(</code>
+  - 语法与作用：日志输出调用；记录任务、错误或调试状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L47** <code>                f&quot;[Workflow] task={eval_task.task_id} reference_backend={eval_task.reference_backend}&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `f"[Workflow] task`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L48** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L49** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L50** <code>        validation = self._validate_inputs(eval_task)</code>
+  - 语法与作用：调用本类输入校验，返回 valid/errors/reference/kernel 等摘要。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L51** <code>        if not validation[&quot;valid&quot;]:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L52** <code>            message = validation[&quot;errors&quot;][0] if validation[&quot;errors&quot;] else &quot;Validation failed&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `message`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L53** <code>            result = self._validation_failed_result(eval_task.task_id, message)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L54** <code>            self._persist_result(eval_task, result)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._persist_result`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L55** <code>            return result</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L56** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L57** <code>        ref_task, kernel_task = _create_paired_tasks(eval_task)</code>
+  - 语法与作用：调用 helper，把一个评测请求拆为 reference timing 与 kernel evaluation 两个任务。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L58** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L59** <code>        kernel_payload = kernel_task.to_dict()</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L60** <code>        kernel_payload[&quot;task_type&quot;] = &quot;kernel_evaluation&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload["task_type"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L61** <code>        kernel_payload[&quot;toolkit&quot;] = kernel_payload.get(&quot;toolkit&quot;, &quot;kernelbench&quot;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload["toolkit"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L62** <code>        kernel_payload[&quot;backend_adapter&quot;] = kernel_payload.get(&quot;backend_adapter&quot;, &quot;kernelbench&quot;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload["backend_adapter"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L63** <code>        run_correctness = eval_task.run_correctness</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_correctness`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L64** <code>        if run_correctness is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L65** <code>            run_correctness = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_correctness`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L66** <code>        run_triton_detection = eval_task.run_triton_detection</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_triton_detection`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L67** <code>        if run_triton_detection is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L68** <code>            run_triton_detection = eval_task.enable_triton_detection</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_triton_detection`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L69** <code>        if run_triton_detection is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L70** <code>            run_triton_detection = eval_task.backend == &quot;triton&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_triton_detection`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L71** <code>        run_performance = eval_task.run_performance</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_performance`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L72** <code>        if run_performance is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L73** <code>            run_performance = eval_task.measure_performance</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_performance`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L74** <code>        if run_performance is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L75** <code>            run_performance = True</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_performance`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L76** <code>        kernel_payload[&quot;run_correctness&quot;] = run_correctness</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload["run_correctness"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L77** <code>        kernel_payload[&quot;run_triton_detection&quot;] = run_triton_detection</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload["run_triton_detection"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L78** <code>        kernel_payload[&quot;run_performance&quot;] = run_performance</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload["run_performance"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L79** <code>        kernel_payload[&quot;enable_triton_detection&quot;] = run_triton_detection</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload["enable_triton_detection"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L80** <code>        kernel_payload[&quot;measure_performance&quot;] = run_performance</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload["measure_performance"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L81** <code>        enable_profiling = eval_task.enable_profiling</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `enable_profiling`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L82** <code>        if enable_profiling is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L83** <code>            enable_profiling = settings.enable_profiling</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `enable_profiling`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L84** <code>        kernel_payload[&quot;enable_profiling&quot;] = enable_profiling</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_payload["enable_profiling"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L85** <code>        kernel_task_spec = TaskSpec(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_task_spec`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L86** <code>            kind=&quot;kernelbench.kernel&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kind`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L87** <code>            payload=kernel_payload,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `payload`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L88** <code>            resources=eval_task.resources,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `resources`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L89** <code>            metadata={&quot;base_task_id&quot;: eval_task.task_id},</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `metadata`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L90** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L91** <code>        kernel_task_id = await scheduler.submit(kernel_task_spec)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_task_id`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L92** <code>        kernel_result_dict = await scheduler.wait(kernel_task_id)</code>
+  - 语法与作用：等待 kernel 子任务终态，结果通常来自 GPU worker。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L93** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L94** <code>        if not kernel_result_dict:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L95** <code>            result = self._failed_result(eval_task.task_id, &quot;kernel result missing&quot;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L96** <code>            self._persist_result(eval_task, result)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._persist_result`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L97** <code>            return result</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L98** <code>        if &quot;error_message&quot; in kernel_result_dict and &quot;compiled&quot; not in kernel_result_dict:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L99** <code>            result = self._failed_result(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L100** <code>                eval_task.task_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L101** <code>                kernel_result_dict.get(&quot;error_message&quot;, &quot;kernel task failed&quot;),</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `kernel_result_dict.get`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L102** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L103** <code>            self._persist_result(eval_task, result)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._persist_result`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L104** <code>            return result</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L105** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L106** <code>        required_kernel_fields = {</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `required_kernel_fields`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L107** <code>            &quot;task_id&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L108** <code>            &quot;base_task_id&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L109** <code>            &quot;compiled&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L110** <code>            &quot;correctness&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L111** <code>            &quot;decoy_kernel&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L112** <code>            &quot;kernel_runtime&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L113** <code>            &quot;metadata&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L114** <code>        }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L115** <code>        if not required_kernel_fields.issubset(kernel_result_dict.keys()):</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L116** <code>            missing = sorted(required_kernel_fields - set(kernel_result_dict.keys()))</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `missing`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L117** <code>            result = self._failed_result(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L118** <code>                eval_task.task_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L119** <code>                f&quot;kernel result missing required fields: {missing}&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L120** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L121** <code>            self._persist_result(eval_task, result)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._persist_result`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L122** <code>            return result</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L123** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L124** <code>        kernel_result = KernelEvaluationResult.from_dict(kernel_result_dict)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L125** <code>        state.data[&quot;kernel_result&quot;] = kernel_result.to_dict()</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `state.data["kernel_result"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L126** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L127** <code>        if not (kernel_result.compiled and kernel_result.correctness):</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L128** <code>            result = self._kernel_only_result(eval_task, kernel_result)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L129** <code>            self._persist_result(eval_task, result)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._persist_result`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L130** <code>            return result</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L131** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L132** <code>        ref_result: Optional[ReferenceTimingResult] = None</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_result: Optional[ReferenceTimingResult]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L133** <code>        if ref_task is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L134** <code>            cached_runtime = _get_cached_reference_runtime(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `cached_runtime`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L135** <code>                eval_task.uuid, eval_task.reference_code, eval_task.is_valid</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L136** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L137** <code>            if cached_runtime is not None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L138** <code>                ref_result = self._cached_reference_result(eval_task, cached_runtime)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L139** <code>            else:</code>
+  - 语法与作用：else 分支；前面条件都不成立时执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L140** <code>                    ref_task = ReferenceTimingTask(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_task`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L141** <code>                        task_id=f&quot;{eval_task.task_id}_ref&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `task_id`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L142** <code>                        base_task_id=eval_task.task_id,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `base_task_id`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L143** <code>                        reference_code=eval_task.reference_code,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_code`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L144** <code>                        backend=eval_task.backend,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `backend`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L145** <code>                        num_perf_trials=eval_task.num_perf_trials,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `num_perf_trials`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L146** <code>                        timeout=eval_task.timeout,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `timeout`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L147** <code>                        device=eval_task.device,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `device`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L148** <code>                        priority=eval_task.priority,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `priority`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L149** <code>                        entry_point=eval_task.entry_point,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `entry_point`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L150** <code>                        reference_backend=eval_task.reference_backend,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_backend`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L151** <code>                        device_preference=eval_task.device_preference,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `device_preference`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L152** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L153** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L154** <code>        if ref_result is None and ref_task is not None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L155** <code>            ref_payload = ref_task.to_dict()</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_payload`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L156** <code>            ref_payload[&quot;task_type&quot;] = &quot;reference_timing&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_payload["task_type"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L157** <code>            ref_payload[&quot;toolkit&quot;] = ref_payload.get(&quot;toolkit&quot;, &quot;kernelbench&quot;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_payload["toolkit"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L158** <code>            ref_payload[&quot;backend_adapter&quot;] = ref_payload.get(&quot;backend_adapter&quot;, &quot;kernelbench&quot;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_payload["backend_adapter"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L159** <code>            ref_task_spec = TaskSpec(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_task_spec`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L160** <code>                kind=&quot;kernelbench.ref&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kind`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L161** <code>                payload=ref_payload,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `payload`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L162** <code>                resources=eval_task.resources,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `resources`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L163** <code>                metadata={&quot;base_task_id&quot;: eval_task.task_id},</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `metadata`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L164** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L165** <code>            ref_task_id = await scheduler.submit(ref_task_spec)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_task_id`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L166** <code>            ref_result_dict = await scheduler.wait(ref_task_id)</code>
+  - 语法与作用：等待 reference timing 子任务终态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L167** <code>            if ref_result_dict:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L168** <code>                if &quot;error_message&quot; in ref_result_dict and &quot;reference_runtime&quot; not in ref_result_dict:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L169** <code>                    result = self._kernel_only_result(eval_task, kernel_result)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L170** <code>                    self._persist_result(eval_task, result)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._persist_result`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L171** <code>                    return result</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L172** <code>                ref_result = ReferenceTimingResult.from_dict(ref_result_dict)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L173** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L174** <code>        if ref_result is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L175** <code>            result = self._kernel_only_result(eval_task, kernel_result)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L176** <code>            self._persist_result(eval_task, result)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._persist_result`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L177** <code>            return result</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L178** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L179** <code>        combined = _combine_results(ref_result, kernel_result)</code>
+  - 语法与作用：调用 helper 校验 base_task_id 并计算配对后的综合 EvaluationResult。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L180** <code>        result = combined.to_dict()</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L181** <code>        self._persist_result(eval_task, result)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._persist_result`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L182** <code>        return result</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L183** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L184** <code>    def _cached_reference_result(self, eval_task: EvaluationTask, runtime: float) -&gt; ReferenceTimingResult:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L185** <code>        return ReferenceTimingResult(</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L186** <code>            task_id=f&quot;{eval_task.task_id}_ref&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `task_id`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L187** <code>            base_task_id=eval_task.task_id,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `base_task_id`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L188** <code>            reference_runtime=runtime,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_runtime`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L189** <code>            metadata={</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `metadata`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L190** <code>                &quot;cached&quot;: True,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L191** <code>                &quot;uuid&quot;: eval_task.uuid,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L192** <code>                &quot;device&quot;: &quot;cached&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L193** <code>                &quot;backend&quot;: eval_task.backend,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L194** <code>                &quot;cache_type&quot;: &quot;validation&quot; if eval_task.is_valid else &quot;regular&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L195** <code>            },</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L196** <code>            status=&quot;completed&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `status`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L197** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L198** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L199** <code>    def _kernel_only_result(self, eval_task: EvaluationTask, kernel_result: KernelEvaluationResult) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L200** <code>        metadata = dict(kernel_result.metadata or {})</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `metadata`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L201** <code>        metadata[&quot;kernel_task_id&quot;] = kernel_result.task_id</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `metadata["kernel_task_id"]`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L202** <code>        result = EvaluationResult(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L203** <code>            task_id=eval_task.task_id,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `task_id`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L204** <code>            compiled=kernel_result.compiled,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `compiled`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L205** <code>            correctness=kernel_result.correctness,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `correctness`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L206** <code>            decoy_kernel=kernel_result.decoy_kernel,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `decoy_kernel`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L207** <code>            reference_runtime=-1.0,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_runtime`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L208** <code>            kernel_runtime=kernel_result.kernel_runtime,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_runtime`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L209** <code>            speedup=0.0,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `speedup`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L210** <code>            metadata=metadata,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `metadata`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L211** <code>            status=kernel_result.status,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `status`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L212** <code>            error_message=kernel_result.error_message,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `error_message`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L213** <code>            error_code=kernel_result.error_code,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `error_code`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L214** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L215** <code>        return result.to_dict()</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L216** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L217** <code>    def _failed_result(self, task_id: str, message: str) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L218** <code>        result = EvaluationResult(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L219** <code>            task_id=task_id,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `task_id`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L220** <code>            compiled=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `compiled`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L221** <code>            correctness=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `correctness`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L222** <code>            decoy_kernel=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `decoy_kernel`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L223** <code>            reference_runtime=-1.0,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_runtime`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L224** <code>            kernel_runtime=-1.0,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_runtime`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L225** <code>            speedup=0.0,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `speedup`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L226** <code>            metadata={&quot;error&quot;: message},</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `metadata`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L227** <code>            status=&quot;failed&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `status`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L228** <code>            error_message=message,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `error_message`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L229** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L230** <code>        return result.to_dict()</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L231** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L232** <code>    def _validation_failed_result(self, task_id: str, message: str) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L233** <code>        result = EvaluationResult(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `result`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L234** <code>            task_id=task_id,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `task_id`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L235** <code>            compiled=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `compiled`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L236** <code>            correctness=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `correctness`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L237** <code>            decoy_kernel=False,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `decoy_kernel`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L238** <code>            reference_runtime=-1.0,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_runtime`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L239** <code>            kernel_runtime=-1.0,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_runtime`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L240** <code>            speedup=0.0,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `speedup`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L241** <code>            metadata={&quot;error&quot;: message},</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `metadata`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L242** <code>            status=&quot;failed&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `status`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L243** <code>            error_message=message,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `error_message`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L244** <code>            error_code=ErrorCode.VALIDATION_ERROR.value,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `error_code`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L245** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L246** <code>        return result.to_dict()</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L247** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L248** <code>    def _validate_inputs(self, eval_task: EvaluationTask) -&gt; Dict[str, Any]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L249** <code>        errors = []</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `errors`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L250** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L251** <code>        resources = eval_task.resources or {}</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `resources`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L252** <code>        if resources:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L253** <code>            gpus = resources.get(&quot;gpus&quot;)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `gpus`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L254** <code>            if gpus is not None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L255** <code>                try:</code>
+  - 语法与作用：异常控制语法；捕获、重新抛出或清理异常。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L256** <code>                    gpus_int = int(gpus)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `gpus_int`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L257** <code>                    if gpus_int &lt; 1:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L258** <code>                        errors.append(&quot;resources.gpus must be &gt;= 1&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `errors.append`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L259** <code>                except (TypeError, ValueError):</code>
+  - 语法与作用：异常控制语法；捕获、重新抛出或清理异常。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L260** <code>                    errors.append(&quot;resources.gpus must be an integer&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `errors.append`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L261** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L262** <code>        if eval_task.use_reference_cache and not eval_task.uuid:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L263** <code>            errors.append(&quot;UUID is required when use_reference_cache is True&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `errors.append`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L264** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L265** <code>        ref_valid, ref_error = _validate_code(eval_task.reference_code, eval_task.entry_point)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_valid, ref_error`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L266** <code>        if not ref_valid:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L267** <code>            errors.append(f&quot;Reference code validation failed: {ref_error}&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `errors.append`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L268** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L269** <code>        kernel_entry_point = f&quot;{eval_task.entry_point}New&quot;</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_entry_point`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L270** <code>        kernel_valid, kernel_error = _validate_code(eval_task.kernel_code, kernel_entry_point)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_valid, kernel_error`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L271** <code>        if not kernel_valid:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L272** <code>            errors.append(f&quot;Kernel code validation failed: {kernel_error}&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `errors.append`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L273** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L274** <code>        return {</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L275** <code>            &quot;valid&quot;: len(errors) == 0,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `"valid": len(errors)`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L276** <code>            &quot;errors&quot;: errors,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L277** <code>            &quot;reference&quot;: {&quot;valid&quot;: ref_valid, &quot;error&quot;: ref_error, &quot;entry_point&quot;: eval_task.entry_point},</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L278** <code>            &quot;kernel&quot;: {&quot;valid&quot;: kernel_valid, &quot;error&quot;: kernel_error, &quot;entry_point&quot;: kernel_entry_point},</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L279** <code>            &quot;cache&quot;: {&quot;use_reference_cache&quot;: eval_task.use_reference_cache, &quot;uuid&quot;: eval_task.uuid},</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L280** <code>            &quot;resources&quot;: resources,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L281** <code>        }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L282** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L283** <code>    def _persist_result(self, eval_task: EvaluationTask, result: Dict[str, Any]) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L284** <code>        if not settings.save_eval_results:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L285** <code>            return</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L286** <code>        try:</code>
+  - 语法与作用：异常控制语法；捕获、重新抛出或清理异常。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L287** <code>            path = Path(settings.eval_results_path)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `path`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L288** <code>            path.parent.mkdir(parents=True, exist_ok=True)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `path.parent.mkdir(parents`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L289** <code>            payload = {</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `payload`，可能创建任务字段或局部状态。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L290** <code>                &quot;timestamp&quot;: datetime.now(timezone.utc).isoformat(),</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `"timestamp": datetime.now`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L291** <code>                &quot;task_id&quot;: eval_task.task_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L292** <code>                &quot;base_task_id&quot;: eval_task.task_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L293** <code>                &quot;toolkit&quot;: eval_task.toolkit,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L294** <code>                &quot;backend&quot;: eval_task.backend,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L295** <code>                &quot;result&quot;: result,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L296** <code>            }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L297** <code>            with path.open(&quot;a&quot;, encoding=&quot;utf-8&quot;) as handle:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时执行清理。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L298** <code>                handle.write(json.dumps(payload) + &quot;\n&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `handle.write`，产生返回值或副作用。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L299** <code>        except Exception:</code>
+  - 语法与作用：异常控制语法；捕获、重新抛出或清理异常。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+- **L300** <code>            return</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：`POST /evaluate` 选择 kernelbench 后执行；模块导入时定义类，request 到来时执行对应异步方法。
+
+### 20.2 `kernelbench_helpers.py`：任务配对与结果合并
+源码：`kernelgym/workflow/kernelbench_helpers.py`；逐行范围 1–127，执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。。
+
+- **L1** <code>&quot;&quot;&quot;KernelBench workflow helpers (server-side orchestration utilities).&quot;&quot;&quot;</code>
+  - 语法与作用：文档字符串；保存模块/类/函数说明，不改变业务控制流。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L2** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L3** <code>from __future__ import annotations</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L4** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L5** <code>from typing import Any, Optional, Tuple</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L6** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L7** <code>from .kernelbench_types import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并绑定名称，失败会阻止服务启动。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L8** <code>    EvaluationTask,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L9** <code>    KernelEvaluationResult,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L10** <code>    KernelEvaluationTask,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L11** <code>    EvaluationResult,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L12** <code>    ReferenceTimingResult,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L13** <code>    ReferenceTimingTask,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L14** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L15** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L16** <code>_reference_cache: Any = None</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `_reference_cache: Any`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L17** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L18** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L19** <code>def set_reference_cache(cache: Any) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L20** <code>    &quot;&quot;&quot;Register a reference cache provider used by workflow orchestration.&quot;&quot;&quot;</code>
+  - 语法与作用：文档字符串；保存模块/类/函数说明，不改变业务控制流。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L21** <code>    global _reference_cache</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L22** <code>    _reference_cache = cache</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `_reference_cache`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L23** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L24** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L25** <code>def _get_cached_reference_runtime(</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L26** <code>    uuid: Optional[str], reference_code: str, is_valid: bool</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L27** <code>) -&gt; Optional[float]:</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L28** <code>    if _reference_cache is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L29** <code>        return None</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L30** <code>    return _reference_cache.get(uuid, reference_code, is_valid)</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L31** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L32** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L33** <code>def _validate_code(code: str, entry_point: str = &quot;Model&quot;) -&gt; Tuple[bool, str]:</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L34** <code>    try:</code>
+  - 语法与作用：异常控制语法；捕获、重新抛出或清理异常。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L35** <code>        if not code:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L36** <code>            return False, &quot;Code is required&quot;</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L37** <code>        if f&quot;class {entry_point}&quot; not in code:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L38** <code>            return False, f&quot;Code must contain a &#x27;{entry_point}&#x27; class&quot;</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L39** <code>        return True, &quot;&quot;</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L40** <code>    except Exception as exc:</code>
+  - 语法与作用：异常控制语法；捕获、重新抛出或清理异常。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L41** <code>        return False, f&quot;Code validation error: {exc}&quot;</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L42** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L43** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L44** <code>def _create_paired_tasks(</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L45** <code>    task: EvaluationTask,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L46** <code>) -&gt; Tuple[Optional[ReferenceTimingTask], KernelEvaluationTask]:</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L47** <code>    ref_device = task.device_preference or task.device</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `ref_device`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L48** <code>    kernel_device = task.device</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_device`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L49** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L50** <code>    reference_task: Optional[ReferenceTimingTask] = None</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_task: Optional[ReferenceTimingTask]`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L51** <code>    if task.use_reference_cache and task.uuid:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L52** <code>        cached_runtime = _get_cached_reference_runtime(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `cached_runtime`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L53** <code>            task.uuid, task.reference_code, task.is_valid</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L54** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L55** <code>        if cached_runtime is None:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L56** <code>            reference_task = ReferenceTimingTask(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_task`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L57** <code>                task_id=f&quot;{task.task_id}_ref&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `task_id`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L58** <code>                base_task_id=task.task_id,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `base_task_id`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L59** <code>                reference_code=task.reference_code,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_code`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L60** <code>                toolkit=task.toolkit,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `toolkit`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L61** <code>                backend_adapter=task.backend_adapter,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `backend_adapter`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L62** <code>                backend=task.backend,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `backend`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L63** <code>                num_perf_trials=task.num_perf_trials,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `num_perf_trials`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L64** <code>                timeout=task.timeout,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `timeout`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L65** <code>                device=ref_device,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `device`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L66** <code>                priority=task.priority,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `priority`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L67** <code>                entry_point=task.entry_point,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `entry_point`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L68** <code>                reference_backend=task.reference_backend,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_backend`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L69** <code>                device_preference=task.device_preference,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `device_preference`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L70** <code>                resources=task.resources,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `resources`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L71** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L72** <code>    else:</code>
+  - 语法与作用：else 分支；前面条件都不成立时执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L73** <code>        reference_task = ReferenceTimingTask(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_task`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L74** <code>            task_id=f&quot;{task.task_id}_ref&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `task_id`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L75** <code>            base_task_id=task.task_id,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `base_task_id`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L76** <code>            reference_code=task.reference_code,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_code`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L77** <code>            toolkit=task.toolkit,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `toolkit`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L78** <code>            backend_adapter=task.backend_adapter,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `backend_adapter`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L79** <code>            backend=task.backend,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `backend`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L80** <code>            num_perf_trials=task.num_perf_trials,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `num_perf_trials`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L81** <code>            timeout=task.timeout,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `timeout`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L82** <code>            device=ref_device,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `device`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L83** <code>            priority=task.priority,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `priority`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L84** <code>            entry_point=task.entry_point,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `entry_point`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L85** <code>            reference_backend=task.reference_backend,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_backend`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L86** <code>            device_preference=task.device_preference,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `device_preference`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L87** <code>            resources=task.resources,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `resources`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L88** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L89** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L90** <code>    kernel_task = KernelEvaluationTask(</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_task`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L91** <code>        task_id=f&quot;{task.task_id}_kernel&quot;,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `task_id`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L92** <code>        base_task_id=task.task_id,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `base_task_id`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L93** <code>        reference_code=task.reference_code,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `reference_code`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L94** <code>        kernel_code=task.kernel_code,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `kernel_code`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L95** <code>        toolkit=task.toolkit,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `toolkit`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L96** <code>        backend_adapter=task.backend_adapter,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `backend_adapter`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L97** <code>        backend=task.backend,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `backend`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L98** <code>        num_correct_trials=task.num_correct_trials,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `num_correct_trials`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L99** <code>        num_perf_trials=task.num_perf_trials,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `num_perf_trials`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L100** <code>        timeout=task.timeout,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `timeout`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L101** <code>        device=kernel_device,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `device`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L102** <code>        priority=task.priority,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `priority`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L103** <code>        entry_point=task.entry_point,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `entry_point`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L104** <code>        device_preference=task.device_preference,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `device_preference`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L105** <code>        enable_profiling=task.enable_profiling,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `enable_profiling`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L106** <code>        enable_triton_detection=task.enable_triton_detection,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `enable_triton_detection`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L107** <code>        measure_performance=task.measure_performance,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `measure_performance`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L108** <code>        run_correctness=task.run_correctness,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_correctness`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L109** <code>        run_triton_detection=task.run_triton_detection,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_triton_detection`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L110** <code>        run_performance=task.run_performance,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `run_performance`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L111** <code>        resources=task.resources,</code>
+  - 语法与作用：赋值语法；计算右侧表达式并绑定/更新 `resources`，可能创建任务字段或局部状态。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L112** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L113** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L114** <code>    return reference_task, kernel_task</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L115** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L116** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L117** <code>def _combine_results(</code>
+  - 语法与作用：定义语法；创建类或函数对象；函数体只有被调用时才执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L118** <code>    reference_result: ReferenceTimingResult,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L119** <code>    kernel_result: KernelEvaluationResult,</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L120** <code>) -&gt; EvaluationResult:</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L121** <code>    if reference_result.base_task_id != kernel_result.base_task_id:</code>
+  - 语法与作用：条件分支；计算布尔条件，决定缩进块是否执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L122** <code>        raise ValueError(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，终止当前正常路径。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L123** <code>            f&quot;Task ID mismatch: {reference_result.base_task_id} != {kernel_result.base_task_id}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L124** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L125** <code>    return EvaluationResult.from_paired_results(</code>
+  - 语法与作用：return；结束当前函数并把结果返回调用者。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L126** <code>        reference_result.base_task_id, reference_result, kernel_result</code>
+  - 语法与作用：普通 Python 表达式；在当前 workflow 作用域求值并按对象语义执行。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+- **L127** <code>    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：由 `KernelBenchWorkflowController` 调用；缓存、代码校验、任务构造和结果合并按请求条件执行。
+
+
+### 20.3 拆分边界说明
+
+跨文件拆分时，源码区间之间的空行与装饰器已移动到各自所属的附录：async engine 边界行见 `03`/`04`，trainer 边界行见 `06`/`08`，FSDP 装饰器见 `11`。
+
+
+---
+
+**导航**：[上一附录](12-agent-environment.md) · [附录目录](index.md) · [附录目录](index.md)

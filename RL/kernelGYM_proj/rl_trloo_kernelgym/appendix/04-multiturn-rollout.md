@@ -1,0 +1,3365 @@
+# 多轮 rollout：生成、agent loop 与 postprocess
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+### 15.5 async multi-turn rollout：实际执行函数
+源码文件：`drkernel/kernel/workers/rollout/vllm_rollout/vllm_async_engine.py`。以下保留指定范围内的每一行；`空行` 和 `注释` 也列出，分别标记为无运行时效果和不执行。以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+
+#### 原始行 1451–1804
+- **L1451** 源码：<code>    async def _process_single_turn(</code>
+  - 语法与作用：函数定义语法；声明 `_process_single_turn` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1452** 源码：<code>        self,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1453** 源码：<code>        req: MultiTurnRequest,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1454** 源码：<code>        request_id: str,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1455** 源码：<code>        sampling_params: dict,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1456** 源码：<code>        agent,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1457** 源码：<code>        env,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1458** 源码：<code>        is_validate: bool,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1459** 源码：<code>        uuid: str,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1460** 源码：<code>        entry_point: str,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1461** 源码：<code>        ground_truth: str,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1462** 源码：<code>        global_step: int = 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1463** 源码：<code>        tool_as_user: bool = True,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1464** 源码：<code>        actual_max_turns: int = None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1465** 源码：<code>    ) -&gt; tuple[str | None, str | None, float, float, bool, bool, float, dict, list[int], list[float], list[int], dict]:</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1466** 源码：<code>        &quot;&quot;&quot;Process a single conversation turn.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1467** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1468** 源码：<code>        Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1469** 源码：<code>            req: The agent request containing conversation state.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1470** 源码：<code>            sampling_params: Sampling parameters for generation.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1471** 源码：<code>            is_validate: Whether the request is from validation.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1472** 源码：<code>            global_step: Current global step for logging.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1473** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1474** 源码：<code>        Returns:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1475** 源码：<code>            Tuple of (</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1476** 源码：<code>                model_response: str | None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1477** 源码：<code>                tool_response: str | None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1478** 源码：<code>                model_time: float,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1479** 源码：<code>                env_time: float,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1480** 源码：<code>                turn_done: bool,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1481** 源码：<code>                turn_truncate: bool,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1482** 源码：<code>                turn_reward: float,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1483** 源码：<code>                turn_info: dict,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1484** 源码：<code>                model_response_token_ids: list[int],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1485** 源码：<code>                model_logprobs: list[float],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1486** 源码：<code>                prompt_token_ids: list[int],  # the actual prompt ids used for this turn</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1487** 源码：<code>                env_state: dict,  # environment state for this turn</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1488** 源码：<code>            ).</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1489** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1490** 源码：<code>        current_turn = req.get_num_turns()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_turn`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1491** 源码：<code>        update_memory = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `update_memory`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1492** 源码：<code>        skip_env = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `skip_env`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1493** 源码：<code>        response_truncation = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_truncation`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1494** 源码：<code>        make_up_tool_response = False # makeup user response firstly</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `make_up_tool_response`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1495** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1496** 源码：<code>        if self.per_turn_prompts is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1497** 源码：<code>            messages = req.messages</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1498** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1499** 源码：<code>            current_prompt_config = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_prompt_config`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1500** 源码：<code>            for prompt_name, prompt_config in self.per_turn_prompts.items():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1501** 源码：<code>                condition_expr = prompt_config[&quot;condition&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `condition_expr`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1502** 源码：<code>                if eval(condition_expr):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1503** 源码：<code>                    current_prompt_config = prompt_config</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_prompt_config`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1504** 源码：<code>                    break</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1505** 源码：<code>            if current_prompt_config is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1506** 源码：<code>                messages = req.messages</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1507** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1508** 源码：<code>                history_mode = current_prompt_config[&quot;history_mode&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `history_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1509** 源码：<code>                update_memory = current_prompt_config[&quot;update_memory&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `update_memory`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1510** 源码：<code>                skip_env_prob = current_prompt_config[&quot;skip_env&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `skip_env_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1511** 源码：<code>                assert skip_env_prob &gt;= 0.0 and skip_env_prob &lt;= 1.0, &quot;skip_env_prob must be between 0 and 1&quot;</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1512** 源码：<code>                skip_env = random.random() &lt; skip_env_prob</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `skip_env`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1513** 源码：<code>                response_truncation = current_prompt_config[&quot;response_truncation&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_truncation`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1514** 源码：<code>                prompt_template = current_prompt_config[&quot;template&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt_template`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1515** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1516** 源码：<code>                print(f&quot;Prompt Template: {prompt_template}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1517** 源码：<code>                </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1518** 源码：<code>                if history_mode == &quot;all&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1519** 源码：<code>                    messages = req.messages</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1520** 源码：<code>                elif history_mode.startswith(&quot;initial+recent&quot;):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1521** 源码：<code>                    suffix = history_mode[len(&quot;initial+recent&quot;) :]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `suffix`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1522** 源码：<code>                    recent_count = int(suffix)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `recent_count`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1523** 源码：<code>                    if len(req.messages) &gt; recent_count + 1:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1524** 源码：<code>                        messages = req.messages[:1] + req.messages[-recent_count:]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1525** 源码：<code>                    else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1526** 源码：<code>                        messages = req.messages</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1527** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1528** 源码：<code>                    raise ValueError(f&quot;Invalid history mode: {history_mode}&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1529** 源码：<code>                if prompt_template is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1530** 源码：<code>                    if not tool_as_user:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1531** 源码：<code>                        if current_turn == 0 and messages[-1][&quot;role&quot;] == &quot;user&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1532** 源码：<code>                            messages[-1][&quot;content&quot;] = f&#x27;{messages[-1][&quot;content&quot;]}\n\n{prompt_template}&#x27;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1533** 源码：<code>                        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1534** 源码：<code>                            messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt_template})</code>
+  - 语法与作用：函数/构造器调用语法；调用 `messages.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1535** 源码：<code>                    else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1536** 源码：<code>                        print(&quot;tool_as_user is True&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1537** 源码：<code>                        if current_turn &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1538** 源码：<code>                            assert messages[-1][&quot;role&quot;] == &quot;user&quot;, &quot;The last message should be a user turn&quot;</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1539** 源码：<code>                            feedback = messages[-1][&quot;content&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `feedback`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1540** 源码：<code>                            #TODO: weiliu: please check the prompt template format and write in config yaml file</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1541** 源码：<code>                            env_feedback_with_prompt = prompt_template.format(feedback=feedback)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `env_feedback_with_prompt`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1542** 源码：<code>                            print(f&quot;env_feedback_with_prompt: {env_feedback_with_prompt}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1543** 源码：<code>                            # messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: env_feedback_with_prompt})</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1544** 源码：<code>                            messages[-1][&quot;content&quot;] = env_feedback_with_prompt</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1545** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1546** 源码：<code>        prompt_ids = self.tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=True)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1547** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1548** 源码：<code>        # Prepare parameters</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1549** 源码：<code>        # Respect both model length limit and configured response length</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1550** 源码：<code>        max_tokens = min(max(1, self.max_model_len - len(prompt_ids)), self.config.rollout.response_length)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_tokens`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1551** 源码：<code>        if max_tokens == 1:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1552** 源码：<code>            print(f&quot;[debug] prompt overlong, max_tokens: {max_tokens}, prompt length: {len(prompt_ids)}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1553** 源码：<code>            return (</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1554** 源码：<code>                # placeholder, will not be used in loss computation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1555** 源码：<code>                &quot;&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1556** 源码：<code>                None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1557** 源码：<code>                0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1558** 源码：<code>                0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1559** 源码：<code>                True,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1560** 源码：<code>                False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1561** 源码：<code>                0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1562** 源码：<code>                {&quot;finish_type&quot;: FinishReasonTypeEnum.LENGTH, &quot;error&quot;: &quot;Prompt Overlong&quot;},</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1563** 源码：<code>                [],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1564** 源码：<code>                [],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1565** 源码：<code>                prompt_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1566** 源码：<code>                {},  # empty env_state</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1567** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1568** 源码：<code>        params = dict(sampling_params)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `params`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1569** 源码：<code>        params[&quot;logprobs&quot;] = 1  # Always get logprobs</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `params["logprobs"]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1570** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1571** 源码：<code>        # Create prompt and parameters</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1572** 源码：<code>        prompt = TokensPrompt(prompt_token_ids=prompt_ids)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1573** 源码：<code>        llm_params = SamplingParams(max_tokens=max_tokens, **params)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `llm_params`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1574** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1575** 源码：<code>        # Add a timer here</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1576** 源码：<code>        agent_start_time = asyncio.get_event_loop().time()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `agent_start_time`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1577** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1578** 源码：<code>        # Qian: sometimes async will be very slow, we add a timeout here</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1579** 源码：<code>        async_timeout = self._compute_adaptive_timeout(max_tokens=max_tokens, is_validate=is_validate)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `async_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1580** 源码：<code>        if async_timeout is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1581** 源码：<code>            total_timeout = async_timeout + self.env_max_timeout + 5.0  # add buffer for env step</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1582** 源码：<code>            self.request_deadlines[request_id] = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.request_deadlines[request_id]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1583** 源码：<code>                &quot;deadline&quot;: asyncio.get_event_loop().time() + total_timeout,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1584** 源码：<code>                &quot;global_step&quot;: global_step,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1585** 源码：<code>            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1586** 源码：<code>            logging.debug(f&quot;Request {request_id} deadline extended by {total_timeout:.2f}s&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1587** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1588** 源码：<code>        if async_timeout is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1589** 源码：<code>            outputs = self.engine.generate(prompt=prompt, sampling_params=llm_params, request_id=request_id)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `outputs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1590** 源码：<code>            async for res in outputs:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1591** 源码：<code>                results = res</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1592** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1593** 源码：<code>            try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1594** 源码：<code>                results = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1595** 源码：<code>                async with vllm_timeout(async_timeout):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1596** 源码：<code>                    async for res in self.engine.generate(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1597** 源码：<code>                        prompt=prompt, sampling_params=llm_params, request_id=request_id</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1598** 源码：<code>                    ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1599** 源码：<code>                        results = res</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `results`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1600** 源码：<code>            except asyncio.TimeoutError:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1601** 源码：<code>                # This block will now execute correctly when the timeout is reached.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1602** 源码：<code>                print(f&quot;Request {request_id}: Timed out after {async_timeout} seconds. The task will be abandoned.&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1603** 源码：<code>                if self.logfire_logger:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1604** 源码：<code>                    self.logfire_logger.warning(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.logfire_logger.warning`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1605** 源码：<code>                        f&quot;Request timeout (asyncio) | request_id: {request_id} | step {global_step}&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1606** 源码：<code>                        request_id=request_id,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `request_id`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1607** 源码：<code>                        global_step=global_step,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `global_step`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1608** 源码：<code>                        timeout_seconds=async_timeout,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `timeout_seconds`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1609** 源码：<code>                        total_timeout=total_timeout,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_timeout`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1610** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1611** 源码：<code>                # Try aborting the request cleanly</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1612** 源码：<code>                await self.engine.abort(request_id)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1613** 源码：<code>                self.clear_request_tracking(request_id)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.clear_request_tracking`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1614** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1615** 源码：<code>                finish_reason = FinishReasonTypeEnum.ASYNC_TIMEOUT</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `finish_reason`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1616** 源码：<code>                return (</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1617** 源码：<code>                    # placeholder, will not be used in loss computation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1618** 源码：<code>                    None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1619** 源码：<code>                    None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1620** 源码：<code>                    async_timeout,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1621** 源码：<code>                    0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1622** 源码：<code>                    True,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1623** 源码：<code>                    False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1624** 源码：<code>                    0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1625** 源码：<code>                    {&quot;finish_type&quot;: finish_reason, &quot;error&quot;: &quot;LLM generation timeout&quot;},</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1626** 源码：<code>                    [],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1627** 源码：<code>                    [],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1628** 源码：<code>                    prompt_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1629** 源码：<code>                    {},  # empty env_state</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1630** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1631** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1632** 源码：<code>        if results is None or results.outputs[0].finish_reason == &quot;abort&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1633** 源码：<code>            # This can happen if the request was aborted due to timeout</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1634** 源码：<code>            finish_reason = FinishReasonTypeEnum.ASYNC_TIMEOUT</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `finish_reason`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1635** 源码：<code>            return (</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1636** 源码：<code>                # placeholder, will not be used in loss computation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1637** 源码：<code>                None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1638** 源码：<code>                None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1639** 源码：<code>                async_timeout if async_timeout is not None else 0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1640** 源码：<code>                0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1641** 源码：<code>                True,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1642** 源码：<code>                False,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1643** 源码：<code>                0.0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1644** 源码：<code>                {&quot;finish_type&quot;: finish_reason, &quot;error&quot;: &quot;LLM generation aborted&quot;},</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1645** 源码：<code>                [],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1646** 源码：<code>                [],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1647** 源码：<code>                prompt_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1648** 源码：<code>                {},  # empty env_state</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1649** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1650** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1651** 源码：<code>        # Extract content and token IDs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1652** 源码：<code>        output = results.outputs[0]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `output`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1653** 源码：<code>        response = output.text</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1654** 源码：<code>        response_token_ids = output.token_ids</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_token_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1655** 源码：<code>        agent_end_time = asyncio.get_event_loop().time()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `agent_end_time`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1656** 源码：<code>        agent_spend_time = agent_end_time - agent_start_time</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `agent_spend_time`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1657** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1658** 源码：<code>        # Update token rate history</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1659** 源码：<code>        self._record_generation_stats(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._record_generation_stats`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1660** 源码：<code>            output_tokens=len(response_token_ids),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `output_tokens`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1661** 源码：<code>            generation_time=agent_spend_time,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `generation_time`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1662** 源码：<code>            is_validate=is_validate,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_validate`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1663** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1664** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1665** 源码：<code>        # Agent thought generation, usually it is very fast and deterministic</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1666** 源码：<code>        agent_result = await agent.generate_thought_and_action(response_token_ids, response_truncation)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `agent_result`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1667** 源码：<code>        # Unpack agent result</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1668** 源码：<code>        #TODO weiliu: handle the agent done case, here I think we could just assign the max turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1669** 源码：<code>        model_response, model_response_token_ids, action, agent_done, agent_info = agent_result</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1670** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1671** 源码：<code>        # Extract logprobs efficiently</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1672** 源码：<code>        model_logprobs = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `model_logprobs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1673** 源码：<code>        if output.logprobs:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1674** 源码：<code>            for i in range(len(model_response_token_ids)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1675** 源码：<code>                token_id = model_response_token_ids[i]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `token_id`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1676** 源码：<code>                model_logprobs.append(output.logprobs[i].get(token_id).logprob)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `model_logprobs.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1677** 源码：<code>        assert len(model_response_token_ids) == len(model_logprobs), &quot;Mismatch in token IDs and logprobs length&quot;</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1678** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1679** 源码：<code>        #TODO: weiliu: In kernel agent, every turn is defined as a complete code generation turn.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1680** 源码：<code>        # if agent_done:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1681** 源码：<code>            # If the agent is done, skip environment step</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1682** 源码：<code>            # return (</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1683** 源码：<code>            #     model_response,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1684** 源码：<code>            #     None,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1685** 源码：<code>            #     agent_spend_time,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1686** 源码：<code>            #     0.0,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1687** 源码：<code>            #     agent_done,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1688** 源码：<code>            #     False,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1689** 源码：<code>            #     0.0,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1690** 源码：<code>            #     agent_info,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1691** 源码：<code>            #     model_response_token_ids,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1692** 源码：<code>            #     model_logprobs,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1693** 源码：<code>            #     prompt_ids,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1694** 源码：<code>            # )</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1695** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1696** 源码：<code>        # if skip_env:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1697** 源码：<code>        #     return (</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1698** 源码：<code>        #         model_response,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1699** 源码：<code>        #         None,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1700** 源码：<code>        #         agent_spend_time,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1701** 源码：<code>        #         0.0,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1702** 源码：<code>        #         False,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1703** 源码：<code>        #         False,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1704** 源码：<code>        #         0.0,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1705** 源码：<code>        #         {},</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1706** 源码：<code>        #         model_response_token_ids,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1707** 源码：<code>        #         model_logprobs,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1708** 源码：<code>        #         prompt_ids,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1709** 源码：<code>        #     )</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1710** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1711** 源码：<code>        # Environment step (if action is None, just skip)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1712** 源码：<code>        env_start_time = asyncio.get_event_loop().time()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `env_start_time`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1713** 源码：<code>        #TODO: weiliu, here we leverage our own reward manager to compute the reward (kernelserver)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1714** 源码：<code>        #TODO: To unify the kernelclient into the agent env</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1715** 源码：<code>        # env_result = await env.step(action)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1716** 源码：<code>        # env_result = await self.reward_fn.score_raw_responses_async(</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1717** 源码：<code>        #     [model_response],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1718** 源码：<code>        #     [ground_truth],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1719** 源码：<code>        #     [data_source],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1720** 源码：<code>        #     [extra_info],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1721** 源码：<code>        # )</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1722** 源码：<code>        reward_kwargs = {&quot;response_length&quot;: max_tokens}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_kwargs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1723** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1724** 源码：<code>        # Use run_in_executor to run sync reward_fn in async context</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1725** 源码：<code>        reward_fn = self.val_reward_fn if is_validate else self.reward_fn</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_fn`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1726** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1727** 源码：<code>        loop = asyncio.get_running_loop()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loop`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1728** 源码：<code>        env_result = await loop.run_in_executor(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `env_result`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1729** 源码：<code>            None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1730** 源码：<code>            lambda: reward_fn(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1731** 源码：<code>                model_response_token_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1732** 源码：<code>                model_response,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1733** 源码：<code>                ground_truth,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1734** 源码：<code>                entry_point,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1735** 源码：<code>                uuid,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1736** 源码：<code>                return_full_state=True,</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1737** 源码：<code>                **reward_kwargs,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1738** 源码：<code>            ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1739** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1740** 源码：<code>        env_end_time = asyncio.get_event_loop().time()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `env_end_time`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1741** 源码：<code>        env_spend_time = env_end_time - env_start_time</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `env_spend_time`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1742** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1743** 源码：<code>        # Unpack environment result</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1744** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1745** 源码：<code>        #TODO: weiliu: change the env results and change returns of kernel clients</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1746** 源码：<code>        # tool_response, env_done, truncate, turn_reward, tool_info = env_result</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1747** 源码：<code>        env_state = env_result[&quot;env_state&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `env_state`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1748** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1749** 源码：<code>        try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1750** 源码：<code>            tool_response_json = json.dumps(env_state, ensure_ascii=False, indent=2)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tool_response_json`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1751** 源码：<code>        except Exception:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1752** 源码：<code>            tool_response_json = str(env_state)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tool_response_json`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1753** 源码：<code>        tool_response = tool_response_json</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tool_response`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1754** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1755** 源码：<code>        make_up_tool_response = True    # makeup tool response secondly</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `make_up_tool_response`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1756** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1757** 源码：<code>        current_prompt_config = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_prompt_config`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1758** 源码：<code>        for prompt_name, prompt_config in self.per_turn_prompts.items():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1759** 源码：<code>            if prompt_name == &quot;tool_response&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1760** 源码：<code>                current_prompt_config = prompt_config</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_prompt_config`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1761** 源码：<code>                break</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1762** 源码：<code>        if current_prompt_config is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1763** 源码：<code>            history_mode = current_prompt_config[&quot;history_mode&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `history_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1764** 源码：<code>            update_memory = current_prompt_config[&quot;update_memory&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `update_memory`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1765** 源码：<code>            skip_env_prob = current_prompt_config[&quot;skip_env&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `skip_env_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1766** 源码：<code>            current_prompt_template = current_prompt_config[&quot;template&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_prompt_template`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1767** 源码：<code>            </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1768** 源码：<code>            if current_prompt_template is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1769** 源码：<code>                tool_response = current_prompt_template.format(feedback=tool_response)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tool_response`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1770** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1771** 源码：<code>                print(f&quot;tool_response: {tool_response}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1772** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1773** 源码：<code>        # Extract scalar reward from reward_tensor (sum of all token-level rewards)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1774** 源码：<code>        reward_tensor = env_result[&quot;reward_tensor&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1775** 源码：<code>        if isinstance(reward_tensor, torch.Tensor):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1776** 源码：<code>            turn_reward = float(reward_tensor.sum().item())</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_reward`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1777** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1778** 源码：<code>            turn_reward = float(reward_tensor)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_reward`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1779** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1780** 源码：<code>        tool_info = env_result[&quot;reward_extra_info&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tool_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1781** 源码：<code>        truncate = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `truncate`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1782** 源码：<code>        # Check if we&#x27;ve reached max_agent_turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1783** 源码：<code>        # current_turn is 0-indexed before this turn completes, so +1 for actual turn count</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1784** 源码：<code>        current_turn_count = req.get_num_turns() + 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_turn_count`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1785** 源码：<code>        # env_done = current_turn_count &gt;= self.max_agent_turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1786** 源码：<code>        env_done = current_turn_count &gt;= actual_max_turns</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `env_done`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1787** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1788** 源码：<code>        print(f&quot;Env Result: {env_result}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1789** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1790** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1791** 源码：<code>        return (</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1792** 源码：<code>            model_response,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1793** 源码：<code>            tool_response,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1794** 源码：<code>            agent_spend_time,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1795** 源码：<code>            env_spend_time,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1796** 源码：<code>            env_done,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1797** 源码：<code>            truncate,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1798** 源码：<code>            turn_reward,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1799** 源码：<code>            tool_info,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1800** 源码：<code>            model_response_token_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1801** 源码：<code>            model_logprobs,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1802** 源码：<code>            prompt_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1803** 源码：<code>            env_state,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1804** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+
+#### 原始行 1806–2104
+- **L1806** 源码：<code>    async def _async_agent_loop(</code>
+  - 语法与作用：函数定义语法；声明 `_async_agent_loop` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1807** 源码：<code>        self,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1808** 源码：<code>        messages: list[dict[str, Any]],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1809** 源码：<code>        tokens,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1810** 源码：<code>        sampling_params: dict,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1811** 源码：<code>        is_validate: bool,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1812** 源码：<code>        global_step: int = 0,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1813** 源码：<code>        extra_info: dict = None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1814** 源码：<code>        ground_truth: str = None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1815** 源码：<code>        entry_point: str = None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1816** 源码：<code>        uuid: str = None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1817** 源码：<code>        actual_max_turns: int = None,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1818** 源码：<code>        **kwargs,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1819** 源码：<code>    ) -&gt; AgentLoopOutput:</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1820** 源码：<code>        &quot;&quot;&quot;Run the full agent loop for multi-turn conversation.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1821** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1822** 源码：<code>        Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1823** 源码：<code>            messages: List of conversation messages.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1824** 源码：<code>            sampling_params: Sampling parameters for generation.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1825** 源码：<code>            timeout: Maximum time in seconds to wait for operations (default: 60s).</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1826** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1827** 源码：<code>        Returns:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1828** 源码：<code>            AgentLoopOutput object with the final result.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1829** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1830** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1831** 源码：<code>        # Create new agent and environment instances for this request based on configuration</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1832** 源码：<code>        agent = create_agent(self.agent_type, self.tokenizer)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `agent`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1833** 源码：<code>        # env = create_environment(self.env_type, self.max_agent_turns, extra_info)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1834** 源码：<code>        env = create_environment(self.env_type, actual_max_turns, extra_info)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `env`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1835** 源码：<code>        await env.reset(extra_info)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1836** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1837** 源码：<code>        # Initialize agent request</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1838** 源码：<code>        req = MultiTurnRequest(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `req`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1839** 源码：<code>            messages=messages,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1840** 源码：<code>            response_token_ids=[],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_token_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1841** 源码：<code>            response_turns=[],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1842** 源码：<code>            mask_void_turn=self.mask_void_turn,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `mask_void_turn`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1843** 源码：<code>            extra_info=extra_info or {},</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1844** 源码：<code>            ground_truth=ground_truth,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ground_truth`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1845** 源码：<code>            entry_point=entry_point,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entry_point`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1846** 源码：<code>            uuid=uuid,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuid`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1847** 源码：<code>            # stats will be initialized with default values from MultiTurnStats</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1848** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1849** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1850** 源码：<code>        # Track rewards and turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1851** 源码：<code>        turn_rewards = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_rewards`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1852** 源码：<code>        turn_speedups = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_speedups`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1853** 源码：<code>        turn_correctness = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_correctness`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1854** 源码：<code>        done = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `done`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1855** 源码：<code>        truncated = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `truncated`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1856** 源码：<code>        finish_reason_type = FinishReasonTypeEnum.STOP</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `finish_reason_type`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1857** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1858** 源码：<code>        # Store all collected logprobs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1859** 源码：<code>        all_logprobs = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_logprobs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1860** 源码：<code>        # Store actual per-turn prompts and responses</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1861** 源码：<code>        all_turn_prompts = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_turn_prompts`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1862** 源码：<code>        all_turn_responses = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_turn_responses`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1863** 源码：<code>        all_turn_lengths = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_turn_lengths`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1864** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1865** 源码：<code>        request_id = uuid4().hex</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `request_id`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1866** 源码：<code>        logging_message = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `logging_message`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1867** 源码：<code>        turn_infos = []  # Store turn_info for each turn</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_infos`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1868** 源码：<code>        request_start_time = asyncio.get_event_loop().time()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `request_start_time`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1869** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1870** 源码：<code>        # Request tracking is handled when deadline is set in _process_single_turn</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1871** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1872** 源码：<code>        # Run the multi-turn interaction loop</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1873** 源码：<code>        while not done and req.get_num_turns() &lt; actual_max_turns:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1874** 源码：<code>            # Process a single turn with timeout</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1875** 源码：<code>            turn_result = await self._process_single_turn(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_result`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1876** 源码：<code>                # (Qian): we have benchmarked the deepcopy cost and it is good for now</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1877** 源码：<code>                # Weiliu: We return env state here to compare speedup among different turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1878** 源码：<code>                deepcopy(req),</code>
+  - 语法与作用：函数/构造器调用语法；调用 `deepcopy`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1879** 源码：<code>                request_id,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1880** 源码：<code>                sampling_params,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1881** 源码：<code>                agent,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1882** 源码：<code>                env,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1883** 源码：<code>                is_validate,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1884** 源码：<code>                uuid,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1885** 源码：<code>                entry_point,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1886** 源码：<code>                ground_truth,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1887** 源码：<code>                global_step,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1888** 源码：<code>                actual_max_turns = actual_max_turns,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actual_max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1889** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1890** 源码：<code>            (</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1891** 源码：<code>                model_response,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1892** 源码：<code>                tool_response,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1893** 源码：<code>                model_time,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1894** 源码：<code>                env_step_time,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1895** 源码：<code>                turn_done,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1896** 源码：<code>                turn_truncate,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1897** 源码：<code>                turn_reward,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1898** 源码：<code>                turn_info,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1899** 源码：<code>                model_response_token_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1900** 源码：<code>                model_logprobs,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1901** 源码：<code>                prompt_token_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1902** 源码：<code>                turn_env_state,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1903** 源码：<code>            ) = turn_result</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1904** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1905** 源码：<code>            # (TODO) Qian: only when there is something wrong we get None response (e.g. async timeout)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1906** 源码：<code>            if model_response is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1907** 源码：<code>                return None</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1908** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1909** 源码：<code>            req.add_message(message=model_response, is_tool_call=False, response_token_ids=model_response_token_ids)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `req.add_message`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1910** 源码：<code>            logging_message.append(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `logging_message.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1911** 源码：<code>                f&quot;Turn {req.get_num_turns()} | Model time: {model_time:.2f}s | Model Response: {model_response} &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1912** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1913** 源码：<code>            #TODO: weiliu: here I think we should append user turn with profiler info</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1914** 源码：<code>            if tool_response is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1915** 源码：<code>                req.add_message(message=tool_response, is_tool_call=True)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `req.add_message`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1916** 源码：<code>                logging_message.append(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `logging_message.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1917** 源码：<code>                    f&quot;Turn {req.get_num_turns()} | Env time: {env_step_time:.2f}s | Tool Response: {tool_response} &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1918** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1919** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1920** 源码：<code>            # Always store turn_info (reward_extra_info), even if tool_response is None</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1921** 源码：<code>            # When tool_response is None (timeout/error), turn_info contains error details</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1922** 源码：<code>            turn_infos.append(turn_info if turn_info is not None else {})</code>
+  - 语法与作用：函数/构造器调用语法；调用 `turn_infos.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1923** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1924** 源码：<code>            # Track cache hits/misses</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1925** 源码：<code>            if tool_response is not None and &quot;from_cache&quot; in turn_info:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1926** 源码：<code>                if turn_info[&quot;from_cache&quot;]:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1927** 源码：<code>                    req.stats.cache_hits += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `req.stats.cache_hits +`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1928** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1929** 源码：<code>                    req.stats.cache_misses += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `req.stats.cache_misses +`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1930** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1931** 源码：<code>            # Store per-turn actual prompt/response/logprobs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1932** 源码：<code>            all_turn_prompts.append(prompt_token_ids)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_turn_prompts.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1933** 源码：<code>            all_turn_responses.append(model_response_token_ids)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_turn_responses.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1934** 源码：<code>            all_logprobs.append(model_logprobs)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_logprobs.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1935** 源码：<code>            all_turn_lengths.append(len(model_response_token_ids))</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_turn_lengths.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1936** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1937** 源码：<code>            # Check if we got an error response</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1938** 源码：<code>            # if turn_done and &quot;error&quot; in turn_info:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1939** 源码：<code>            #     logging.warning(f&quot;Turn ended with error: {turn_info[&#x27;error&#x27;]}&quot;)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1940** 源码：<code>            #     finish_reason_type = FinishReasonTypeEnum.from_str(turn_info.get(&quot;finish_type&quot;, &quot;error&quot;))</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1941** 源码：<code>            #     break</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1942** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1943** 源码：<code>            turn_rewards.append(turn_reward)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `turn_rewards.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1944** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1945** 源码：<code>            # speedup</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1946** 源码：<code>            if &quot;speedup&quot; in turn_env_state:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1947** 源码：<code>                turn_speedups.append(turn_env_state[&quot;speedup&quot;])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `turn_speedups.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1948** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1949** 源码：<code>                turn_speedups.append(0.0)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `turn_speedups.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1950** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1951** 源码：<code>            if &quot;correctness&quot; in turn_env_state and &quot;decoy_kernel&quot; in turn_env_state:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1952** 源码：<code>                turn_correctness.append(turn_env_state[&quot;correctness&quot;] and not turn_env_state[&quot;decoy_kernel&quot;])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `turn_correctness.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1953** 源码：<code>            elif &quot;correctness&quot; in turn_env_state:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1954** 源码：<code>                logging.warning(f&quot;Decoy kernel is not found in turn env state: {turn_env_state}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1955** 源码：<code>                turn_correctness.append(turn_env_state[&quot;correctness&quot;])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `turn_correctness.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1956** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1957** 源码：<code>                logging.warning(f&quot;Correctness is not found in turn env state: {turn_env_state}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1958** 源码：<code>                turn_correctness.append(False)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `turn_correctness.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1959** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1960** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1961** 源码：<code>            done = turn_done</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `done`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1962** 源码：<code>            truncated = turn_truncate</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `truncated`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1963** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1964** 源码：<code>            # Determine finish reason</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1965** 源码：<code>            if done:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1966** 源码：<code>                if &quot;finish_type&quot; in turn_info:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1967** 源码：<code>                    try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1968** 源码：<code>                        finish_reason_type = FinishReasonTypeEnum.from_str(turn_info[&quot;finish_type&quot;])</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `finish_reason_type`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1969** 源码：<code>                    except ValueError:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1970** 源码：<code>                        logging.warning(f&quot;Unknown finish_type: {turn_info[&#x27;finish_type&#x27;]}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1971** 源码：<code>                        finish_reason_type = FinishReasonTypeEnum.STOP</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `finish_reason_type`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1972** 源码：<code>                elif truncated:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1973** 源码：<code>                    finish_reason_type = FinishReasonTypeEnum.LENGTH</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `finish_reason_type`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1974** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1975** 源码：<code>        logging_message.append(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `logging_message.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1976** 源码：<code>            f&quot;Finalizing after {req.get_num_turns()} turns. Finish reason: {finish_reason_type.value}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1977** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1978** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1979** 源码：<code>        # resolve multi-turn rewards according to turn speedups</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1980** 源码：<code>        finlized_turn_rewards = self._resolve_multi_turn_rewards(turn_rewards, turn_speedups, turn_correctness)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `finlized_turn_rewards`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1981** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1982** 源码：<code>        # Finalize the agent request</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1983** 源码：<code>        final_output = agent.finalize(req, finlized_turn_rewards, finish_reason_type.value)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `final_output`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1984** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1985** 源码：<code>        # Build per-turn outputs using actual prompts/responses collected during the loop</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1986** 源码：<code>        multi_prompt_ids = all_turn_prompts</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_prompt_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1987** 源码：<code>        multi_response_ids = all_turn_responses</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_response_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1988** 源码：<code>        multi_logprobs = all_logprobs</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_logprobs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1989** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1990** 源码：<code>        # # Compute scalar reward with reward_fn only for the last turn; others set to 0.0</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1991** 源码：<code>        # response_ids_for_reward = [multi_response_ids[-1]]</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1992** 源码：<code>        # Concatenate all response ids for reward</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1993** 源码：<code>        response_ids_for_reward = [[item for sublist in multi_response_ids for item in sublist]]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_ids_for_reward`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1994** 源码：<code>        response_strs = self.tokenizer.batch_decode(response_ids_for_reward, skip_special_tokens=True)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_strs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1995** 源码：<code>        ground_truths = [extra_info[&#x27;ground_truth&#x27;]]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ground_truths`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1996** 源码：<code>        data_sources = [extra_info[&#x27;data_source&#x27;]]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data_sources`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1997** 源码：<code>        extra_infos = [extra_info[&#x27;extra_info&#x27;]]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_infos`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1998** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L1999** 源码：<code>        if self.use_async_reward:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2000** 源码：<code>            # We&#x27;ve already computed the rewards in _process_single_turn</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2001** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2002** 源码：<code>            # weiliu: shape: [turn_num, 1]</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2003** 源码：<code>            multi_rewards = finlized_turn_rewards</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_rewards`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2004** 源码：<code>            multi_reward_extra_info = turn_infos</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_reward_extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2005** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2006** 源码：<code>            # if is_validate:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2007** 源码：<code>            #     return_multi_output = MultiTurnOutput(</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2008** 源码：<code>            #         multi_prompt_ids=[multi_prompt_ids[-1]],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2009** 源码：<code>            #         multi_response_ids=[multi_response_ids[-1]],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2010** 源码：<code>            #         multi_logprobs=[multi_logprobs[-1]],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2011** 源码：<code>            #         multi_loss_mask=[final_output[&quot;loss_mask&quot;][-1]],  # Last turn only</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2012** 源码：<code>            #         multi_rewards=[reward_result[&quot;scores&quot;][0]],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2013** 源码：<code>            #         stats=final_output[&quot;stats&quot;],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2014** 源码：<code>            #         request_id=request_id,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2015** 源码：<code>            #         messages=final_output[&quot;messages&quot;],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2016** 源码：<code>            #         multi_reward_extra_info=[reward_result[&quot;extra_info&quot;]],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2017** 源码：<code>            #     )</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2018** 源码：<code>            # else:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2019** 源码：<code>                # fill only on last turn row per sample, others 0.0</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2020** 源码：<code>            # multi_rewards = []</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2021** 源码：<code>            # for turn_idx, turn_length in enumerate(all_turn_lengths):</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2022** 源码：<code>            #     single_rewards = [0.0] * (turn_length - 1) + [finlized_turn_rewards[turn_idx]]</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2023** 源码：<code>            #     multi_rewards.extend(single_rewards)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2024** 源码：<code>                </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2025** 源码：<code>            # multi_reward_extra_info = []</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2026** 源码：<code>            # for turn_idx, turn_length in enumerate(all_turn_lengths):</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2027** 源码：<code>            #     single_extra_info = [{}] * (turn_length - 1) + [turn_infos[turn_idx]]</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2028** 源码：<code>            #     multi_reward_extra_info.extend(single_extra_info)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2029** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2030** 源码：<code>            return_multi_output = MultiTurnOutput(</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2031** 源码：<code>                multi_prompt_ids=multi_prompt_ids,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_prompt_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2032** 源码：<code>                multi_response_ids=multi_response_ids,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_response_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2033** 源码：<code>                multi_logprobs=multi_logprobs,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_logprobs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2034** 源码：<code>                multi_loss_mask=final_output[&quot;loss_mask&quot;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_loss_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2035** 源码：<code>                multi_rewards=multi_rewards,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_rewards`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2036** 源码：<code>                stats=final_output[&quot;stats&quot;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `stats`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2037** 源码：<code>                request_id=request_id,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `request_id`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2038** 源码：<code>                messages=final_output[&quot;messages&quot;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2039** 源码：<code>                multi_reward_extra_info=multi_reward_extra_info,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_reward_extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2040** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2041** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2042** 源码：<code>            raise NotImplementedError(&quot;We only support async reward for multi-turn rewards&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2043** 源码：<code>            # if is_validate:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2044** 源码：<code>            #     return_multi_output = MultiTurnOutput(</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2045** 源码：<code>            #         multi_prompt_ids=[multi_prompt_ids[-1]],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2046** 源码：<code>            #         multi_response_ids=[multi_response_ids[-1]],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2047** 源码：<code>            #         multi_logprobs=[multi_logprobs[-1]],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2048** 源码：<code>            #         multi_loss_mask=[final_output[&quot;loss_mask&quot;][-1]],  # Last turn only</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2049** 源码：<code>            #         stats=final_output[&quot;stats&quot;],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2050** 源码：<code>            #         request_id=request_id,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2051** 源码：<code>            #         messages=final_output[&quot;messages&quot;],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2052** 源码：<code>            #     )</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2053** 源码：<code>            # else:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2054** 源码：<code>                # fill only on last turn row per sample, others 0.0</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2055** 源码：<code>                # return_multi_output = MultiTurnOutput(</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2056** 源码：<code>                #     multi_prompt_ids=multi_prompt_ids,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2057** 源码：<code>                #     multi_response_ids=multi_response_ids,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2058** 源码：<code>                #     multi_logprobs=multi_logprobs,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2059** 源码：<code>                #     multi_loss_mask=final_output[&quot;loss_mask&quot;],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2060** 源码：<code>                #     stats=final_output[&quot;stats&quot;],</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2061** 源码：<code>                #     request_id=request_id,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2062** 源码：<code>                # )</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2063** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2064** 源码：<code>        # Calculate total request time</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2065** 源码：<code>        total_request_time = asyncio.get_event_loop().time() - request_start_time</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total_request_time`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2066** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2067** 源码：<code>        # Check with the shared tracker if this is the slowest request</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2068** 源码：<code>        is_slowest = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_slowest`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2069** 源码：<code>        if self.slowest_tracker is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2070** 源码：<code>            try:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2071** 源码：<code>                update_ref = self.slowest_tracker.update_slowest_time.remote(total_request_time, global_step)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `update_ref`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2072** 源码：<code>                is_slowest = await asyncio.wait_for(asyncio.shield(update_ref), timeout=self.slowest_tracker_timeout)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_slowest`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2073** 源码：<code>            except asyncio.TimeoutError:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2074** 源码：<code>                is_slowest = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_slowest`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2075** 源码：<code>                logging.debug(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2076** 源码：<code>                    &quot;Slowest tracker update timed out after %.2fs, skipping slowest-request logging.&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2077** 源码：<code>                    self.slowest_tracker_timeout,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2078** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2079** 源码：<code>            except Exception as e:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2080** 源码：<code>                logging.debug(f&quot;Failed to update slowest tracker: {e}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2081** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2082** 源码：<code>        # Different logging probability for validation and training</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2083** 源码：<code>        log_probability = 0.02 if is_validate else 0.005  # 1% for both validation and training</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `log_probability`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2084** 源码：<code>        should_log = is_slowest or random.random() &lt; log_probability</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `should_log`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2085** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2086** 源码：<code>        # Log if it&#x27;s the slowest or randomly sampled</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2087** 源码：<code>        if should_log:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2088** 源码：<code>            self.log_multiturn_messages(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.log_multiturn_messages`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2089** 源码：<code>                step=global_step,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `step`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2090** 源码：<code>                request_id=request_id,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `request_id`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2091** 源码：<code>                logging_messages=logging_message,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `logging_messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2092** 源码：<code>                turn_rewards=turn_rewards,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_rewards`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2093** 源码：<code>                turn_infos=turn_infos,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_infos`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2094** 源码：<code>                stats=final_output[&quot;stats&quot;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `stats`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2095** 源码：<code>                finish_reason=finish_reason_type.value,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `finish_reason`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2096** 源码：<code>                multi_turn_output=return_multi_output,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_output`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2097** 源码：<code>                is_slowest=is_slowest,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_slowest`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2098** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2099** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2100** 源码：<code>        # Remove request from active set and deadline tracking when done</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2101** 源码：<code>        self.clear_request_tracking(request_id)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.clear_request_tracking`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2102** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2103** 源码：<code>        # Create agent loop output - using the collected logprobs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2104** 源码：<code>        return return_multi_output</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+
+#### 原始行 2135–2338
+- **L2135** 源码：<code>    async def generate_sequences(self, prompts: DataProto, **kwargs) -&gt; DataProto:</code>
+  - 语法与作用：函数定义语法；声明 `generate_sequences` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2136** 源码：<code>        do_sample = prompts.meta_info.get(&quot;do_sample&quot;, True)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `do_sample`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2137** 源码：<code>        is_validate = prompts.meta_info.get(&quot;validate&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_validate`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2138** 源码：<code>        global_step = prompts.meta_info.get(&quot;global_step&quot;, 0)  # Extract global_step for logfire</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `global_step`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2139** 源码：<code>        tgt_device = prompts.batch[&quot;input_ids&quot;].device</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tgt_device`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2140** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2141** 源码：<code>        # Support multiple sampling for both training and validation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2142** 源码：<code>        if is_validate:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2143** 源码：<code>            # For validation, use a separate config for number of samples</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2144** 源码：<code>            val_n_samples = self.config.rollout.get(&quot;val_n_samples&quot;, 1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `val_n_samples`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2145** 源码：<code>            prompts = prompts.repeat(repeat_times=val_n_samples, interleave=True)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompts`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2146** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2147** 源码：<code>            prompts = prompts.repeat(repeat_times=self.config.rollout.n, interleave=True)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompts`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2148** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2149** 源码：<code>        config = self.config.rollout</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `config`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2150** 源码：<code>        sampling_params = dict(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sampling_params`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2151** 源码：<code>            temperature=config.temperature,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `temperature`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2152** 源码：<code>            top_p=config.top_p,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `top_p`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2153** 源码：<code>            repetition_penalty=1.0,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `repetition_penalty`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2154** 源码：<code>            logprobs=1,  # Ensure logprobs are collected</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `logprobs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2155** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2156** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2157** 源码：<code>        # override sampling params for validation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2158** 源码：<code>        if prompts.meta_info.get(&quot;validate&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2159** 源码：<code>            sampling_params[&quot;top_p&quot;] = config.val_kwargs.top_p</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sampling_params["top_p"]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2160** 源码：<code>            sampling_params[&quot;temperature&quot;] = config.val_kwargs.temperature</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sampling_params["temperature"]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2161** 源码：<code>            # actual_max_turns = config.val_kwargs.get(&#x27;max_user_turns&#x27;, self.max_agent_turns)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2162** 源码：<code>            # actual_max_turns = prompts.meta_info.get(&quot;actual_max_turns&quot;, self.max_agent_turns)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2163** 源码：<code>        </code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2164** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2165** 源码：<code>        stop_token_ids = config.stop_token_ids</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `stop_token_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2166** 源码：<code>        if stop_token_ids is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2167** 源码：<code>            sampling_params[&quot;stop_token_ids&quot;] = list(stop_token_ids)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sampling_params["stop_token_ids"]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2168** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2169** 源码：<code>        actual_max_turns = self.max_agent_turns</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actual_max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2170** 源码：<code>        if is_validate:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2171** 源码：<code>            val_stop_token_ids = config.val_kwargs.stop_token_ids</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `val_stop_token_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2172** 源码：<code>            if val_stop_token_ids is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2173** 源码：<code>                sampling_params[&quot;stop_token_ids&quot;] = list(val_stop_token_ids)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sampling_params["stop_token_ids"]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2174** 源码：<code>            actual_max_turns = config.val_kwargs.get(&#x27;max_user_turns&#x27;, self.max_agent_turns)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actual_max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2175** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2176** 源码：<code>        print(f&quot;Actual max turns: {actual_max_turns}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2177** 源码：<code>        print(&quot;stop_token_ids: &quot;, sampling_params[&quot;stop_token_ids&quot;])</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2178** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2179** 源码：<code>        raw_prompts = prompts.non_tensor_batch[&quot;raw_prompt&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `raw_prompts`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2180** 源码：<code>        tokens_ids = prompts.non_tensor_batch[&quot;raw_prompt_ids&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tokens_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2181** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2182** 源码：<code>        ground_truths = prompts.non_tensor_batch.get(&quot;ground_truth&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ground_truths`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2183** 源码：<code>        entry_points = prompts.non_tensor_batch.get(&quot;entry_point&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entry_points`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2184** 源码：<code>        uuids = prompts.non_tensor_batch.get(&quot;uuid&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2185** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2186** 源码：<code>        # CRITICAL: Ensure uuids are strings to pass Pydantic validation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2187** 源码：<code>        # Convert any integer/numeric uuids to strings</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2188** 源码：<code>        if uuids is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2189** 源码：<code>            if isinstance(uuids, np.ndarray):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2190** 源码：<code>                uuids = [str(u) for u in uuids]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2191** 源码：<code>            elif isinstance(uuids, list):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2192** 源码：<code>                uuids = [str(u) for u in uuids]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2193** 源码：<code>            elif not isinstance(uuids, (list, tuple)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2194** 源码：<code>                # Handle scalar case</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2195** 源码：<code>                uuids = [str(uuids)]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2196** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2197** 源码：<code>        # Handle None values by extracting from reward_model or extra_info</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2198** 源码：<code>        batch_size = len(raw_prompts)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_size`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2199** 源码：<code>        if ground_truths is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2200** 源码：<code>            ground_truths = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ground_truths`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2201** 源码：<code>            for i in range(batch_size):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2202** 源码：<code>                if &quot;reward_model&quot; in prompts.non_tensor_batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2203** 源码：<code>                    rm = prompts.non_tensor_batch[&quot;reward_model&quot;][i]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rm`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2204** 源码：<code>                    if isinstance(rm, str):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2205** 源码：<code>                        rm = json.loads(rm)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rm`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2206** 源码：<code>                    ground_truths.append(rm.get(&quot;ground_truth&quot;, &quot;&quot;))</code>
+  - 语法与作用：函数/构造器调用语法；调用 `ground_truths.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2207** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2208** 源码：<code>                    ground_truths.append(&quot;&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `ground_truths.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2209** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2210** 源码：<code>        if entry_points is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2211** 源码：<code>            entry_points = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entry_points`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2212** 源码：<code>            extra_info_list = prompts.non_tensor_batch.get(&quot;extra_info&quot;, [{}] * batch_size)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_info_list`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2213** 源码：<code>            for i in range(batch_size):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2214** 源码：<code>                if extra_info_list is not None and i &lt; len(extra_info_list) and extra_info_list[i]:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2215** 源码：<code>                    # entry_points.append(extra_info_list[i].get(&quot;entry_point&quot;, infer_entry_point(ground_truths[i])))</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2216** 源码：<code>                    entry_points.append(extra_info_list[i].get(&quot;entry_point&quot;, &quot;Model&quot;))</code>
+  - 语法与作用：函数/构造器调用语法；调用 `entry_points.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2217** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2218** 源码：<code>                    # entry_points.append(infer_entry_point(ground_truths[i]))</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2219** 源码：<code>                    entry_points.append(&quot;Model&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `entry_points.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2220** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2221** 源码：<code>        if uuids is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2222** 源码：<code>            uuids = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uuids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2223** 源码：<code>            extra_info_list = prompts.non_tensor_batch.get(&quot;extra_info&quot;, [{}] * batch_size)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_info_list`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2224** 源码：<code>            for i in range(batch_size):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2225** 源码：<code>                if extra_info_list is not None and i &lt; len(extra_info_list) and extra_info_list[i]:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2226** 源码：<code>                    uuids.append(extra_info_list[i].get(&quot;uuid&quot;) or extra_info_list[i].get(&quot;problem_id&quot;) or uuid4().hex)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `uuids.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2227** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2228** 源码：<code>                    uuids.append(uuid4().hex)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `uuids.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2229** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2230** 源码：<code>        # Extract uid from non_tensor_batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2231** 源码：<code>        uids = prompts.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2232** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2233** 源码：<code>        tasks = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `tasks`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2234** 源码：<code>        for i, (messages, tokens, ground_truth, entry_point, uuid) in enumerate(zip(raw_prompts, tokens_ids, ground_truths, entry_points, uuids)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2235** 源码：<code>            # Extract prompt-dependent extra_info</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2236** 源码：<code>            if self.env_type == &quot;MathSandboxEnv&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2237** 源码：<code>                extra_info = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2238** 源码：<code>                    &#x27;ground_truth&#x27;: prompts[i].non_tensor_batch[&#x27;reward_model&#x27;][&#x27;ground_truth&#x27;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2239** 源码：<code>                    &#x27;data_source&#x27;: prompts[i].non_tensor_batch[&#x27;data_source&#x27;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2240** 源码：<code>                    &#x27;extra_info&#x27;: prompts[i].non_tensor_batch.get(&quot;extra_info&quot;, None),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2241** 源码：<code>                }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2242** 源码：<code>            elif self.env_type == &quot;CodeSandboxEnv&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2243** 源码：<code>                if isinstance(prompts[i].non_tensor_batch[&quot;reward_model&quot;], str):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2244** 源码：<code>                    ground_truth = json.loads(prompts[i].non_tensor_batch[&quot;reward_model&quot;])[&quot;ground_truth&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ground_truth`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2245** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2246** 源码：<code>                    ground_truth = prompts[i].non_tensor_batch[&quot;reward_model&quot;][&quot;ground_truth&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ground_truth`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2247** 源码：<code>                extra_info = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2248** 源码：<code>                    &#x27;ground_truth&#x27;: ground_truth,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2249** 源码：<code>                    &#x27;data_source&#x27;: prompts[i].non_tensor_batch[&#x27;data_source&#x27;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2250** 源码：<code>                    &#x27;extra_info&#x27;: prompts[i].non_tensor_batch.get(&quot;extra_info&quot;, None),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2251** 源码：<code>                }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2252** 源码：<code>            elif self.env_type == &quot;FileSearchEnv&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2253** 源码：<code>                # provide root dir for file search</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2254** 源码：<code>                extra_info = {&quot;root_dir&quot;: self.config.env.root_dir}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2255** 源码：<code>            elif self.env_type == &quot;SWEFileLocationEnv&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2256** 源码：<code>                # provide root dir for file search</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2257** 源码：<code>                extra_info = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2258** 源码：<code>                    &quot;root_dir&quot;: self.config.env.root_dir,  # In SWEFileLocationEnv, root_dir is the where we place all github repos</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2259** 源码：<code>                    &quot;repo&quot;: prompts[i].non_tensor_batch[&#x27;reward_model&#x27;][&#x27;repo&#x27;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2260** 源码：<code>                    &quot;base_commit&quot;: prompts[i].non_tensor_batch[&#x27;reward_model&#x27;][&#x27;base_commit&#x27;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2261** 源码：<code>                }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2262** 源码：<code>            elif self.env_type == &quot;KernelEnv&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2263** 源码：<code>                # For Kernel training, extract ground_truth from reward_model</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2264** 源码：<code>                if &quot;reward_model&quot; in prompts[i].non_tensor_batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2265** 源码：<code>                    rm = prompts[i].non_tensor_batch[&quot;reward_model&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rm`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2266** 源码：<code>                    if isinstance(rm, str):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2267** 源码：<code>                        rm = json.loads(rm)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rm`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2268** 源码：<code>                    gt = rm.get(&quot;ground_truth&quot;, ground_truth)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gt`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2269** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2270** 源码：<code>                    gt = ground_truth</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gt`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2271** 源码：<code>                extra_info = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2272** 源码：<code>                    &#x27;ground_truth&#x27;: gt,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2273** 源码：<code>                    &#x27;data_source&#x27;: prompts[i].non_tensor_batch.get(&#x27;data_source&#x27;, &#x27;kernel&#x27;),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2274** 源码：<code>                    &#x27;extra_info&#x27;: prompts[i].non_tensor_batch.get(&quot;extra_info&quot;, {}),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2275** 源码：<code>                }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2276** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2277** 源码：<code>                raise ValueError(f&quot;Unsupported environment type: {self.env_type}&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2278** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2279** 源码：<code>            if not isinstance(messages, list):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2280** 源码：<code>                messages = messages.tolist()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2281** 源码：<code>            tasks.append(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `tasks.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2282** 源码：<code>                asyncio.create_task(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `asyncio.create_task`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2283** 源码：<code>                    self._async_agent_loop(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._async_agent_loop`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2284** 源码：<code>                        messages, tokens, sampling_params, is_validate, global_step, extra_info, ground_truth, entry_point, uuid, actual_max_turns, **kwargs</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2285** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2286** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2287** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2288** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2289** 源码：<code>        outputs = await asyncio.gather(*tasks)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `outputs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2290** 源码：<code>        # filter out None of outputs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2291** 源码：<code>        if None in outputs:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2292** 源码：<code>            # for training, we remove the whole group if one of the outputs is None</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2293** 源码：<code>            if not is_validate:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2294** 源码：<code>                # if one of the outputs is None, we need to filter out the corresponding prompts and uids</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2295** 源码：<code>                removed_uids = {uids[i] for i, output in enumerate(outputs) if output is None}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `removed_uids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2296** 源码：<code>                removed_indices = set()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `removed_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2297** 源码：<code>                # remove from all responses if the uids match</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2298** 源码：<code>                for i in range(len(outputs)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2299** 源码：<code>                    if uids[i] in removed_uids:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2300** 源码：<code>                        removed_indices.add(i)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `removed_indices.add`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2301** 源码：<code>                keep_indices = [i for i in range(len(outputs)) if i not in removed_indices]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `keep_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2302** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2303** 源码：<code>                if self.logfire_logger:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2304** 源码：<code>                    self.logfire_logger.warning(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.logfire_logger.warning`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2305** 源码：<code>                        f&quot;Some training requests returned None output, possibly due to timeouts or errors. Keeped responses ({len(keep_indices)} / {len(outputs)}) &quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2306** 源码：<code>                        global_step=global_step,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `global_step`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2307** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2308** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2309** 源码：<code>                filtered_outputs = [outputs[i] for i in keep_indices]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `filtered_outputs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2310** 源码：<code>                filtered_uids = [uids[i] for i in keep_indices]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `filtered_uids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2311** 源码：<code>                assert None not in filtered_outputs, &quot;Filtered outputs should not contain None&quot;</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2312** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2313** 源码：<code>                uids = np.array(filtered_uids)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2314** 源码：<code>                outputs = filtered_outputs</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `outputs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2315** 源码：<code>            # for validation, we just keep the valid outputs, and add placeholder responses for None outputs to avoid</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2316** 源码：<code>            # over-estimating the validation performance</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2317** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2318** 源码：<code>                placeholder_number = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `placeholder_number`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2319** 源码：<code>                for i in range(len(outputs)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2320** 源码：<code>                    if outputs[i] is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2321** 源码：<code>                        # create a placeholder MultiTurnOutput with empty content</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2322** 源码：<code>                        placeholder_output = MultiTurnOutput(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `placeholder_output`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2323** 源码：<code>                            multi_prompt_ids=[1],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_prompt_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2324** 源码：<code>                            multi_response_ids=[1],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_response_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2325** 源码：<code>                            multi_logprobs=[1.0],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_logprobs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2326** 源码：<code>                            multi_loss_mask=[1],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_loss_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2327** 源码：<code>                            stats=MultiTurnStats(),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `stats`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2328** 源码：<code>                            request_id=f&quot;placeholder_{i}&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `request_id`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2329** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2330** 源码：<code>                        outputs[i] = placeholder_output</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `outputs[i]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2331** 源码：<code>                        placeholder_number += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `placeholder_number +`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2332** 源码：<code>                if self.logfire_logger:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2333** 源码：<code>                    self.logfire_logger.warning(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.logfire_logger.warning`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2334** 源码：<code>                        f&quot;Some validation requests returned None output, possibly due to timeouts or errors. Replaced with {placeholder_number} placeholder outputs.&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2335** 源码：<code>                        global_step=global_step,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `global_step`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2336** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2337** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2338** 源码：<code>        return self._postprocess(outputs, is_validate, uids, actual_max_turns = actual_max_turns)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+
+#### 原始行 2340–2594
+- **L2340** 源码：<code>    def _postprocess(self, inputs: list[MultiTurnOutput], is_validate: bool, uids: np.ndarray, actual_max_turns: int = None) -&gt; DataProto:</code>
+  - 语法与作用：函数定义语法；声明 `_postprocess` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2341** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2342** 源码：<code>        This function pads multi-turn data to have uniform shapes across batches, specifically:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2343** 源码：<code>        - prompt_ids as [batch_size * rollout_n * max_multi_turn, max_prompt_length]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2344** 源码：<code>        - response_ids as [batch_size * rollout_n * max_multi_turn, max_response_length]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2345** 源码：<code>        - And similar shapes for other tensors</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2346** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2347** 源码：<code>        # Skip processing if no inputs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2348** 源码：<code>        if not inputs or len(inputs) == 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2349** 源码：<code>            return None</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2350** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2351** 源码：<code>        # Get max lengths from config</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2352** 源码：<code>        max_prompt_length = self.config.rollout.prompt_length</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_prompt_length`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2353** 源码：<code>        max_response_length = self.config.rollout.response_length</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2354** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2355** 源码：<code>        # Calculate max valid turns across the batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2356** 源码：<code>        # (TODO) Qian: originally we want to use a dynamic multi_turn based on the batch, but it seems to cause some issues in training due to</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2357** 源码：<code>        # the data distribution across different ray workers. So we just use a fixed max_agent_turns for now.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2358** 源码：<code>        # if is_validate:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2359** 源码：<code>        #     max_multi_turn = 1</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2360** 源码：<code>        # else:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2361** 源码：<code>        max_multi_turn = actual_max_turns</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_multi_turn`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2362** 源码：<code>        # Flatten all turns into single collections</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2363** 源码：<code>        all_prompts = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_prompts`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2364** 源码：<code>        all_responses = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_responses`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2365** 源码：<code>        all_response_masks = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_response_masks`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2366** 源码：<code>        all_logprobs = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_logprobs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2367** 源码：<code>        all_loss_mask = []  # Per-turn loss mask from finalization</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_loss_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2368** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2369** 源码：<code>        if self.use_async_reward:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2370** 源码：<code>            all_rewards = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_rewards`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2371** 源码：<code>            all_reward_extra_info = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_reward_extra_info`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2372** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2373** 源码：<code>        # Add indices for tracking</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2374** 源码：<code>        all_sample_indices = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_sample_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2375** 源码：<code>        # (TODO) Qian: star from 1 for turn indices</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2376** 源码：<code>        all_turn_indices = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_turn_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2377** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2378** 源码：<code>        # Multi-turn statistics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2379** 源码：<code>        all_num_turns = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_num_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2380** 源码：<code>        all_contain_void_turn = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_contain_void_turn`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2381** 源码：<code>        all_finish_reasons = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_finish_reasons`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2382** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2383** 源码：<code>        # Expanded uids for multi-turn</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2384** 源码：<code>        all_uids = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_uids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2385** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2386** 源码：<code>        # Complete conversation messages for each sample (only stored once per sample)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2387** 源码：<code>        all_messages = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_messages`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2388** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2389** 源码：<code>        # Get padding token</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2390** 源码：<code>        pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pad_token_id`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2391** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2392** 源码：<code>        # Process each input sample and flatten</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2393** 源码：<code>        # The all_prompts has the following shape: batch_size * rollout_n * max_multi_turn, max_prompt_length</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2394** 源码：<code>        # [response_1_turn_1, response_1_turn_2, ..., response_1_turn_n, response_2_turn_1, ..., response_m_turn_n]</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2395** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2396** 源码：<code>        # (TODO) Qian: here we have a special handling for samples with fewer turns than max_multi_turn, we add fake padding turns first, then the actual turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2397** 源码：<code>        # This is to ensure that we can always get the last turn by indexing with -1</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2398** 源码：<code>        for sample_idx, input in enumerate[MultiTurnOutput](inputs):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2399** 源码：<code>            num_turns = len(input.multi_prompt_ids)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2400** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2401** 源码：<code>            # Add fake padding turns to ensure consistent shape for each sample</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2402** 源码：<code>            # For multi-turn, it is [LEFT] padding + actual prompt</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2403** 源码：<code>            #TODO weiliu: I think actually we do not need this but we will definitely meet </code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2404** 源码：<code>            # the issue the length of model is not enough for max_multi_turn, </code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2405** 源码：<code>            # so we need to add fake padding turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2406** 源码：<code>            for _ in range(num_turns, max_multi_turn):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2407** 源码：<code>                # Create fake prompt with padding tokens</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2408** 源码：<code>                fake_prompt = [pad_token_id] * 1  # Minimal length, will be padded later</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `fake_prompt`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2409** 源码：<code>                # Create fake response with padding tokens</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2410** 源码：<code>                fake_response = [pad_token_id] * 1  # Minimal length, will be padded later</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `fake_response`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2411** 源码：<code>                # Create fake response mask (all zeros)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2412** 源码：<code>                fake_mask = [0] * 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `fake_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2413** 源码：<code>                # Create fake logprobs (all -1.0)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2414** 源码：<code>                fake_logprobs = [-1.0] * 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `fake_logprobs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2415** 源码：<code>                # Create fake turn idx</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2416** 源码：<code>                fake_turn_idx = -1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `fake_turn_idx`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2417** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2418** 源码：<code>                all_prompts.append(fake_prompt)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_prompts.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2419** 源码：<code>                all_responses.append(fake_response)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_responses.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2420** 源码：<code>                all_response_masks.append(fake_mask)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_response_masks.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2421** 源码：<code>                all_logprobs.append(fake_logprobs)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_logprobs.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2422** 源码：<code>                all_sample_indices.append(sample_idx)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_sample_indices.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2423** 源码：<code>                all_turn_indices.append(fake_turn_idx)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_turn_indices.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2424** 源码：<code>                all_loss_mask.append(0)  # Padding turns should not contribute to loss</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_loss_mask.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2425** 源码：<code>                if self.use_async_reward:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2426** 源码：<code>                    all_rewards.append(0.0)  # Padding turns should not contribute to reward</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_rewards.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2427** 源码：<code>                    all_reward_extra_info.append({})  # Empty dict for padding turns</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_reward_extra_info.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2428** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2429** 源码：<code>                # Add stats for padding turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2430** 源码：<code>                all_num_turns.append(input.stats.num_turns)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_num_turns.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2431** 源码：<code>                all_contain_void_turn.append(input.stats.contain_void_turn)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_contain_void_turn.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2432** 源码：<code>                all_finish_reasons.append(input.stats.finish_reason)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_finish_reasons.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2433** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2434** 源码：<code>                # Add uid for padding turn</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2435** 源码：<code>                if uids is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2436** 源码：<code>                    all_uids.append(uids[sample_idx])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_uids.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2437** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2438** 源码：<code>                    all_uids.append(None)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_uids.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2439** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2440** 源码：<code>                # Add None for messages in padding turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2441** 源码：<code>                all_messages.append(None)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_messages.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2442** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2443** 源码：<code>            # Process each turn for this input</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2444** 源码：<code>            for turn_idx in range(num_turns):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2445** 源码：<code>                all_prompts.append(input.multi_prompt_ids[turn_idx])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_prompts.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2446** 源码：<code>                all_responses.append(input.multi_response_ids[turn_idx])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_responses.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2447** 源码：<code>                all_logprobs.append(input.multi_logprobs[turn_idx])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_logprobs.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2448** 源码：<code>                all_loss_mask.append(input.multi_loss_mask[turn_idx])  # Use per-turn mask from finalization</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_loss_mask.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2449** 源码：<code>                # if self.use_async_reward:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2450** 源码：<code>                assert self.use_async_reward, &quot;We only support async reward for multi-turn rewards&quot;</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2451** 源码：<code>                all_rewards.append(input.multi_rewards[turn_idx])  # Add rewards for actual turns</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_rewards.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2452** 源码：<code>                all_reward_extra_info.append(input.multi_reward_extra_info[turn_idx])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_reward_extra_info.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2453** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2454** 源码：<code>                # Sample and turn indices</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2455** 源码：<code>                all_sample_indices.append(sample_idx)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_sample_indices.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2456** 源码：<code>                all_turn_indices.append(turn_idx + 1)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_turn_indices.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2457** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2458** 源码：<code>                # Add stats for actual turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2459** 源码：<code>                all_num_turns.append(input.stats.num_turns)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_num_turns.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2460** 源码：<code>                all_contain_void_turn.append(input.stats.contain_void_turn)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_contain_void_turn.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2461** 源码：<code>                all_finish_reasons.append(input.stats.finish_reason)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_finish_reasons.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2462** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2463** 源码：<code>                # Add uid for actual turn</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2464** 源码：<code>                if uids is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2465** 源码：<code>                    all_uids.append(uids[sample_idx])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_uids.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2466** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2467** 源码：<code>                    all_uids.append(None)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_uids.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2468** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2469** 源码：<code>                # Add messages only for the first actual turn (to avoid duplication)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2470** 源码：<code>                if turn_idx == 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2471** 源码：<code>                    all_messages.append(input.messages)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_messages.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2472** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2473** 源码：<code>                    all_messages.append(None)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_messages.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2474** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2475** 源码：<code>        # Manually truncate prompts that exceed max_prompt_length</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2476** 源码：<code>        truncated_prompts = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `truncated_prompts`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2477** 源码：<code>        num_truncated = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_truncated`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2478** 源码：<code>        for i, prompt_ids in enumerate(all_prompts):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2479** 源码：<code>            if len(prompt_ids) &gt; max_prompt_length:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2480** 源码：<code>                num_truncated += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_truncated +`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2481** 源码：<code>                logging.warning(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2482** 源码：<code>                    f&quot;Prompt at index {i} exceeds max length ({len(prompt_ids)} &gt; {max_prompt_length}). &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2483** 源码：<code>                    f&quot;Truncating to {max_prompt_length} tokens.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2484** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2485** 源码：<code>                # Truncate from the left (beginning) since padding_side is left</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2486** 源码：<code>                truncated_prompts.append(prompt_ids[-max_prompt_length:])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `truncated_prompts.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2487** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2488** 源码：<code>                truncated_prompts.append(prompt_ids)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `truncated_prompts.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2489** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2490** 源码：<code>        # Pad prompts (left padding)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2491** 源码：<code>        self.tokenizer.padding_side = &quot;left&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.tokenizer.padding_side`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2492** 源码：<code>        prompt_outputs = self.tokenizer.pad(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt_outputs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2493** 源码：<code>            [{&quot;input_ids&quot;: prompt_ids} for prompt_ids in truncated_prompts],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2494** 源码：<code>            padding=&quot;max_length&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `padding`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2495** 源码：<code>            max_length=max_prompt_length,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_length`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2496** 源码：<code>            return_tensors=&quot;pt&quot;,</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2497** 源码：<code>            return_attention_mask=True,</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2498** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2499** 源码：<code>        prompt_ids = prompt_outputs[&quot;input_ids&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2500** 源码：<code>        prompt_mask = prompt_outputs[&quot;attention_mask&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2501** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2502** 源码：<code>        # Pad responses (right padding)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2503** 源码：<code>        self.tokenizer.padding_side = &quot;right&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.tokenizer.padding_side`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2504** 源码：<code>        response_outputs = self.tokenizer.pad(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_outputs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2505** 源码：<code>            [{&quot;input_ids&quot;: response_ids} for response_ids in all_responses],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2506** 源码：<code>            padding=&quot;max_length&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `padding`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2507** 源码：<code>            max_length=max_response_length,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_length`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2508** 源码：<code>            return_tensors=&quot;pt&quot;,</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2509** 源码：<code>            return_attention_mask=True,</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2510** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2511** 源码：<code>        response_ids = response_outputs[&quot;input_ids&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2512** 源码：<code>        response_mask = response_outputs[&quot;attention_mask&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2513** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2514** 源码：<code>        # Pad logprobs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2515** 源码：<code>        padded_logprobs = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `padded_logprobs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2516** 源码：<code>        for logprob in all_logprobs:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2517** 源码：<code>            padded = logprob + [-1.0] * (max_response_length - len(logprob))</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `padded`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2518** 源码：<code>            padded_logprobs.append(padded[:max_response_length])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `padded_logprobs.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2519** 源码：<code>        rollout_log_probs = torch.tensor(padded_logprobs, dtype=torch.float32, device=response_ids.device)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_log_probs`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2520** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2521** 源码：<code>        # Create combined tensors</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2522** 源码：<code>        input_ids = torch.cat([prompt_ids, response_ids], dim=1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `input_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2523** 源码：<code>        attention_mask = torch.cat([prompt_mask, response_mask], dim=1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `attention_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2524** 源码：<code>        position_ids = (attention_mask.cumsum(dim=1) - 1) * attention_mask</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `position_ids`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2525** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2526** 源码：<code>        # Create loss mask from the per-turn loss mask values</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2527** 源码：<code>        # Shape: [batch_size * rollout_n * max_multi_turn]</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2528** 源码：<code>        loss_mask = torch.tensor(all_loss_mask, dtype=torch.long, device=response_ids.device)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2529** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2530** 源码：<code>        # Create metadata tensors</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2531** 源码：<code>        turn_indices = torch.tensor(all_turn_indices, dtype=torch.long, device=response_ids.device)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2532** 源码：<code>        assert max(all_turn_indices) &lt;= max_multi_turn, &quot;Turn indices are not equal to max_multi_turn&quot;</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2533** 源码：<code>        sample_indices = torch.tensor(all_sample_indices, dtype=torch.long, device=response_ids.device)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sample_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2534** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2535** 源码：<code>        batch_dict = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_dict`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2536** 源码：<code>            &quot;prompts&quot;: prompt_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2537** 源码：<code>            &quot;responses&quot;: response_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2538** 源码：<code>            &quot;response_mask&quot;: response_mask,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2539** 源码：<code>            &quot;input_ids&quot;: input_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2540** 源码：<code>            &quot;attention_mask&quot;: attention_mask,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2541** 源码：<code>            &quot;position_ids&quot;: position_ids,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2542** 源码：<code>            &quot;rollout_log_probs&quot;: rollout_log_probs,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2543** 源码：<code>            &quot;turn_indices&quot;: turn_indices,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2544** 源码：<code>            &quot;sample_indices&quot;: sample_indices,   # note: do not use this for any aggregation metrics. Use uid instead.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2545** 源码：<code>            # Loss mask for filtered turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2546** 源码：<code>            &quot;loss_mask&quot;: loss_mask,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2547** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2548** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2549** 源码：<code>        if self.use_async_reward:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2550** 源码：<code>            # Build reward tensor from scalar rewards computed in _async_agent_loop via reward_fn</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2551** 源码：<code>            reward_tensor = torch.zeros_like(response_ids, dtype=torch.float32)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2552** 源码：<code>            reward_extra_info_list = [{} for _ in range(len(reward_tensor))]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info_list`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2553** 源码：<code>            valid_response_length = attention_mask[:, prompt_ids.shape[1] :].sum(dim=-1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `valid_response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2554** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2555** 源码：<code>            # Determine last actual turn row index for each sample (ignore padding turns)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2556** 源码：<code>            # last_row_of_sample = {}</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2557** 源码：<code>            valid_row_indices = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `valid_row_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2558** 源码：<code>            s_t_format = &quot;{sampe_idx}_{turn_idx}&quot;</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `s_t_format`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2559** 源码：<code>            for row_idx, (s_idx, t_idx) in enumerate(zip(all_sample_indices, all_turn_indices)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2560** 源码：<code>                if t_idx != -1:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2561** 源码：<code>                    valid_row_indices[s_t_format.format(sampe_idx=s_idx, turn_idx=t_idx)] = row_idx</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2562** 源码：<code>            # Assign reward only for the last turn of each sample at its last valid token</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2563** 源码：<code>            for row_idx_format in valid_row_indices:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2564** 源码：<code>                row_idx = valid_row_indices[row_idx_format]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `row_idx`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2565** 源码：<code>                reward_tensor[row_idx, valid_response_length[row_idx].item() - 1] = float(all_rewards[row_idx])</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2566** 源码：<code>                assert all_reward_extra_info[row_idx] is not None and isinstance(all_reward_extra_info[row_idx], dict)</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2567** 源码：<code>                reward_extra_info_list[row_idx] = all_reward_extra_info[row_idx]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info_list[row_idx]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2568** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2569** 源码：<code>            batch_dict[&quot;token_level_scores&quot;] = reward_tensor</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_dict["token_level_scores"]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2570** 源码：<code>            reward_extra_info_array = np.array(reward_extra_info_list, dtype=object)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info_array`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2571** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2572** 源码：<code>        # Create the batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2573** 源码：<code>        batch = TensorDict(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2574** 源码：<code>            batch_dict,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2575** 源码：<code>            batch_size=len(input_ids),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_size`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2576** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2577** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2578** 源码：<code>        # Multi-turn statistics in non-tensor batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2579** 源码：<code>        non_tensor_batch = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `non_tensor_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2580** 源码：<code>            &quot;num_turns&quot;: np.array(all_num_turns, dtype=np.int32),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2581** 源码：<code>            &quot;contain_void_turn&quot;: np.array(all_contain_void_turn, dtype=np.int32),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2582** 源码：<code>            &quot;finish_reasons&quot;: np.array(all_finish_reasons, dtype=object),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2583** 源码：<code>            &quot;multiturn_messages&quot;: np.array(all_messages, dtype=object),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2584** 源码：<code>        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2585** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2586** 源码：<code>        # Add expanded uid to non_tensor_batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2587** 源码：<code>        non_tensor_batch[&quot;uid&quot;] = np.array(all_uids, dtype=object)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `non_tensor_batch["uid"]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2588** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2589** 源码：<code>        if self.use_async_reward:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2590** 源码：<code>            non_tensor_batch[&quot;reward_extra_info&quot;] = reward_extra_info_array</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `non_tensor_batch["reward_extra_info"]`，可能创建、覆盖或累加状态。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2591** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2592** 源码：<code>        print(f&quot;reward_extra_info_array: {reward_extra_info_array}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2593** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+- **L2594** 源码：<code>        return DataProto(batch=batch, non_tensor_batch=non_tensor_batch)</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：以下是 `rollout.mode=async_vllm`、`multi_turn.enable=True` 时从项目代码进入 vLLM 的实际路径；vLLM 内部生成实现不展开。
+
+
+
+#### async engine 边界行
+- **L1805** <code>&lt;空行&gt;</code>：空行；位于 `_process_single_turn()` 与 `_async_agent_loop()` 之间，不执行。
+- **L2339** <code>&lt;空行&gt;</code>：空行；位于 `generate_sequences()` 与 `_postprocess()` 之间，不执行。
+
+
+---
+
+**导航**：[上一附录](03-async-bootstrap.md) · [附录目录](index.md) · [下一附录](05-reward-pipeline.md)

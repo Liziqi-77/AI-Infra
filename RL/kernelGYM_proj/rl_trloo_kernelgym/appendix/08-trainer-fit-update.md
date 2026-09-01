@@ -1,0 +1,3738 @@
+# Trainer fit：rollout correction、奖励、TRLOO、actor、验证与 checkpoint
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+源码文件：`drkernel/kernel/kernel_trainer.py`。本篇完整覆盖该文件的 2554–3792 行：rollout correction、PPO fit 主循环、actor 更新、验证和保存。
+
+#### 原始行 2554–2697
+- **L2554** 源码：<code>    def compute_rollout_correction_and_add_to_batch(</code>
+  - 语法与作用：函数定义语法；声明 `compute_rollout_correction_and_add_to_batch` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2555** 源码：<code>        self, batch: DataProto, max_turns: int = 1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2556** 源码：<code>    ) -&gt; tuple[DataProto, dict]:</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2557** 源码：<code>        &quot;&quot;&quot;Compute IS weights and rejection mask for rollout-training policy mismatch.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2558** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2559** 源码：<code>        Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2560** 源码：<code>            batch: DataProto containing required fields:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2561** 源码：<code>                - old_log_probs: Log probabilities from training policy</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2562** 源码：<code>                - rollout_log_probs: Log probabilities from rollout policy</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2563** 源码：<code>                - response_mask: Original valid token mask (1=valid, 0=padding)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2564** 源码：<code>            max_turns: Maximum number of conversation turns (for sequence-level aggregation)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2565** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2566** 源码：<code>        Returns:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2567** 源码：<code>            Tuple of (updated_batch, metrics):</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2568** 源码：<code>                updated_batch: DataProto with:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2569** 源码：<code>                    - Modified `response_mask` (if `rollout_rs` is enabled)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2570** 源码：<code>                    - New `rollout_is_weights` (if `rollout_is` is enabled)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2571** 源码：<code>                metrics: Dictionary of mismatch/IS/rejection metrics (prefixed with &quot;mismatch/&quot;),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2572** 源码：<code>                    empty if rollout data is missing.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2573** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2574** 源码：<code>        # Skip processing if rollout_log_probs are missing (no mismatch to correct)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2575** 源码：<code>        if &quot;rollout_log_probs&quot; not in batch.batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2576** 源码：<code>            return batch, {}</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2577** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2578** 源码：<code>        # Store original mask for quality analysis</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2579** 源码：<code>        original_response_mask = batch.batch[&quot;response_mask&quot;].clone()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `original_response_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2580** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2581** 源码：<code>        rollout_rs = self.config.algorithm.get(&quot;rollout_rs&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_rs`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2582** 源码：<code>        rollout_is = self.config.algorithm.get(&quot;rollout_is&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_is`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2583** 源码：<code>        coverage_rs = self.config.reward_model.get(&quot;coverage_rs&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage_rs`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2584** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2585** 源码：<code>        # Compute IS weights and rejection mask (for log-prob mismatch)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2586** 源码：<code>        (</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2587** 源码：<code>            rollout_is_weights,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2588** 源码：<code>            modified_response_mask,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2589** 源码：<code>            rollout_metrics,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2590** 源码：<code>        ) = compute_rollout_importance_weights_and_rejection_mask(</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2591** 源码：<code>            old_log_prob=batch.batch[&quot;old_log_probs&quot;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `old_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2592** 源码：<code>            rollout_log_prob=batch.batch[&quot;rollout_log_probs&quot;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2593** 源码：<code>            response_mask=batch.batch[&quot;response_mask&quot;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2594** 源码：<code>            max_turns=max_turns,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2595** 源码：<code>            rollout_is=rollout_is,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_is`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2596** 源码：<code>            rollout_is_threshold=self.config.algorithm.get(&quot;rollout_is_kwargs&quot;, {}).get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_is_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2597** 源码：<code>                &quot;upper&quot;, None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2598** 源码：<code>            ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2599** 源码：<code>            rollout_rs=rollout_rs,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_rs`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2600** 源码：<code>            rollout_rs_threshold=self.config.algorithm.get(&quot;rollout_rs_kwargs&quot;, {}).get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_rs_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2601** 源码：<code>                &quot;upper&quot;, None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2602** 源码：<code>            ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2603** 源码：<code>            rollout_rs_threshold_lower=self.config.algorithm.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_rs_threshold_lower`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2604** 源码：<code>                &quot;rollout_rs_kwargs&quot;, {}</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2605** 源码：<code>            ).get(&quot;lower&quot;, None),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2606** 源码：<code>            rollout_token_veto_threshold=self.config.algorithm.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_token_veto_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2607** 源码：<code>                &quot;rollout_token_veto_threshold&quot;, None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2608** 源码：<code>            ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2609** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2610** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2611** 源码：<code>        # Apply coverage-based rejection sampling (only for correct samples)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2612** 源码：<code>        coverage_metrics = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2613** 源码：<code>        if coverage_rs is not None and &quot;reward_extra_info&quot; in batch.non_tensor_batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2614** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2615** 源码：<code>            # Collect coverage data from reward_extra_info</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2616** 源码：<code>            device = batch.batch[&quot;response_mask&quot;].device</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `device`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2617** 源码：<code>            batch_size = batch.batch[&quot;response_mask&quot;].shape[0] // max_turns</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_size`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2618** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2619** 源码：<code>            time_coverage_list = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `time_coverage_list`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2620** 源码：<code>            num_coverage_list = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_coverage_list`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2621** 源码：<code>            correctness_list = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness_list`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2622** 源码：<code>            performance_list = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `performance_list`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2623** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2624** 源码：<code>            for info in batch.non_tensor_batch[&quot;reward_extra_info&quot;]:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2625** 源码：<code>                time_coverage_list.append(info.get(&quot;time_coverage&quot;, 0.0))</code>
+  - 语法与作用：函数/构造器调用语法；调用 `time_coverage_list.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2626** 源码：<code>                num_coverage_list.append(info.get(&quot;num_coverage&quot;, 0.0))</code>
+  - 语法与作用：函数/构造器调用语法；调用 `num_coverage_list.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2627** 源码：<code>                # Consider both correctness and decoy_kernel for filtering</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2628** 源码：<code>                is_correct = info.get(&quot;correctness&quot;, False) and not info.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_correct`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2629** 源码：<code>                    &quot;decoy_kernel&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2630** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2631** 源码：<code>                correctness_list.append(is_correct)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `correctness_list.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2632** 源码：<code>                performance_list.append(info.get(&quot;performance&quot;, 0.0))</code>
+  - 语法与作用：函数/构造器调用语法；调用 `performance_list.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2633** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2634** 源码：<code>            # Convert to tensors with proper shapes</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2635** 源码：<code>            time_coverage = torch.tensor(time_coverage_list, device=device).reshape(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `time_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2636** 源码：<code>                batch_size, max_turns</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2637** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2638** 源码：<code>            num_coverage = torch.tensor(num_coverage_list, device=device).reshape(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2639** 源码：<code>                batch_size, max_turns</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2640** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2641** 源码：<code>            correctness = torch.tensor(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2642** 源码：<code>                correctness_list, dtype=torch.bool, device=device</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2643** 源码：<code>            )  # (batch_size * max_turns,)</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2644** 源码：<code>            performance = torch.tensor(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `performance`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2645** 源码：<code>                performance_list, dtype=torch.float32, device=device</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2646** 源码：<code>            )  # (batch_size * max_turns,)</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2647** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2648** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2649** 源码：<code>            # Apply coverage-based rejection sampling</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2650** 源码：<code>            modified_response_mask, coverage_metrics = compute_coverage_rejection_mask(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2651** 源码：<code>                time_coverage=time_coverage,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `time_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2652** 源码：<code>                num_coverage=num_coverage,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_coverage`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2653** 源码：<code>                response_mask=modified_response_mask,  # Use already-modified mask from rollout_rs</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2654** 源码：<code>                correctness=correctness,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `correctness`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2655** 源码：<code>                max_turns=max_turns,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2656** 源码：<code>                coverage_rs=coverage_rs,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage_rs`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2657** 源码：<code>                coverage_rs_key=self.config.reward_model.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage_rs_key`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2658** 源码：<code>                    &quot;coverage_rs_key&quot;, &quot;time_coverage&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2659** 源码：<code>                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2660** 源码：<code>                coverage_rs_threshold=self.config.reward_model.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage_rs_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2661** 源码：<code>                    &quot;coverage_rs_threshold&quot;, 0.3</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2662** 源码：<code>                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2663** 源码：<code>                coverage_rs_factor=self.config.reward_model.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `coverage_rs_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2664** 源码：<code>                    &quot;coverage_rs_factor&quot;, 0.1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2665** 源码：<code>                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2666** 源码：<code>                speedup=performance,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2667** 源码：<code>                speedup_threshold=self.config.reward_model.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `speedup_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2668** 源码：<code>                    &quot;speedup_threshold&quot;, None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2669** 源码：<code>                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2670** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2671** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2672** 源码：<code>        quality_metrics = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `quality_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2673** 源码：<code>        # Compute quality metrics for masked samples (only if RS is enabled and reward info available)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2674** 源码：<code>        if rollout_rs is not None and &quot;reward_extra_info&quot; in batch.non_tensor_batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2675** 源码：<code>            from kernel.metrics.mismatch_quality_metrics import (</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2676** 源码：<code>                compute_mismatch_quality_metrics,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2677** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2678** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2679** 源码：<code>            quality_metrics = compute_mismatch_quality_metrics(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `quality_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2680** 源码：<code>                batch=batch,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2681** 源码：<code>                original_response_mask=original_response_mask,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `original_response_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2682** 源码：<code>                modified_response_mask=modified_response_mask,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `modified_response_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2683** 源码：<code>                prefix=&quot;mismatch_quality&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prefix`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2684** 源码：<code>            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2685** 源码：<code>            # rollout_metrics.update(quality_metrics)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2686** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2687** 源码：<code>        if rollout_rs is not None or coverage_rs is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2688** 源码：<code>            # Update response_mask if either rollout_rs or coverage_rs is enabled</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2689** 源码：<code>            # Rejected tokens/sequences are masked to 0 — excluded from loss</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2690** 源码：<code>            batch.batch[&quot;response_mask&quot;] = modified_response_mask</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.batch["response_mask"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2691** 源码：<code>        if rollout_is is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2692** 源码：<code>            # Add IS weights to batch only if explicitly enabled (for variance reduction in loss)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2693** 源码：<code>            batch.batch[&quot;rollout_is_weights&quot;] = rollout_is_weights</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.batch["rollout_is_weights"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2694** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2695** 源码：<code>        # Merge all metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2696** 源码：<code>        all_metrics = {**rollout_metrics, **coverage_metrics}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2697** 源码：<code>        return batch, all_metrics, quality_metrics</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+
+#### 原始行 2699–3792
+- **L2699** 源码：<code>    def fit(self):</code>
+  - 语法与作用：函数定义语法；声明 `fit` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2700** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2701** 源码：<code>        The training loop of PPO.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2702** 源码：<code>        The driver process only need to call the compute functions of the worker group through RPC to construct the PPO dataflow.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2703** 源码：<code>        The light-weight advantage computation is done on the driver process.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2704** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2705** 源码：<code>        from omegaconf import OmegaConf</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2706** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2707** 源码：<code>        from verl_patch.utils.tracking import Tracking</code>
+  - 语法与作用：模块导入语法；把外部模块/名称绑定到当前模块命名空间，导入失败会在启动阶段抛异常。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2708** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2709** 源码：<code>        logger = Tracking(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `logger`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2710** 源码：<code>            project_name=self.config.trainer.project_name,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `project_name`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2711** 源码：<code>            experiment_name=self.config.trainer.experiment_name,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `experiment_name`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2712** 源码：<code>            default_backend=self.config.trainer.logger,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `default_backend`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2713** 源码：<code>            config=OmegaConf.to_container(self.config, resolve=True),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `config`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2714** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2715** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2716** 源码：<code>        self.global_steps = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.global_steps`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2717** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2718** 源码：<code>        # Initialize early stopping variables</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2719** 源码：<code>        self.best_val_score = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.best_val_score`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2720** 源码：<code>        self.val_patience_counter = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.val_patience_counter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2721** 源码：<code>        self.train_metric_history = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.train_metric_history`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2722** 源码：<code>        self.train_metric_drop_counter = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.train_metric_drop_counter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2723** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2724** 源码：<code>        # Get early stopping config - check new structure first, then fall back to old</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2725** 源码：<code>        early_stop_config = self.config.trainer.get(&quot;early_stopping&quot;, {})</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `early_stop_config`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2726** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2727** 源码：<code>        # Validation early stopping</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2728** 源码：<code>        self.val_metric = early_stop_config.get(&quot;val_metric&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.val_metric`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2729** 源码：<code>        self.val_patience = early_stop_config.get(&quot;val_patience&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.val_patience`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2730** 源码：<code>        self.val_mode = early_stop_config.get(&quot;val_mode&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.val_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2731** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2732** 源码：<code>        # Training metric early stopping</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2733** 源码：<code>        self.train_metric = early_stop_config.get(&quot;train_metric&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.train_metric`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2734** 源码：<code>        self.train_threshold = early_stop_config.get(&quot;train_threshold&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.train_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2735** 源码：<code>        self.train_window = early_stop_config.get(&quot;train_window&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.train_window`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2736** 源码：<code>        self.train_patience = early_stop_config.get(&quot;train_patience&quot;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.train_patience`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2737** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2738** 源码：<code>        # load checkpoint before doing anything</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2739** 源码：<code>        self._load_checkpoint()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._load_checkpoint`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2740** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2741** 源码：<code>        # perform validation before training</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2742** 源码：<code>        # currently, we only support validation using the reward_function.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2743** 源码：<code>        if self.val_reward_fn is not None and self.config.trainer.get(</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2744** 源码：<code>            &quot;val_before_train&quot;, True</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2745** 源码：<code>        ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2746** 源码：<code>            val_metrics = self._validate()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `val_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2747** 源码：<code>            pprint(f&quot;Initial validation metrics: {val_metrics}&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `pprint`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2748** 源码：<code>            logger.log(data=val_metrics, step=self.global_steps)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2749** 源码：<code>            # Initialize validation early stopping with first validation score</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2750** 源码：<code>            if self.val_metric and self.val_patience &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2751** 源码：<code>                if self.val_metric in val_metrics:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2752** 源码：<code>                    self.best_val_score = val_metrics[self.val_metric]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.best_val_score`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2753** 源码：<code>                    print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2754** 源码：<code>                        f&quot;Validation early stopping: Initial best score for {self.val_metric}: {self.best_val_score}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2755** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2756** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2757** 源码：<code>                    print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2758** 源码：<code>                        f&quot;Warning: Validation early stop metric &#x27;{self.val_metric}&#x27; not found in initial validation metrics&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2759** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2760** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2761** 源码：<code>            if self.config.trainer.get(&quot;val_only&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2762** 源码：<code>                return</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2763** 源码：<code>        # add tqdm</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2764** 源码：<code>        progress_bar = tqdm(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `progress_bar`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2765** 源码：<code>            total=self.total_training_steps,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `total`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2766** 源码：<code>            initial=self.global_steps,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `initial`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2767** 源码：<code>            desc=&quot;Training Progress&quot;,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `desc`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2768** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2769** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2770** 源码：<code>        # we start from step 1</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2771** 源码：<code>        self.global_steps += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.global_steps +`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2772** 源码：<code>        last_val_metrics = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `last_val_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2773** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2774** 源码：<code>        # temp buffer if we skip batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2775** 源码：<code>        buffer_batch = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `buffer_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2776** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2777** 源码：<code>        for _ in range(self.config.trainer.total_epochs):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2778** 源码：<code>            for batch_dict in self.train_dataloader:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2779** 源码：<code>                metrics = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2780** 源码：<code>                timing_raw = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `timing_raw`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2781** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2782** 源码：<code>                batch: DataProto = DataProto.from_single_dict(batch_dict)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2783** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2784** 源码：<code>                # (TODO) Qian: previously we set uid as batch_x_sample_i, but it is not unique if we have buffer.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2785** 源码：<code>                batch.non_tensor_batch[&quot;uid&quot;] = np.array(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.non_tensor_batch["uid"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2786** 源码：<code>                    [</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2787** 源码：<code>                        f&quot;batch_{self.global_steps}_example_{uuid4().hex}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2788** 源码：<code>                        for _ in range(len(batch.batch))</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2789** 源码：<code>                    ],</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2790** 源码：<code>                    dtype=object,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `dtype`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2791** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2792** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2793** 源码：<code>                metrics[&quot;batch/oversampling_batch_size&quot;] = batch.batch[</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2794** 源码：<code>                    &quot;input_ids&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2795** 源码：<code>                ].shape[0]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2796** 源码：<code>                batch_keys_to_pop = [&quot;input_ids&quot;, &quot;attention_mask&quot;, &quot;position_ids&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_keys_to_pop`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2797** 源码：<code>                non_tensor_batch_keys_to_pop = [&quot;raw_prompt_ids&quot;, &quot;uid&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `non_tensor_batch_keys_to_pop`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2798** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2799** 源码：<code>                # pop those keys for generation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2800** 源码：<code>                if &quot;multi_modal_inputs&quot; in batch.non_tensor_batch.keys():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2801** 源码：<code>                    gen_batch = batch.pop(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2802** 源码：<code>                        batch_keys=[&quot;input_ids&quot;, &quot;attention_mask&quot;, &quot;position_ids&quot;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_keys`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2803** 源码：<code>                        non_tensor_batch_keys=[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `non_tensor_batch_keys`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2804** 源码：<code>                            &quot;raw_prompt_ids&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2805** 源码：<code>                            &quot;multi_modal_data&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2806** 源码：<code>                            &quot;multi_modal_inputs&quot;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2807** 源码：<code>                        ],</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2808** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2809** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2810** 源码：<code>                    if &quot;raw_prompt&quot; in batch.non_tensor_batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2811** 源码：<code>                        non_tensor_batch_keys_to_pop.append(&quot;raw_prompt&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `non_tensor_batch_keys_to_pop.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2812** 源码：<code>                    if &quot;tools_kwargs&quot; in batch.non_tensor_batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2813** 源码：<code>                        non_tensor_batch_keys_to_pop.append(&quot;tools_kwargs&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `non_tensor_batch_keys_to_pop.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2814** 源码：<code>                    gen_batch = batch.pop(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2815** 源码：<code>                        batch_keys=batch_keys_to_pop,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_keys`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2816** 源码：<code>                        non_tensor_batch_keys=non_tensor_batch_keys_to_pop,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `non_tensor_batch_keys`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2817** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2818** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2819** 源码：<code>                    # Apply sample-level oversampling by modifying generation parameters</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2820** 源码：<code>                    target_n = self.config.actor_rollout_ref.rollout.n</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `target_n`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2821** 源码：<code>                    sample_oversampling_factor = self.config.data.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sample_oversampling_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2822** 源码：<code>                        &quot;sample_oversampling_factor&quot;, 1.0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2823** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2824** 源码：<code>                    actual_n = int(target_n * sample_oversampling_factor)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actual_n`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2825** 源码：<code>                    gen_batch.meta_info[&quot;n&quot;] = actual_n</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_batch.meta_info["n"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2826** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2827** 源码：<code>                    # Pass the oversampled n value through meta_info</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2828** 源码：<code>                    if sample_oversampling_factor != 1.0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2829** 源码：<code>                        metrics[</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2830** 源码：<code>                            &quot;batch/sample_oversampling_factor&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2831** 源码：<code>                        ] = sample_oversampling_factor</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2832** 源码：<code>                        metrics[&quot;batch/samples_per_prompt_generated&quot;] = actual_n</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2833** 源码：<code>                        metrics[&quot;batch/samples_per_prompt_target&quot;] = target_n</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2834** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2835** 源码：<code>                is_last_step = self.global_steps &gt;= self.total_training_steps</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `is_last_step`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2836** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2837** 源码：<code>                # for uid, we assign it back from gen_batch to batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2838** 源码：<code>                batch.non_tensor_batch[&quot;uid&quot;] = gen_batch.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.non_tensor_batch["uid"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2839** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2840** 源码：<code>                # record if use multi turn training</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2841** 源码：<code>                use_multi_turn = self.config.actor_rollout_ref.rollout.multi_turn.enable</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_multi_turn`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2842** 源码：<code>                max_turns = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2843** 源码：<code>                    self.config.actor_rollout_ref.rollout.multi_turn.max_user_turns</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2844** 源码：<code>                    if use_multi_turn</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2845** 源码：<code>                    else 1</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2846** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2847** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2848** 源码：<code>                # Add reward_model to gen_batch if it exists in batch, but keep it in original batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2849** 源码：<code>                # Only add for multi_turn async mode to avoid batch size mismatch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2850** 源码：<code>                if &quot;reward_model&quot; in batch.non_tensor_batch and self.async_rollout_mode:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2851** 源码：<code>                    gen_batch.non_tensor_batch[&quot;reward_model&quot;] = batch.non_tensor_batch[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_batch.non_tensor_batch["reward_model"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2852** 源码：<code>                        &quot;reward_model&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2853** 源码：<code>                    ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2854** 源码：<code>                    gen_batch.non_tensor_batch[&quot;data_source&quot;] = batch.non_tensor_batch[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_batch.non_tensor_batch["data_source"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2855** 源码：<code>                        &quot;data_source&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2856** 源码：<code>                    ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2857** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2858** 源码：<code>                with _timer(&quot;step&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2859** 源码：<code>                    # generate a batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2860** 源码：<code>                    with _timer(&quot;gen&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2861** 源码：<code>                        # Pass global_step through meta_info for logfire logging</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2862** 源码：<code>                        gen_batch.meta_info[&quot;global_step&quot;] = self.global_steps</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_batch.meta_info["global_step"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2863** 源码：<code>                        if not self.async_rollout_mode:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2864** 源码：<code>                            gen_batch_output = self.actor_rollout_wg.generate_sequences(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_batch_output`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2865** 源码：<code>                                gen_batch</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2866** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2867** 源码：<code>                        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2868** 源码：<code>                            self.async_rollout_manager.wake_up()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.async_rollout_manager.wake_up`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2869** 源码：<code>                            gen_batch_output = self.async_rollout_manager.generate_sequences(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_batch_output`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2870** 源码：<code>                                gen_batch</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2871** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2872** 源码：<code>                            self.async_rollout_manager.sleep()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.async_rollout_manager.sleep`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2873** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2874** 源码：<code>                    # check on if generation is empty due to filtering in async mode</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2875** 源码：<code>                    if gen_batch_output is None or len(gen_batch_output.batch) == 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2876** 源码：<code>                        # skip this batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2877** 源码：<code>                        print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2878** 源码：<code>                            f&quot;Warning: all prompts in batch {self.global_steps} are filtered during generation, skipping this batch.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2879** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2880** 源码：<code>                        continue</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2881** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2882** 源码：<code>                    if self.config.algorithm.adv_estimator == AdvantageEstimator.REMAX:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2883** 源码：<code>                        with _timer(&quot;gen_max&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2884** 源码：<code>                            gen_baseline_batch = deepcopy(gen_batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_baseline_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2885** 源码：<code>                            gen_baseline_batch.meta_info[&quot;do_sample&quot;] = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_baseline_batch.meta_info["do_sample"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2886** 源码：<code>                            gen_baseline_output = self.actor_rollout_wg.generate_sequences(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_baseline_output`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2887** 源码：<code>                                gen_baseline_batch</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2888** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2889** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2890** 源码：<code>                            batch = batch.union(gen_baseline_output)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2891** 源码：<code>                            reward_baseline_tensor = self.reward_fn(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_baseline_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2892** 源码：<code>                            reward_baseline_tensor = reward_baseline_tensor.sum(dim=-1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_baseline_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2893** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2894** 源码：<code>                            batch.pop(batch_keys=list(gen_baseline_output.batch.keys()))</code>
+  - 语法与作用：函数/构造器调用语法；调用 `batch.pop`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2895** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2896** 源码：<code>                            batch.batch[&quot;reward_baselines&quot;] = reward_baseline_tensor</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.batch["reward_baselines"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2897** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2898** 源码：<code>                            del gen_baseline_batch, gen_baseline_output</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2899** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2900** 源码：<code>                    # repeat to align with repeated responses in rollout</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2901** 源码：<code>                    if not use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2902** 源码：<code>                        batch = batch.repeat(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2903** 源码：<code>                            repeat_times=self.config.actor_rollout_ref.rollout.n,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `repeat_times`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2904** 源码：<code>                            interleave=True,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `interleave`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2905** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2906** 源码：<code>                    else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2907** 源码：<code>                        # For multi-turn, we will expand to rollout_n * current_max_turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2908** 源码：<code>                        batch = batch.repeat(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2909** 源码：<code>                            repeat_times=self.config.actor_rollout_ref.rollout.n</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `repeat_times`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2910** 源码：<code>                            * max_turns,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2911** 源码：<code>                            interleave=True,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `interleave`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2912** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2913** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2914** 源码：<code>                    metrics[&quot;batch/rollout_timeout_samples&quot;] = len(batch.batch) - len(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2915** 源码：<code>                        gen_batch_output.batch</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2916** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2917** 源码：<code>                    # if batch is larger than gen_batch_output, which means that some prompts have been filtered out because of async timeout</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2918** 源码：<code>                    if len(batch.batch) &gt; len(gen_batch_output.batch):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2919** 源码：<code>                        # use uid to filter</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2920** 源码：<code>                        gen_uids = set(gen_batch_output.non_tensor_batch[&quot;uid&quot;])</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gen_uids`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2921** 源码：<code>                        batch_mask = np.array(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2922** 源码：<code>                            [uid in gen_uids for uid in batch.non_tensor_batch[&quot;uid&quot;]]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2923** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2924** 源码：<code>                        batch = batch[batch_mask]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2925** 源码：<code>                        # guarantee that all uids are equalivant to gen_batch_output&#x27;s uid</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2926** 源码：<code>                        assert False not in (</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2927** 源码：<code>                            batch.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2928** 源码：<code>                            == gen_batch_output.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2929** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2930** 源码：<code>                        # assign gen_batch_output to batch&#x27;s uid</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2931** 源码：<code>                        batch.non_tensor_batch[</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2932** 源码：<code>                            &quot;uid&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2933** 源码：<code>                        ] = gen_batch_output.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2934** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2935** 源码：<code>                    # Union the generated responses with the batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2936** 源码：<code>                    batch = batch.union(gen_batch_output)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2937** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2938** 源码：<code>                    # Check if buffer is disabled</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2939** 源码：<code>                    disable_buffer = self.config.trainer.get(&quot;disable_buffer&quot;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `disable_buffer`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2940** 源码：<code>                    with _timer(&quot;buffer_load&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2941** 源码：<code>                        batch, buffer_batch = self._load_from_buffer(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2942** 源码：<code>                            batch=batch,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2943** 源码：<code>                            buffer_batch=buffer_batch,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `buffer_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2944** 源码：<code>                            disable_buffer=disable_buffer,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `disable_buffer`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2945** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2946** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2947** 源码：<code>                    batch.batch[&quot;response_mask&quot;] = compute_response_mask(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.batch["response_mask"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2948** 源码：<code>                    if use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2949** 源码：<code>                        # Apply loss mask for batch to avoid computing loss on padded turns</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2950** 源码：<code>                        apply_loss_mask_to_masks(batch)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `apply_loss_mask_to_masks`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2951** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2952** 源码：<code>                    batch, pad_size = pad_dataproto_to_divisor(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2953** 源码：<code>                        batch, self.max_world_size</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2954** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2955** 源码：<code>                    if pad_size &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2956** 源码：<code>                        print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2957** 源码：<code>                            f&quot;[Log Prob Padding] Padded batch with {pad_size} samples to be divisible by world_size={self.max_world_size}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2958** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2959** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2960** 源码：<code>                    # Rollout correction mode selection</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2961** 源码：<code>                    bypass_mode = self.config.algorithm.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `bypass_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2962** 源码：<code>                        &quot;bypass_old_logprob_for_rollout&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2963** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2964** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2965** 源码：<code>                    if bypass_mode:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2966** 源码：<code>                        # BYPASS MODE: Use rollout_log_probs as old_log_probs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2967** 源码：<code>                        # This skips the expensive actor forward pass for old_log_prob computation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2968** 源码：<code>                        #</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2969** 源码：<code>                        # Two sub-modes (controlled by use_pure_rollout_correction in actor):</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2970** 源码：<code>                        # 1. PPO_IS mode (use_pure_rollout_correction=False, default):</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2971** 源码：<code>                        #    - Actor uses standard PPO with old_log_prob=rollout_log_prob</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2972** 源码：<code>                        #    - PPO clips ratio = π_current / π_rollout (not π_current / π_old)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2973** 源码：<code>                        #    - IS correction happens implicitly through the ratio</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2974** 源码：<code>                        #</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2975** 源码：<code>                        # 2. Pure rollout correction mode (use_pure_rollout_correction=True):</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2976** 源码：<code>                        #    - Actor uses compute_policy_loss_with_rollout_correction()</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2977** 源码：<code>                        #    - Pure policy gradient with IS correction (no PPO clipping)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2978** 源码：<code>                        #    - Computes IS/RS on-the-fly in actor</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2979** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2980** 源码：<code>                        batch.meta_info[&quot;bypass_old_logprob_for_rollout&quot;] = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.meta_info["bypass_old_logprob_for_rollout"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2981** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2982** 源码：<code>                        if &quot;rollout_log_probs&quot; not in batch.batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2983** 源码：<code>                            raise ValueError(</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2984** 源码：<code>                                &quot;bypass_old_logprob_for_rollout=True requires rollout_log_probs in batch. &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2985** 源码：<code>                                &quot;Ensure rollout worker is configured to return log probabilities.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2986** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2987** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2988** 源码：<code>                        # Store temperature for update</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2989** 源码：<code>                        batch.meta_info[</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2990** 源码：<code>                            &quot;temperature&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2991** 源码：<code>                        ] = self.config.actor_rollout_ref.rollout.temperature</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2992** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2993** 源码：<code>                        # Use rollout log probs as old log probs (zero-cost substitution)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2994** 源码：<code>                        batch.batch[&quot;old_log_probs&quot;] = batch.batch[&quot;rollout_log_probs&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.batch["old_log_probs"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2995** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2996** 源码：<code>                        # Skip trainer-level IS computation (will be done in actor if needed)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2997** 源码：<code>                        # Log that we&#x27;re in bypass mode</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2998** 源码：<code>                        metrics[&quot;rollout_correction/bypass_mode&quot;] = 1.0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L2999** 源码：<code>                        metrics[</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3000** 源码：<code>                            &quot;rollout_correction/old_logprob_computation_skipped&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3001** 源码：<code>                        ] = 1.0</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3002** 源码：<code>                    else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3003** 源码：<code>                        # LEGACY MODE: Compute old_log_probs from actor</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3004** 源码：<code>                        with _timer(&quot;old_log_prob&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3005** 源码：<code>                            old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `old_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3006** 源码：<code>                            batch = batch.union(old_log_prob)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3007** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3008** 源码：<code>                        # Compute rollout IS weights ONCE before advantage computation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3009** 源码：<code>                        # (optimal_baseline needs them to scale W(τ), others will use them for policy loss)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3010** 源码：<code>                        (</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3011** 源码：<code>                            batch,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3012** 源码：<code>                            is_metrics,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3013** 源码：<code>                            mismatch_quality_metrics,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3014** 源码：<code>                        ) = self.compute_rollout_correction_and_add_to_batch(</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3015** 源码：<code>                            batch, max_turns</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3016** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3017** 源码：<code>                        metrics.update(is_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3018** 源码：<code>                        metrics.update(mismatch_quality_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3019** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3020** 源码：<code>                    # If we have reference log prob, it should be computed on the whole multi-turn batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3021** 源码：<code>                    if self.use_reference_policy:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3022** 源码：<code>                        # compute reference log_prob</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3023** 源码：<code>                        with _timer(&quot;ref&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3024** 源码：<code>                            ref_log_prob = self.ref_policy_wg.compute_ref_log_prob(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ref_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3025** 源码：<code>                                batch</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3026** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3027** 源码：<code>                            batch = batch.union(ref_log_prob)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3028** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3029** 源码：<code>                    # compute values</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3030** 源码：<code>                    if self.use_critic:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3031** 源码：<code>                        with _timer(&quot;values&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3032** 源码：<code>                            values = self.critic_wg.compute_values(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `values`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3033** 源码：<code>                            batch = batch.union(values)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3034** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3035** 源码：<code>                    with _timer(&quot;adv&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3036** 源码：<code>                        # compute scores. Support both model and function-based.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3037** 源码：<code>                        # We first compute the scores using reward model. Then, we call reward_fn to combine</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3038** 源码：<code>                        # the results from reward model and rule-based results.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3039** 源码：<code>                        if self.use_rm:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3040** 源码：<code>                            # we first compute reward model score</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3041** 源码：<code>                            with _timer(&quot;reward_model&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3042** 源码：<code>                                reward_tensor = self.rm_wg.compute_rm_score(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3043** 源码：<code>                                batch = batch.union(reward_tensor)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3044** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3045** 源码：<code>                        with _timer(&quot;reward_fn&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3046** 源码：<code>                            # we combine with rule-based rm</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3047** 源码：<code>                            extra_rewards_info = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_rewards_info`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3048** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3049** 源码：<code>                            use_final_reward = self.config.algorithm.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_final_reward`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3050** 源码：<code>                                &quot;use_final_reward&quot;, True</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3051** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3052** 源码：<code>                            # if reward already computed in async loop, skip recomputation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3053** 源码：<code>                            if &quot;token_level_scores&quot; not in batch.batch.keys():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3054** 源码：<code>                                if use_final_reward and use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3055** 源码：<code>                                    last_turn_batch = get_last_turn_data(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `last_turn_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3056** 源码：<code>                                        batch, max_turns=max_turns</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3057** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3058** 源码：<code>                                    reward_result = self.reward_fn(last_turn_batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_result`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3059** 源码：<code>                                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3060** 源码：<code>                                    reward_result = self.reward_fn(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_result`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3061** 源码：<code>                                if isinstance(reward_result, dict):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3062** 源码：<code>                                    token_level_scores = reward_result[&quot;reward_tensor&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `token_level_scores`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3063** 源码：<code>                                    if &quot;extra_info&quot; in reward_result:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3064** 源码：<code>                                        extra_rewards_info = reward_result[&quot;extra_info&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_rewards_info`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3065** 源码：<code>                                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3066** 源码：<code>                                    token_level_scores = reward_result</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `token_level_scores`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3067** 源码：<code>                                # Apply final reward logic if enabled</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3068** 源码：<code>                                if use_final_reward and use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3069** 源码：<code>                                    # Expand scores to all turns but only keep last turn reward</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3070** 源码：<code>                                    token_level_scores = token_level_scores.unsqueeze(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `token_level_scores`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3071** 源码：<code>                                        1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3072** 源码：<code>                                    ).repeat(1, max_turns, 1)</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3073** 源码：<code>                                    token_level_scores[:, :-1, :] = 0.0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3074** 源码：<code>                                    token_level_scores = token_level_scores.reshape(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `token_level_scores`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3075** 源码：<code>                                        -1, token_level_scores.shape[-1]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3076** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3077** 源码：<code>                                batch.batch[&quot;token_level_scores&quot;] = token_level_scores</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.batch["token_level_scores"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3078** 源码：<code>                            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3079** 源码：<code>                                if use_final_reward and use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3080** 源码：<code>                                    token_level_scores = batch.batch.pop(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `token_level_scores`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3081** 源码：<code>                                        &quot;token_level_scores&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3082** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3083** 源码：<code>                                    # Expand scores to all turns but only keep last turn reward</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3084** 源码：<code>                                    token_level_scores = token_level_scores.reshape(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `token_level_scores`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3085** 源码：<code>                                        -1, max_turns, token_level_scores.shape[-1]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3086** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3087** 源码：<code>                                    token_level_scores[:, :-1, :] = 0.0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3088** 源码：<code>                                    token_level_scores = token_level_scores.reshape(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `token_level_scores`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3089** 源码：<code>                                        -1, token_level_scores.shape[-1]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3090** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3091** 源码：<code>                                    batch.batch[</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3092** 源码：<code>                                        &quot;token_level_scores&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3093** 源码：<code>                                    ] = token_level_scores</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3094** 源码：<code>                                reward_extra_info_list = batch.non_tensor_batch[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_extra_info_list`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3095** 源码：<code>                                    &quot;reward_extra_info&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3096** 源码：<code>                                ].tolist()</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3097** 源码：<code>                                # Convert list of dict to dict of list, filtering out None values and non-numeric values</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3098** 源码：<code>                                extra_rewards_info = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_rewards_info`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3099** 源码：<code>                                if len(reward_extra_info_list) &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3100** 源码：<code>                                    # Collect all keys from all dicts</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3101** 源码：<code>                                    all_keys = set()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_keys`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3102** 源码：<code>                                    for d in reward_extra_info_list:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3103** 源码：<code>                                        if len(d) &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3104** 源码：<code>                                            all_keys.update(d.keys())</code>
+  - 语法与作用：函数/构造器调用语法；调用 `all_keys.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3105** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3106** 源码：<code>                                    # Build dict of lists, filtering None values, missing keys, and non-numeric values</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3107** 源码：<code>                                    for k in all_keys:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3108** 源码：<code>                                        values = []</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `values`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3109** 源码：<code>                                        for d in reward_extra_info_list:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3110** 源码：<code>                                            if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3111** 源码：<code>                                                len(d) &gt; 0</code>
+  - 语法与作用：函数/构造器调用语法；调用 `len`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3112** 源码：<code>                                                and k in d</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3113** 源码：<code>                                                and d[k] is not None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3114** 源码：<code>                                            ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3115** 源码：<code>                                                # Only add numeric values (int, float, bool)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3116** 源码：<code>                                                # Skip string fields like &#x27;error&#x27;, &#x27;finish_type&#x27;, etc.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3117** 源码：<code>                                                if isinstance(</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3118** 源码：<code>                                                    d[k], (int, float, bool, np.number)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3119** 源码：<code>                                                ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3120** 源码：<code>                                                    values.append(d[k])</code>
+  - 语法与作用：函数/构造器调用语法；调用 `values.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3121** 源码：<code>                                        if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3122** 源码：<code>                                            values</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3123** 源码：<code>                                        ):  # Only add key if there are valid numeric values</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3124** 源码：<code>                                            extra_rewards_info[k] = values</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_rewards_info[k]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3125** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3126** 源码：<code>                        # (TODO) Qian: we should be careful about here, to avoid &quot;void turn&quot; still getting non-zero rewards, we mask them here to zero</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3127** 源码：<code>                        apply_loss_mask_to_rewards(batch)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `apply_loss_mask_to_rewards`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3128** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3129** 源码：<code>                        # Extract last turn for filter stats update</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3130** 源码：<code>                        if use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3131** 源码：<code>                            # Keep a reference to the full multi-turn batch for later usage</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3132** 源码：<code>                            multi_turn_batch = batch</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3133** 源码：<code>                            # override batch with the last turn data only</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3134** 源码：<code>                            if self.config.algorithm.is_get_last_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3135** 源码：<code>                                batch = get_last_turn_data(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3136** 源码：<code>                                    multi_turn_batch, max_turns=max_turns</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3137** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3138** 源码：<code>                            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3139** 源码：<code>                                batch = multi_turn_batch</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3140** 源码：<code>                        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3141** 源码：<code>                            multi_turn_batch = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3142** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3143** 源码：<code>                        prompt_filter_stats = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt_filter_stats`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3144** 源码：<code>                        if self.batch_filter is not None and (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3145** 源码：<code>                            self.config.trainer.rejection_sample</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3146** 源码：<code>                            or self.config.trainer.remove_clip</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3147** 源码：<code>                            or self.config.get(&quot;rejection_sampling&quot;, {}).get(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3148** 源码：<code>                                &quot;enable_two_gate_filter&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3149** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3150** 源码：<code>                            or self.config.data.get(&quot;prompt_oversampling_factor&quot;, 1.0)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3151** 源码：<code>                            &gt; 1.0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3152** 源码：<code>                            or self.config.data.get(&quot;sample_oversampling_factor&quot;, 1.0)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3153** 源码：<code>                            &gt; 1.0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3154** 源码：<code>                        ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3155** 源码：<code>                            # Prepare batch data for the oversampling filter</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3156** 源码：<code>                            filter_batch_data = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `filter_batch_data`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3157** 源码：<code>                                &quot;rewards&quot;: batch.batch[&quot;token_level_scores&quot;].sum(-1),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3158** 源码：<code>                                &quot;response_mask&quot;: batch.batch[&quot;response_mask&quot;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3159** 源码：<code>                            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3160** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3161** 源码：<code>                            # Add optional data for two-gate filter if present</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3162** 源码：<code>                            if &quot;old_log_probs&quot; in batch.batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3163** 源码：<code>                                filter_batch_data[&quot;old_log_probs&quot;] = batch.batch[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `filter_batch_data["old_log_probs"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3164** 源码：<code>                                    &quot;old_log_probs&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3165** 源码：<code>                                ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3166** 源码：<code>                            if &quot;rollout_log_probs&quot; in batch.batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3167** 源码：<code>                                filter_batch_data[&quot;rollout_log_probs&quot;] = batch.batch[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `filter_batch_data["rollout_log_probs"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3168** 源码：<code>                                    &quot;rollout_log_probs&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3169** 源码：<code>                                ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3170** 源码：<code>                            if &quot;top_log_probs&quot; in batch.batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3171** 源码：<code>                                filter_batch_data[&quot;top_log_probs&quot;] = batch.batch[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `filter_batch_data["top_log_probs"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3172** 源码：<code>                                    &quot;top_log_probs&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3173** 源码：<code>                                ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3174** 源码：<code>                            if &quot;prompt_index&quot; in batch.non_tensor_batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3175** 源码：<code>                                filter_batch_data[</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3176** 源码：<code>                                    &quot;prompt_index&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3177** 源码：<code>                                ] = batch.non_tensor_batch[&quot;prompt_index&quot;]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3178** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3179** 源码：<code>                            # Get UIDs for group tracking; include turn_id when using multi-turn advantages</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3180** 源码：<code>                            if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3181** 源码：<code>                                use_multi_turn</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3182** 源码：<code>                                and not self.config.algorithm.is_get_last_turn</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3183** 源码：<code>                            ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3184** 源码：<code>                                uids_list = [</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uids_list`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3185** 源码：<code>                                    f&quot;{uid}_t{int(turn)}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3186** 源码：<code>                                    for uid, turn in zip(</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3187** 源码：<code>                                        batch.non_tensor_batch[&quot;uid&quot;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3188** 源码：<code>                                        batch.batch[&quot;turn_indices&quot;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3189** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3190** 源码：<code>                                ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3191** 源码：<code>                            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3192** 源码：<code>                                uids_list = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uids_list`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3193** 源码：<code>                                    batch.non_tensor_batch[&quot;uid&quot;].tolist()</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3194** 源码：<code>                                    if hasattr(batch.non_tensor_batch[&quot;uid&quot;], &quot;tolist&quot;)</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3195** 源码：<code>                                    else list(batch.non_tensor_batch[&quot;uid&quot;])</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3196** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3197** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3198** 源码：<code>                            # Apply filtering and selection through the unified filter</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3199** 源码：<code>                            with _timer(&quot;filter&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3200** 源码：<code>                                (</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3201** 源码：<code>                                    selected_indices,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3202** 源码：<code>                                    filter_metrics,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3203** 源码：<code>                                ) = self.batch_filter.filter_batch(</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3204** 源码：<code>                                    filter_batch_data,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3205** 源码：<code>                                    uids_list,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3206** 源码：<code>                                    global_step=self.global_steps,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `global_step`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3207** 源码：<code>                                    return_indices=True,  # Get indices to filter main batch</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3208** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3209** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3210** 源码：<code>                            # CRITICAL FIX: Store filter statistics for later update (only if batch is used for training)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3211** 源码：<code>                            # This prevents poisoning DynamicBatchSampler with statistics from skipped batches</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3212** 源码：<code>                            #</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3213** 源码：<code>                            # Previous bug: Filter stats were updated BEFORE checking if batch would be skipped,</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3214** 源码：<code>                            # causing a feedback loop where high filter rates from skipped batches led to</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3215** 源码：<code>                            # excessive oversampling in subsequent iterations.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3216** 源码：<code>                            #</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3217** 源码：<code>                            # Now: We save the stats here and only update DynamicBatchSampler after confirming</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3218** 源码：<code>                            # the batch will be used for training (see line ~1484)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3219** 源码：<code>                            if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3220** 源码：<code>                                hasattr(self, &quot;dynamic_batch_sampler&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `hasattr`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3221** 源码：<code>                                and &quot;prompt_filter_stats&quot; in filter_metrics</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3222** 源码：<code>                            ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3223** 源码：<code>                                # Save the statistics but don&#x27;t update yet</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3224** 源码：<code>                                prompt_filter_stats = filter_metrics[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt_filter_stats`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3225** 源码：<code>                                    &quot;prompt_filter_stats&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3226** 源码：<code>                                ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3227** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3228** 源码：<code>                            if &quot;prompt_filter_stats&quot; in filter_metrics:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3229** 源码：<code>                                # Remove prompt_filter_stats from filter_metrics BEFORE updating metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3230** 源码：<code>                                # to avoid passing numpy.int64 keys to WandB</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3231** 源码：<code>                                del filter_metrics[&quot;prompt_filter_stats&quot;]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3232** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3233** 源码：<code>                            # Update metrics with filter statistics (after removing prompt_filter_stats)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3234** 源码：<code>                            metrics.update(filter_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3235** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3236** 源码：<code>                            # Reorder selected indices to maintain original batch order</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3237** 源码：<code>                            # (TODO) Qian: this is very important for multi-turn broadcasting since it assumes the order is not changed</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3238** 源码：<code>                            selected_indices = sorted(selected_indices)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `selected_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3239** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3240** 源码：<code>                            # Calculate the size of the valid batch after filtering</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3241** 源码：<code>                            valid_query_size = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `valid_query_size`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3242** 源码：<code>                                len(selected_indices)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `len`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3243** 源码：<code>                                // self.config.actor_rollout_ref.rollout.n</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3244** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3245** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3246** 源码：<code>                            if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3247** 源码：<code>                                use_multi_turn</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3248** 源码：<code>                                and not self.config.algorithm.is_get_last_turn</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3249** 源码：<code>                            ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3250** 源码：<code>                                valid_query_size = valid_query_size // max_turns</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `valid_query_size`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3251** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3252** 源码：<code>                            assert (</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3253** 源码：<code>                                valid_query_size &lt;= self.config.data.train_batch_size</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3254** 源码：<code>                            ), &quot;The valid batch size after filtering should not exceed the expected batch size&quot;</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3255** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3256** 源码：<code>                            # Apply selection to the main batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3257** 源码：<code>                            selected_indices_tensor = torch.as_tensor(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `selected_indices_tensor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3258** 源码：<code>                                selected_indices, dtype=torch.long</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3259** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3260** 源码：<code>                            batch = batch.select_idxs(selected_indices_tensor)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3261** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3262** 源码：<code>                            # Handle multi-turn batch filtering based on is_get_last_turn mode</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3263** 源码：<code>                            if use_multi_turn and multi_turn_batch is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3264** 源码：<code>                                if self.config.algorithm.is_get_last_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3265** 源码：<code>                                    # When is_get_last_turn=True:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3266** 源码：<code>                                    # - batch is last-turn-only (size N)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3267** 源码：<code>                                    # - selected_indices are in range [0, N)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3268** 源码：<code>                                    # - Need to expand indices to select corresponding turns from multi_turn_batch (size N * max_turns)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3269** 源码：<code>                                    turn_offsets = torch.arange(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_offsets`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3270** 源码：<code>                                        max_turns, device=selected_indices_tensor.device</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3271** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3272** 源码：<code>                                    multi_turn_indices = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3273** 源码：<code>                                        selected_indices_tensor.unsqueeze(1) * max_turns</code>
+  - 语法与作用：函数/构造器调用语法；调用 `selected_indices_tensor.unsqueeze`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3274** 源码：<code>                                        + turn_offsets</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3275** 源码：<code>                                    ).reshape(-1)</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3276** 源码：<code>                                    multi_turn_batch = multi_turn_batch.select_idxs(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3277** 源码：<code>                                        multi_turn_indices</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3278** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3279** 源码：<code>                                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3280** 源码：<code>                                    # When is_get_last_turn=False:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3281** 源码：<code>                                    # - batch IS multi_turn_batch (size N * max_turns)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3282** 源码：<code>                                    # - selected_indices are already in range [0, N * max_turns)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3283** 源码：<code>                                    # - batch.select_idxs() already filtered, just assign to multi_turn_batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3284** 源码：<code>                                    multi_turn_batch = batch</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3285** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3286** 源码：<code>                        # Calculate expected size for final training batch, no whether filtering is applied</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3287** 源码：<code>                        expected_input_ids_size = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `expected_input_ids_size`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3288** 源码：<code>                            self.config.actor_rollout_ref.rollout.n</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3289** 源码：<code>                            * self.config.data.train_batch_size</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3290** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3291** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3292** 源码：<code>                        if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3293** 源码：<code>                            use_multi_turn</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3294** 源码：<code>                            and not self.config.algorithm.is_get_last_turn</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3295** 源码：<code>                        ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3296** 源码：<code>                            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3297** 源码：<code>                                f&quot;use_multi_turn and not is_get_last_turn, expected_input_ids_size: {expected_input_ids_size}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3298** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3299** 源码：<code>                            expected_input_ids_size = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `expected_input_ids_size`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3300** 源码：<code>                                expected_input_ids_size * max_turns</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3301** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3302** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3303** 源码：<code>                        actual_input_ids_size = batch.batch[&quot;input_ids&quot;].shape[0]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actual_input_ids_size`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3304** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3305** 源码：<code>                        if actual_input_ids_size == 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3306** 源码：<code>                            raise RuntimeError(</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3307** 源码：<code>                                &quot;No valid samples were selected after filtering. &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3308** 源码：<code>                                &quot;Increase rollout number to ensure that there are valid examples for training.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3309** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3310** 源码：<code>                        elif actual_input_ids_size &lt; expected_input_ids_size:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3311** 源码：<code>                            current_sample_factor = float(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_sample_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3312** 源码：<code>                                self.config.data.get(&quot;prompt_oversampling_factor&quot;, 1.0)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.config.data.get`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3313** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3314** 源码：<code>                            suggested_factor = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `suggested_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3315** 源码：<code>                                self._compute_suggested_sample_factor(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._compute_suggested_sample_factor`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3316** 源码：<code>                                    expected_input_ids_size, actual_input_ids_size</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3317** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3318** 源码：<code>                                or current_sample_factor</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3319** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3320** 源码：<code>                            skip_metrics = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `skip_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3321** 源码：<code>                                &quot;over_sampling/suggested_min_oversample_factor&quot;: suggested_factor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3322** 源码：<code>                                &quot;over_sampling/current_sample_oversample_factor&quot;: current_sample_factor,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3323** 源码：<code>                            }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3324** 源码：<code>                            logger.log(data=skip_metrics, step=self.global_steps)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3325** 源码：<code>                            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3326** 源码：<code>                                f&quot;[Oversampling] Selected {actual_input_ids_size} of {expected_input_ids_size} required samples. &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3327** 源码：<code>                                f&quot;Suggested minimum prompt_oversampling_factor: {suggested_factor:.2f} &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3328** 源码：<code>                                f&quot;(current {current_sample_factor}).&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3329** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3330** 源码：<code>                            with _timer(&quot;buffer_save&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3331** 源码：<code>                                buffer_batch = self._save_to_buffer(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `buffer_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3332** 源码：<code>                                    buffer_batch=buffer_batch,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `buffer_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3333** 源码：<code>                                    batch=batch,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3334** 源码：<code>                                    disable_buffer=disable_buffer,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `disable_buffer`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3335** 源码：<code>                                    multi_turn_batch=multi_turn_batch,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3336** 源码：<code>                                    use_multi_turn=use_multi_turn,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_multi_turn`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3337** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3338** 源码：<code>                            continue</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3339** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3340** 源码：<code>                        # Update DynamicBatchSampler ONLY for batches we actually train on</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3341** 源码：<code>                        # This prevents skipped batches from poisoning the filter statistics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3342** 源码：<code>                        skip_steps = self.config.trainer.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `skip_steps`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3343** 源码：<code>                            &quot;automatic_oversampling_skip_steps&quot;, 0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3344** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3345** 源码：<code>                        if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3346** 源码：<code>                            prompt_filter_stats is not None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3347** 源码：<code>                            and hasattr(self, &quot;dynamic_batch_sampler&quot;)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3348** 源码：<code>                            and self.global_steps &gt; skip_steps</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3349** 源码：<code>                        ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3350** 源码：<code>                            # Update batch sampler with exact per-prompt statistics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3351** 源码：<code>                            # Format: prompt_filter_stats[prompt_idx] =</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3352** 源码：<code>                            #         {&#x27;before&#x27;: total_groups, &#x27;after&#x27;: valid_groups, &#x27;selected&#x27;: used_groups}</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3353** 源码：<code>                            self.dynamic_batch_sampler.update_filter_stats(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.dynamic_batch_sampler.update_filter_stats`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3354** 源码：<code>                                prompt_filter_stats</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3355** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3356** 源码：<code>                            # Get and record sampler metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3357** 源码：<code>                            sampler_metrics = self.dynamic_batch_sampler.get_metrics()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sampler_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3358** 源码：<code>                            metrics.update(sampler_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3359** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3360** 源码：<code>                        # Update other sampler if available</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3361** 源码：<code>                        self._update_sampler_states(batch, metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._update_sampler_states`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3362** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3363** 源码：<code>                        # Restore multi_turn_batch if use_multi_turn is True</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3364** 源码：<code>                        if use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3365** 源码：<code>                            batch = multi_turn_batch</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3366** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3367** 源码：<code>                        # compute rewards. apply_kl_penalty if available</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3368** 源码：<code>                        if self.config.algorithm.use_kl_in_reward:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3369** 源码：<code>                            with _timer(&quot;kl_penalty&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3370** 源码：<code>                                batch, kl_metrics = apply_kl_penalty(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3371** 源码：<code>                                    batch,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3372** 源码：<code>                                    kl_ctrl=self.kl_ctrl_in_reward,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `kl_ctrl`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3373** 源码：<code>                                    kl_penalty=self.config.algorithm.kl_penalty,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `kl_penalty`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3374** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3375** 源码：<code>                            metrics.update(kl_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3376** 源码：<code>                        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3377** 源码：<code>                            batch.batch[&quot;token_level_rewards&quot;] = batch.batch[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.batch["token_level_rewards"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3378** 源码：<code>                                &quot;token_level_scores&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3379** 源码：<code>                            ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3380** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3381** 源码：<code>                        apply_loss_mask_to_rewards(batch)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `apply_loss_mask_to_rewards`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3382** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3383** 源码：<code>                        batch.meta_info[</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3384** 源码：<code>                            &quot;optimal_baseline_kwargs&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3385** 源码：<code>                        ] = self.config.algorithm.get(&quot;optimal_baseline_kwargs&quot;, {})</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3386** 源码：<code>                        # (TODO) Qian: old_log_prob must be computed before advantage computation for optimal baseline setup</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3387** 源码：<code>                        with _timer(&quot;compute_adv&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3388** 源码：<code>                            adv_kwargs = dict(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `adv_kwargs`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3389** 源码：<code>                                adv_estimator=self.config.algorithm.adv_estimator,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `adv_estimator`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3390** 源码：<code>                                gamma=self.config.algorithm.gamma,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `gamma`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3391** 源码：<code>                                lam=self.config.algorithm.lam,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `lam`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3392** 源码：<code>                                num_repeat=self.config.actor_rollout_ref.rollout.n,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_repeat`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3393** 源码：<code>                                batch_std=self.config.algorithm.get(&quot;batch_std&quot;, False),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_std`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3394** 源码：<code>                                use_multi_prompt_mvu=self.config.algorithm.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_multi_prompt_mvu`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3395** 源码：<code>                                    &quot;use_multi_prompt_mvu&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3396** 源码：<code>                                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3397** 源码：<code>                                reward_shaping=self.config.algorithm.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `reward_shaping`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3398** 源码：<code>                                    &quot;reward_shaping&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3399** 源码：<code>                                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3400** 源码：<code>                                unbiased_shaping=self.config.algorithm.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `unbiased_shaping`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3401** 源码：<code>                                    &quot;unbiased_shaping&quot;, False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3402** 源码：<code>                                ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3403** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3404** 源码：<code>                            if self.config.algorithm.get(&quot;adv_by_last_turn&quot;, True):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3405** 源码：<code>                                print(&quot;[ADV] Using last turn to compute advantages&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3406** 源码：<code>                                last_turn_batch = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `last_turn_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3407** 源码：<code>                                    get_last_turn_data(batch, max_turns=max_turns)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `get_last_turn_data`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3408** 源码：<code>                                    if use_multi_turn</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3409** 源码：<code>                                    else batch</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3410** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3411** 源码：<code>                                last_turn_batch = compute_advantage(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `last_turn_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3412** 源码：<code>                                    last_turn_batch, **adv_kwargs</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3413** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3414** 源码：<code>                                if use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3415** 源码：<code>                                    # Filter the multi_turn_batch whose uid is in the current batch</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3416** 源码：<code>                                    valid_uids = set(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `valid_uids`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3417** 源码：<code>                                        last_turn_batch.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3418** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3419** 源码：<code>                                    batch = batch[</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3420** 源码：<code>                                        [</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3421** 源码：<code>                                            uid in valid_uids</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3422** 源码：<code>                                            for uid in batch.non_tensor_batch[&quot;uid&quot;]</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3423** 源码：<code>                                        ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3424** 源码：<code>                                    ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3425** 源码：<code>                                    batch = broadcast_last_turn_to_multi_turn(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3426** 源码：<code>                                        last_turn_data=last_turn_batch,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `last_turn_data`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3427** 源码：<code>                                        multi_turn_data=batch,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_data`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3428** 源码：<code>                                        max_turns=max_turns,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3429** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3430** 源码：<code>                                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3431** 源码：<code>                                    batch = last_turn_batch</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3432** 源码：<code>                            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3433** 源码：<code>                                print(&quot;[ADV] Using multi turn to compute advantages&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3434** 源码：<code>                                batch = compute_multi_turn_advantage(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3435** 源码：<code>                                    batch, max_turns, **adv_kwargs,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3436** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3437** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3438** 源码：<code>                        batch = compute_rloo_advantages_for_metric_computation(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3439** 源码：<code>                            batch, max_turns</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3440** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3441** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3442** 源码：<code>                        if use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3443** 源码：<code>                            # Compute multi-turn metrics before filtering</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3444** 源码：<code>                            multi_turn_metrics = compute_multi_turn_metrics(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multi_turn_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3445** 源码：<code>                            metrics.update(multi_turn_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3446** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3447** 源码：<code>                        # If the entire sample is masked, we remove it from the batch, use sum of response_mask to determine</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3448** 源码：<code>                        masked_examples = batch.batch[&quot;response_mask&quot;].sum(dim=1) == 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `masked_examples`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3449** 源码：<code>                        # Get indices of samples to remove</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3450** 源码：<code>                        remove_indices = torch.nonzero(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `remove_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3451** 源码：<code>                            masked_examples, as_tuple=False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3452** 源码：<code>                        ).squeeze(1)</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3453** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3454** 源码：<code>                        if len(remove_indices) &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3455** 源码：<code>                            keep_indices = torch.tensor(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `keep_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3456** 源码：<code>                                [</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3457** 源码：<code>                                    i</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3458** 源码：<code>                                    for i in range(len(batch.batch[&quot;input_ids&quot;]))</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3459** 源码：<code>                                    if i not in remove_indices</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3460** 源码：<code>                                ],</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3461** 源码：<code>                                dtype=torch.long,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `dtype`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3462** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3463** 源码：<code>                            originl_len = len(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `originl_len`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3464** 源码：<code>                            batch = batch.select_idxs(keep_indices)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3465** 源码：<code>                            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3466** 源码：<code>                                f&quot;Filtered batch: {originl_len} -&gt; {len(batch)} examples&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3467** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3468** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3469** 源码：<code>                        # Pad by duplicating first N samples to make batch % max_world_size == 0</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3470** 源码：<code>                        # Duplicated samples contribute same gradients (equivalent to increased sample weight)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3471** 源码：<code>                        batch, pad_size = pad_dataproto_to_divisor(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3472** 源码：<code>                            batch, self.max_world_size</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3473** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3474** 源码：<code>                        if pad_size &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3475** 源码：<code>                            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3476** 源码：<code>                                f&quot;[Example Removal Padding] Padded batch with {pad_size} samples to be divisible by world_size={self.max_world_size}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3477** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3478** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3479** 源码：<code>                        # NOTE: Qian: we must move balance batch to later to guarantee the correctness of the batch order</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3480** 源码：<code>                        if self.config.trainer.balance_batch:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3481** 源码：<code>                            self._balance_batch(batch, metrics=metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._balance_batch`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3482** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3483** 源码：<code>                    # Rollout correction mode selection</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3484** 源码：<code>                    if self.config.algorithm.get(&quot;use_pure_rollout_correction&quot;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3485** 源码：<code>                        rollout_correction_kwargs = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_correction_kwargs`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3486** 源码：<code>                            &quot;rollout_is&quot;: self.config.algorithm.get(&quot;rollout_is&quot;, None),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3487** 源码：<code>                            &quot;rollout_is_kwargs&quot;: self.config.algorithm.get(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3488** 源码：<code>                                &quot;rollout_is_kwargs&quot;, {}</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3489** 源码：<code>                            ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3490** 源码：<code>                            &quot;rollout_rs&quot;: self.config.algorithm.get(&quot;rollout_rs&quot;, None),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3491** 源码：<code>                            &quot;rollout_rs_kwargs&quot;: self.config.algorithm.get(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3492** 源码：<code>                                &quot;rollout_rs_kwargs&quot;, {}</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3493** 源码：<code>                            ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3494** 源码：<code>                            &quot;rollout_token_veto_threshold&quot;: self.config.algorithm.get(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3495** 源码：<code>                                &quot;rollout_token_veto_threshold&quot;, None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3496** 源码：<code>                            ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3497** 源码：<code>                        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3498** 源码：<code>                        batch.meta_info[</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3499** 源码：<code>                            &quot;rollout_correction_kwargs&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3500** 源码：<code>                        ] = rollout_correction_kwargs</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3501** 源码：<code>                        batch.meta_info[&quot;max_turns&quot;] = max_turns</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.meta_info["max_turns"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3502** 源码：<code>                        batch.meta_info[&quot;use_pure_rollout_correction&quot;] = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.meta_info["use_pure_rollout_correction"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3503** 源码：<code>                        batch.meta_info[&quot;bypass_old_logprob_for_rollout&quot;] = True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.meta_info["bypass_old_logprob_for_rollout"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3504** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3505** 源码：<code>                    # update critic</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3506** 源码：<code>                    if self.use_critic:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3507** 源码：<code>                        with _timer(&quot;update_critic&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3508** 源码：<code>                            critic_output = self.critic_wg.update_critic(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `critic_output`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3509** 源码：<code>                        critic_output_metrics = reduce_metrics(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `critic_output_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3510** 源码：<code>                            critic_output.meta_info[&quot;metrics&quot;]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3511** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3512** 源码：<code>                        metrics.update(critic_output_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3513** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3514** 源码：<code>                    # compute global_valid tokens after filtering</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3515** 源码：<code>                    batch.meta_info[&quot;global_token_num&quot;] = torch.sum(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.meta_info["global_token_num"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3516** 源码：<code>                        batch.batch[&quot;attention_mask&quot;], dim=-1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3517** 源码：<code>                    ).tolist()</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3518** 源码：<code>                    batch.meta_info[&quot;global_response_token_num&quot;] = torch.sum(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch.meta_info["global_response_token_num"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3519** 源码：<code>                        batch.batch[&quot;response_mask&quot;], dim=-1</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3520** 源码：<code>                    ).tolist()</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3521** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3522** 源码：<code>                    # implement critic warmup</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3523** 源码：<code>                    if self.config.trainer.critic_warmup &lt;= self.global_steps:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3524** 源码：<code>                        # Rollout IS weights already computed before advantage computation (line 1584)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3525** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3526** 源码：<code>                        # update actor</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3527** 源码：<code>                        with _timer(&quot;update_actor&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3528** 源码：<code>                            actor_output = self.actor_rollout_wg.update_actor(batch)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_output`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3529** 源码：<code>                        actor_output_metrics = reduce_metrics(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_output_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3530** 源码：<code>                            actor_output.meta_info[&quot;metrics&quot;]</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3531** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3532** 源码：<code>                        metrics.update(actor_output_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3533** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3534** 源码：<code>                    # validate</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3535** 源码：<code>                    if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3536** 源码：<code>                        self.val_reward_fn is not None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3537** 源码：<code>                        and self.config.trainer.test_freq &gt; 0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3538** 源码：<code>                        and (</code>
+  - 语法与作用：函数/构造器调用语法；调用 `and`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3539** 源码：<code>                            is_last_step</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3540** 源码：<code>                            or self.global_steps % self.config.trainer.test_freq == 0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3541** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3542** 源码：<code>                    ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3543** 源码：<code>                        with _timer(&quot;testing&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3544** 源码：<code>                            val_metrics: dict = self._validate()</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3545** 源码：<code>                            if is_last_step:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3546** 源码：<code>                                last_val_metrics = val_metrics</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `last_val_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3547** 源码：<code>                        metrics.update(val_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3548** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3549** 源码：<code>                    if self.config.trainer.save_freq &gt; 0 and (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3550** 源码：<code>                        is_last_step</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3551** 源码：<code>                        or self.global_steps % self.config.trainer.save_freq == 0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3552** 源码：<code>                    ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3553** 源码：<code>                        with _timer(&quot;save_checkpoint&quot;, timing_raw):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3554** 源码：<code>                            self._save_checkpoint()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self._save_checkpoint`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3555** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3556** 源码：<code>                n_gpus = self.resource_pool_manager.get_n_gpus()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `n_gpus`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3557** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3558** 源码：<code>                # Extract gradient norm from actor metrics if available</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3559** 源码：<code>                batch_gradient_norm_squared = None</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_gradient_norm_squared`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3560** 源码：<code>                if &quot;actor/grad_norm&quot; in metrics:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3561** 源码：<code>                    # The gradient norm from dp_actor is already the L2 norm</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3562** 源码：<code>                    # We need to square it for the variance proxy computations</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3563** 源码：<code>                    grad_norm = metrics[&quot;actor/grad_norm&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `grad_norm`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3564** 源码：<code>                    batch_gradient_norm_squared = grad_norm ** 2</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_gradient_norm_squared`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3565** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3566** 源码：<code>                all_metrics = compute_all_training_metrics(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `all_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3567** 源码：<code>                    batch=batch,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3568** 源码：<code>                    use_critic=self.use_critic,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_critic`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3569** 源码：<code>                    extra_rewards_info=extra_rewards_info,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extra_rewards_info`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3570** 源码：<code>                    timing_raw=timing_raw,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `timing_raw`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3571** 源码：<code>                    n_gpus=n_gpus,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `n_gpus`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3572** 源码：<code>                    global_step=self.global_steps,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `global_step`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3573** 源码：<code>                    batch_gradient_norm_squared=batch_gradient_norm_squared,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch_gradient_norm_squared`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3574** 源码：<code>                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3575** 源码：<code>                metrics.update(all_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3576** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3577** 源码：<code>                # Compute kernel-specific multi-turn training metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3578** 源码：<code>                if use_multi_turn:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3579** 源码：<code>                    kernel_training_multi_turn_metrics = compute_kernel_multi_turn_metrics(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `kernel_training_multi_turn_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3580** 源码：<code>                        batch, prefix=&quot;kernel&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3581** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3582** 源码：<code>                    for key, val in kernel_training_multi_turn_metrics.items():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3583** 源码：<code>                        metrics[f&quot;train/{key}&quot;] = val</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3584** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3585** 源码：<code>                # TODO: make a canonical logger that supports various backend</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3586** 源码：<code>                logger.log(data=metrics, step=self.global_steps)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3587** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3588** 源码：<code>                # Check training metric early stopping</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3589** 源码：<code>                if self.train_metric:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3590** 源码：<code>                    if self.train_metric in metrics:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3591** 源码：<code>                        current_value = metrics[self.train_metric]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_value`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3592** 源码：<code>                        self.train_metric_history.append(current_value)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.train_metric_history.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3593** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3594** 源码：<code>                        # Only check after we have enough history</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3595** 源码：<code>                        if len(self.train_metric_history) &gt;= self.train_window:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3596** 源码：<code>                            # Keep only the most recent window</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3597** 源码：<code>                            if len(self.train_metric_history) &gt; self.train_window:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3598** 源码：<code>                                self.train_metric_history.pop(0)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.train_metric_history.pop`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3599** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3600** 源码：<code>                            # Calculate moving average</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3601** 源码：<code>                            moving_avg = sum(self.train_metric_history) / len(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `moving_avg`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3602** 源码：<code>                                self.train_metric_history</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3603** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3604** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3605** 源码：<code>                            # Check for sudden drop (compare current value to moving average)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3606** 源码：<code>                            drop_ratio = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `drop_ratio`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3607** 源码：<code>                                (moving_avg - current_value) / moving_avg</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3608** 源码：<code>                                if moving_avg &gt; 0</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3609** 源码：<code>                                else 0</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3610** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3611** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3612** 源码：<code>                            if drop_ratio &gt; self.train_threshold:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3613** 源码：<code>                                self.train_metric_drop_counter += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.train_metric_drop_counter +`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3614** 源码：<code>                                print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3615** 源码：<code>                                    f&quot;Training metric {self.train_metric} dropped by {drop_ratio:.2%} &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3616** 源码：<code>                                    f&quot;(current: {current_value:.4f}, moving avg: {moving_avg:.4f}). &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3617** 源码：<code>                                    f&quot;Drop counter: {self.train_metric_drop_counter}/{self.train_patience}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3618** 源码：<code>                                )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3619** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3620** 源码：<code>                                if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3621** 源码：<code>                                    self.train_metric_drop_counter</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3622** 源码：<code>                                    &gt;= self.train_patience</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3623** 源码：<code>                                ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3624** 源码：<code>                                    print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3625** 源码：<code>                                        f&quot;Training metric early stopping triggered! &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3626** 源码：<code>                                        f&quot;{self.train_metric} has dropped significantly for &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3627** 源码：<code>                                        f&quot;{self.train_patience} consecutive steps.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3628** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3629** 源码：<code>                                    progress_bar.close()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `progress_bar.close`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3630** 源码：<code>                                    print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3631** 源码：<code>                                        f&quot;Early stopping: metric={self.train_metric}, best_score={moving_avg}, patience={self.train_patience}, step={self.global_steps}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3632** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3633** 源码：<code>                                    return</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3634** 源码：<code>                            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3635** 源码：<code>                                # Reset counter if no significant drop</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3636** 源码：<code>                                if self.train_metric_drop_counter &gt; 0:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3637** 源码：<code>                                    print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3638** 源码：<code>                                        f&quot;Training metric {self.train_metric} recovered. Resetting drop counter.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3639** 源码：<code>                                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3640** 源码：<code>                                self.train_metric_drop_counter = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.train_metric_drop_counter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3641** 源码：<code>                    else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3642** 源码：<code>                        print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3643** 源码：<code>                            f&quot;Warning: Training early stop metric &#x27;{self.train_metric}&#x27; not found in training metrics&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3644** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3645** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3646** 源码：<code>                # Check for validation early stopping</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3647** 源码：<code>                if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3648** 源码：<code>                    self.val_metric</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3649** 源码：<code>                    and self.val_patience &gt; 0</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3650** 源码：<code>                    and self.val_metric in metrics</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3651** 源码：<code>                ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3652** 源码：<code>                    current_score = metrics[self.val_metric]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `current_score`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3653** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3654** 源码：<code>                    # Check if this is the best score so far</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3655** 源码：<code>                    if self.best_val_score is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3656** 源码：<code>                        self.best_val_score = current_score</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.best_val_score`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3657** 源码：<code>                        self.val_patience_counter = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.val_patience_counter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3658** 源码：<code>                        print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3659** 源码：<code>                            f&quot;Validation early stopping: Initial best score for {self.val_metric}: {self.best_val_score}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3660** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3661** 源码：<code>                    else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3662** 源码：<code>                        # Check if score improved</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3663** 源码：<code>                        improved = False</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `improved`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3664** 源码：<code>                        if self.val_mode == &quot;max&quot;:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3665** 源码：<code>                            improved = current_score &gt; self.best_val_score</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `improved`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3666** 源码：<code>                        else:  # mode == &#x27;min&#x27;</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3667** 源码：<code>                            improved = current_score &lt; self.best_val_score</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `improved`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3668** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3669** 源码：<code>                        if improved:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3670** 源码：<code>                            self.best_val_score = current_score</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.best_val_score`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3671** 源码：<code>                            self.val_patience_counter = 0</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.val_patience_counter`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3672** 源码：<code>                            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3673** 源码：<code>                                f&quot;Validation early stopping: New best score for {self.val_metric}: {self.best_val_score}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3674** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3675** 源码：<code>                        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3676** 源码：<code>                            self.val_patience_counter += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.val_patience_counter +`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3677** 源码：<code>                            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3678** 源码：<code>                                f&quot;Validation early stopping: No improvement for {self.val_patience_counter}/{self.val_patience} validations&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3679** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3680** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3681** 源码：<code>                        # Check if we should stop</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3682** 源码：<code>                        if self.val_patience_counter &gt;= self.val_patience:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3683** 源码：<code>                            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3684** 源码：<code>                                f&quot;Validation early stopping triggered! Best score for {self.val_metric}: {self.best_val_score}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3685** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3686** 源码：<code>                            progress_bar.close()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `progress_bar.close`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3687** 源码：<code>                            print(</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3688** 源码：<code>                                f&quot;Early stopping: metric={self.val_metric}, best_score={self.best_val_score}, patience={self.val_patience}, step={self.global_steps}&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3689** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3690** 源码：<code>                            return</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3691** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3692** 源码：<code>                if is_last_step:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3693** 源码：<code>                    pprint(f&quot;Final validation metrics: {last_val_metrics}&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `pprint`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3694** 源码：<code>                    progress_bar.close()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `progress_bar.close`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3695** 源码：<code>                    return</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3696** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3697** 源码：<code>                progress_bar.update(1)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `progress_bar.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3698** 源码：<code>                self.global_steps += 1</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.global_steps +`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3699** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3700** 源码：<code>        progress_bar.close()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `progress_bar.close`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3701** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3702** 源码：<code>    def _log_multiturn_to_jsonl(self, gen_batch_output: DataProto, scores: list):</code>
+  - 语法与作用：函数定义语法；声明 `_log_multiturn_to_jsonl` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3703** 源码：<code>        &quot;&quot;&quot;Log multi-turn conversations to JSONL file.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3704** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3705** 源码：<code>        Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3706** 源码：<code>            gen_batch_output: DataProto containing multi-turn conversation data</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3707** 源码：<code>            scores: Reward scores for each row (flattened format)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3708** 源码：<code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3709** 源码：<code>        # Get the save path from config</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3710** 源码：<code>        rollout_save_jsonl = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_save_jsonl`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3711** 源码：<code>            self.config.actor_rollout_ref.rollout.multi_turn.rollout_save_jsonl</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3712** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3713** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3714** 源码：<code>        # Create directory if it doesn&#x27;t exist</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3715** 源码：<code>        os.makedirs(os.path.dirname(rollout_save_jsonl), exist_ok=True)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `os.makedirs`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3716** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3717** 源码：<code>        # Get sample and turn indices</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3718** 源码：<code>        # sample_indices = gen_batch_output.batch.get(&#x27;sample_indices&#x27;, None)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3719** 源码：<code>        # if sample_indices is not None:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3720** 源码：<code>        #     sample_indices = sample_indices.cpu().numpy()</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3721** 源码：<code>        turn_indices = gen_batch_output.batch[&quot;turn_indices&quot;].cpu().numpy()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `turn_indices`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3722** 源码：<code>        uids = gen_batch_output.non_tensor_batch.get(&quot;uid&quot;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `uids`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3723** 源码：<code>        multiturn_messages = gen_batch_output.non_tensor_batch.get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `multiturn_messages`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3724** 源码：<code>            &quot;multiturn_messages&quot;, None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3725** 源码：<code>        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3726** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3727** 源码：<code>        # Find first turn (with messages) for each sample and aggregate scores</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3728** 源码：<code>        # Use uid as sample_id for uniqueness across batches</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3729** 源码：<code>        # sample_indices are batch-local (reset to 0 in each batch), so they repeat when batches are concatenated</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3730** 源码：<code>        sample_data = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sample_data`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3731** 源码：<code>            {}</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3732** 源码：<code>        )  # sample_id -&gt; {&#x27;first_idx&#x27;: row_idx, &#x27;num_turns&#x27;: int, &#x27;total_score&#x27;: float}</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3733** 源码：<code>        for i in range(len(gen_batch_output.batch)):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3734** 源码：<code>            # Get sample identifier - prioritize uid over sample_indices</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3735** 源码：<code>            if uids is not None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3736** 源码：<code>                s_idx = uids[i]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `s_idx`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3737** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3738** 源码：<code>                raise ValueError(&quot;uids is None&quot;)</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3739** 源码：<code>            # elif sample_indices is not None:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3740** 源码：<code>            #     s_idx = int(sample_indices[i])</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3741** 源码：<code>            # else:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3742** 源码：<code>            #     s_idx = i</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3743** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3744** 源码：<code>            t_idx = int(turn_indices[i])</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `t_idx`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3745** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3746** 源码：<code>            if t_idx == -1:  # Skip padding turns</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3747** 源码：<code>                continue</code>
+  - 语法与作用：循环控制语句；改变当前循环的执行位置。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3748** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3749** 源码：<code>            if s_idx not in sample_data:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3750** 源码：<code>                sample_data[s_idx] = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sample_data[s_idx]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3751** 源码：<code>                    &quot;first_idx&quot;: i,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3752** 源码：<code>                    &quot;num_turns&quot;: t_idx,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3753** 源码：<code>                    &quot;total_score&quot;: scores[i],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3754** 源码：<code>                }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3755** 源码：<code>            else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3756** 源码：<code>                sample_data[s_idx][&quot;total_score&quot;] += scores[i]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sample_data[s_idx]["total_score"] +`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3757** 源码：<code>                if t_idx &gt; sample_data[s_idx][&quot;num_turns&quot;]:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3758** 源码：<code>                    sample_data[s_idx][&quot;num_turns&quot;] = t_idx</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sample_data[s_idx]["num_turns"]`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3759** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3760** 源码：<code>        # Write to JSONL file</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3761** 源码：<code>        with open(rollout_save_jsonl, &quot;a&quot;, encoding=&quot;utf-8&quot;) as f:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3762** 源码：<code>            for s_idx in sorted(sample_data.keys()):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3763** 源码：<code>                data = sample_data[s_idx]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3764** 源码：<code>                first_idx = data[&quot;first_idx&quot;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `first_idx`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3765** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3766** 源码：<code>                # Use multiturn_messages if available</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3767** 源码：<code>                if (</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3768** 源码：<code>                    multiturn_messages is not None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3769** 源码：<code>                    and multiturn_messages[first_idx] is not None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3770** 源码：<code>                ):</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3771** 源码：<code>                    messages = multiturn_messages[first_idx]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `messages`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3772** 源码：<code>                    entry = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entry`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3773** 源码：<code>                        &quot;messages&quot;: messages,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3774** 源码：<code>                        &quot;score&quot;: data[&quot;total_score&quot;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3775** 源码：<code>                        &quot;num_turns&quot;: data[&quot;num_turns&quot;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3776** 源码：<code>                    }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3777** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3778** 源码：<code>                    # Fallback to prompt + response</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3779** 源码：<code>                    prompt = self.tokenizer.decode(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `prompt`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3780** 源码：<code>                        gen_batch_output.batch[&quot;prompts&quot;][first_idx],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3781** 源码：<code>                        skip_special_tokens=True,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `skip_special_tokens`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3782** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3783** 源码：<code>                    response = self.tokenizer.decode(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3784** 源码：<code>                        gen_batch_output.batch[&quot;responses&quot;][first_idx],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3785** 源码：<code>                        skip_special_tokens=True,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `skip_special_tokens`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3786** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3787** 源码：<code>                    entry = {</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entry`，可能创建、覆盖或累加状态。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3788** 源码：<code>                        &quot;conversation&quot;: prompt + response,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3789** 源码：<code>                        &quot;score&quot;: data[&quot;total_score&quot;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3790** 源码：<code>                        &quot;num_turns&quot;: data[&quot;num_turns&quot;],</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3791** 源码：<code>                    }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+- **L3792** 源码：<code>                f.write(json.dumps(entry, ensure_ascii=False) + &quot;\n&quot;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `f.write`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：这里覆盖训练器中从 mask、筛选、优势到 actor、验证、保存的项目代码；未满足当前配置的分支会在逐行说明中标记为条件执行或不执行。
+
+
+#### 边界行 2698
+- **L2698** 源码：<code>&lt;空行&gt;</code>
+  - 语法与作用：空行；仅用于排版，不产生运行时效果。
+  - 当前路径：位于 `compute_rollout_correction_and_add_to_batch()` 返回与 `fit()` 定义之间。
+
+
+---
+
+**导航**：[Trainer 预处理](07-trainer-preprocessing.md) · [附录目录](index.md) · [TRLOO/PPO core](09-trloo-ppo-core.md)

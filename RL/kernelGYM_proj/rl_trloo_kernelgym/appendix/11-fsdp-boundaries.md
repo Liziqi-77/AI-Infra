@@ -1,0 +1,5077 @@
+# FSDP worker：模型、rollout 与 actor update 边界
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+源码文件：`drkernel/verl_patch/workers/code/fsdp_workers.py`。本篇所有逐行条目均来自 `fsdp_workers.py`；覆盖 FSDP 模型、rollout、dispatch 和 actor update 边界。
+
+#### 原始行 555–631
+- **L555** <code>    def _build_rollout(self, trust_remote_code=False):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L556** <code>        from torch.distributed.device_mesh import init_device_mesh</code>
+  - 语法与作用：导入语句；模块加载时把依赖或名称绑定到当前命名空间。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L557** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L558** <code>        # TODO(sgm): support FSDP hybrid shard for larger model</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L559** <code>        infer_tp = self.config.rollout.tensor_model_parallel_size</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `infer_tp`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L560** <code>        dp = self.world_size // infer_tp</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `dp`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L561** <code>        assert (</code>
+  - 语法与作用：assert；验证运行时不变量，失败时抛出 AssertionError。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L562** <code>            self.world_size % infer_tp == 0</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.world_size % infer_tp`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L563** <code>        ), f&quot;rollout world_size: {self.world_size} is not divisible by infer_tp: {infer_tp}&quot;</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L564** <code>        rollout_device_mesh = init_device_mesh(</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `rollout_device_mesh`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L565** <code>            device_name, mesh_shape=(dp, infer_tp), mesh_dim_names=[&quot;dp&quot;, &quot;infer_tp&quot;]</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `device_name, mesh_shape`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L566** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L567** <code>        rollout_name = self.config.rollout.name</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `rollout_name`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L568** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L569** <code>        if rollout_name == &quot;hf&quot;:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L570** <code>            self._register_dispatch_collect_info(&quot;rollout&quot;, dp_rank=self.rank, is_collect=True)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L571** <code>        else:</code>
+  - 语法与作用：else 分支；前面的条件都不成立时执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L572** <code>            is_collect = rollout_device_mesh[&quot;infer_tp&quot;].get_local_rank() == 0</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `is_collect`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L573** <code>            self._register_dispatch_collect_info(</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L574** <code>                &quot;rollout&quot;, dp_rank=rollout_device_mesh[&quot;dp&quot;].get_local_rank(), is_collect=is_collect</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `"rollout", dp_rank`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L575** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L576** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L577** <code>        rollout_config: RolloutConfig = omega_conf_to_dataclass(self.config.rollout)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `rollout_config: RolloutConfig`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L578** <code>        model_config: HFModelConfig = omega_conf_to_dataclass(self.config.model, dataclass_type=HFModelConfig)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model_config: HFModelConfig`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L579** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L580** <code>        # build rollout worker inside hybrid engine</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L581** <code>        log_gpu_memory_usage(f&quot;Before building {rollout_name} rollout&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage(f"Before building {rollout_name} rollout", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L582** <code>        rollout_worker = RolloutWorker(config=rollout_config, model_config=model_config)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `rollout_worker`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L583** <code>        log_gpu_memory_usage(f&quot;After building {rollout_name} rollout&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage(f"After building {rollout_name} rollout", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L584** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L585** <code>        if rollout_name == &quot;vllm&quot;:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L586** <code>            from verl.workers.sharding_manager.fsdp_vllm import FSDPVLLMShardingManager</code>
+  - 语法与作用：导入语句；模块加载时把依赖或名称绑定到当前命名空间。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L587** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L588** <code>            full_params = torch.distributed.get_world_size() == 1</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `full_params`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L589** <code>            rollout_sharding_manager = FSDPVLLMShardingManager(</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `rollout_sharding_manager`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L590** <code>                module=self.actor_module_fsdp,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `module`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L591** <code>                inference_engine=rollout_worker.rollout.inference_engine,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `inference_engine`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L592** <code>                model_config=self.actor_model_config,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L593** <code>                rollout_config=self.config.rollout,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `rollout_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L594** <code>                full_params=full_params,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `full_params`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L595** <code>                device_mesh=rollout_device_mesh,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `device_mesh`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L596** <code>                offload_param=self._is_offload_param,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `offload_param`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L597** <code>                load_format=self.config.rollout.load_format,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `load_format`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L598** <code>                layered_summon=self.config.rollout.get(&quot;layered_summon&quot;, False),</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `layered_summon`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L599** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L600** <code>            log_gpu_memory_usage(&quot;After building sharding manager&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage("After building sharding manager", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L601** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L602** <code>        elif rollout_name == &quot;sglang&quot;:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L603** <code>            # NOTE(linjunrong): Due to recent fp8 support in SGLang. Now importing any symbol relate to</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L604** <code>            # SGLang&#x27;s model_runner would check CUDA device capability. However, due to verl&#x27;s setting,</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L605** <code>            # the main process of ray can not find any CUDA device, which would potentially lead to:</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L606** <code>            # &quot;RuntimeError: No CUDA GPUs are available&quot;.</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L607** <code>            # For this reason, sharding_manager.__init__ should not import FSDPSGLangShardingManager and</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L608** <code>            # we import it here use the abs path.</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L609** <code>            # check: https://github.com/sgl-project/sglang/blob/00f42707eaddfc2c0528e5b1e0094025c640b7a0/python/sglang/srt/layers/quantization/fp8_utils.py#L76</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L610** <code>            from verl.workers.sharding_manager.fsdp_sglang import (</code>
+  - 语法与作用：导入语句；模块加载时把依赖或名称绑定到当前命名空间。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L611** <code>                FSDPSGLangShardingManager,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L612** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L613** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L614** <code>            if torch.distributed.get_world_size() == 1:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L615** <code>                self.config.rollout.load_format = &quot;dummy_hf&quot;</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.config.rollout.load_format`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L616** <code>            rollout_sharding_manager = FSDPSGLangShardingManager(</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `rollout_sharding_manager`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L617** <code>                module=self.actor_module_fsdp,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `module`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L618** <code>                inference_engine=rollout_worker.rollout._engine,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `inference_engine`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L619** <code>                model_config=self.actor_model_config,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L620** <code>                rollout_config=self.config.rollout,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `rollout_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L621** <code>                full_params=&quot;hf&quot; in self.config.rollout.load_format,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `full_params`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L622** <code>                device_mesh=rollout_device_mesh,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `device_mesh`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L623** <code>                offload_param=self._is_offload_param,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `offload_param`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L624** <code>                multi_stage_wake_up=self.config.rollout.multi_stage_wake_up,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `multi_stage_wake_up`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L625** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L626** <code>            log_gpu_memory_usage(&quot;After building sharding manager&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage("After building sharding manager", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L627** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L628** <code>        else:</code>
+  - 语法与作用：else 分支；前面的条件都不成立时执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L629** <code>            raise NotImplementedError(f&quot;Rollout name: {self.config.rollout.name} is not supported&quot;)</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L630** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L631** <code>        return rollout_worker, rollout_sharding_manager</code>
+  - 语法与作用：return；结束当前函数并返回结果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+
+#### 原始行 633–755
+- **L633** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方类/方法定义时注册 Ray、dispatch、profiling 等行为。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L634** <code>    def init_model(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L635** <code>        from verl_patch.workers.code.actor.dp_actor import (</code>
+  - 语法与作用：导入语句；模块加载时把依赖或名称绑定到当前命名空间。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L636** <code>            CodeDataParallelPPOActor as DataParallelPPOActor,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L637** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L638** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L639** <code>        # This is used to import external_lib into the huggingface systems</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L640** <code>        import_external_libs(self.config.model.get(&quot;external_lib&quot;, None))</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L641** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L642** <code>        override_model_config = OmegaConf.to_container(OmegaConf.create(self.config.model.get(&quot;override_config&quot;, {})))</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `override_model_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L643** <code>        use_remove_padding = self.config.model.get(&quot;use_remove_padding&quot;, False)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `use_remove_padding`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L644** <code>        use_shm = self.config.model.get(&quot;use_shm&quot;, False)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `use_shm`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L645** <code>        use_fused_kernels = self.config.model.get(&quot;use_fused_kernels&quot;, False)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `use_fused_kernels`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L646** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L647** <code>        if self._is_actor or self._is_rollout:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L648** <code>            # we need the model for actor and rollout</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L649** <code>            if self._is_actor:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L650** <code>                optim_config = self.config.actor.optim</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `optim_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L651** <code>                fsdp_config = omega_conf_to_dataclass(self.config.actor.fsdp_config)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `fsdp_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L652** <code>            else:</code>
+  - 语法与作用：else 分支；前面的条件都不成立时执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L653** <code>                optim_config = None</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `optim_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L654** <code>                fsdp_config = FSDPEngineConfig()</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `fsdp_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L655** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L656** <code>            local_path = copy_to_local(self.config.model.path, use_shm=use_shm)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `local_path`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L657** <code>            (</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L658** <code>                self.actor_module_fsdp,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L659** <code>                self.actor_optimizer,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L660** <code>                self.actor_lr_scheduler,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L661** <code>                self.actor_model_config,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L662** <code>            ) = self._build_model_optimizer(</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `)`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L663** <code>                model_path=local_path,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model_path`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L664** <code>                fsdp_config=fsdp_config,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `fsdp_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L665** <code>                optim_config=optim_config,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `optim_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L666** <code>                override_model_config=override_model_config,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `override_model_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L667** <code>                use_remove_padding=use_remove_padding,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `use_remove_padding`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L668** <code>                use_fused_kernels=use_fused_kernels,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `use_fused_kernels`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L669** <code>                enable_gradient_checkpointing=self.config.model.get(&quot;enable_gradient_checkpointing&quot;, False),</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `enable_gradient_checkpointing`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L670** <code>                trust_remote_code=self.config.model.get(&quot;trust_remote_code&quot;, False),</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `trust_remote_code`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L671** <code>                use_liger=self.config.model.get(&quot;use_liger&quot;, False),</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `use_liger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L672** <code>                role=&quot;actor&quot;,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `role`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L673** <code>                enable_activation_offload=self.config.model.get(&quot;enable_activation_offload&quot;, False),</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `enable_activation_offload`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L674** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L675** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L676** <code>            # get the original unwrapped module</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L677** <code>            if fsdp_version(self.actor_module_fsdp) == 1:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L678** <code>                self.actor_module = self.actor_module_fsdp._fsdp_wrapped_module</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.actor_module`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L679** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L680** <code>            if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L681** <code>                offload_fsdp_model_to_cpu(self.actor_module_fsdp)</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L682** <code>                log_gpu_memory_usage(&quot;After offload actor model during init&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage("After offload actor model during init", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L683** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L684** <code>            if self._is_offload_optimizer:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L685** <code>                offload_fsdp_optimizer(optimizer=self.actor_optimizer)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `offload_fsdp_optimizer(optimizer`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L686** <code>                log_gpu_memory_usage(&quot;After offload actor optimizer during init&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage("After offload actor optimizer during init", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L687** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L688** <code>        if self._is_actor:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L689** <code>            actor_cfg = omega_conf_to_dataclass(self.config.actor)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `actor_cfg`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L690** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L691** <code>            # Create actor - CodeDataParallelPPOActor now handles sum_pi_squared automatically</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L692** <code>            # based on config.actor.compute_sum_pi_squared</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L693** <code>            self.actor = DataParallelPPOActor(</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L694** <code>                config=actor_cfg, actor_module=self.actor_module_fsdp, actor_optimizer=self.actor_optimizer</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L695** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L696** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L697** <code>            # Log if sum_pi_squared computation is enabled</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L698** <code>            if hasattr(self.config.actor, &#x27;compute_sum_pi_squared&#x27;) and self.config.actor.compute_sum_pi_squared:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L699** <code>                logger.info(&quot;Actor initialized with sum_pi_squared computation enabled&quot;)</code>
+  - 语法与作用：日志/输出调用；把调试、状态或错误信息写入输出系统。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L700** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L701** <code>        if self._is_rollout:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L702** <code>            self.rollout, self.rollout_sharding_manager = self._build_rollout(</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L703** <code>                trust_remote_code=self.config.model.get(&quot;trust_remote_code&quot;, False)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `trust_remote_code`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L704** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L705** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L706** <code>        if self._is_ref:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L707** <code>            ref_model_path = self.config.model.path</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `ref_model_path`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L708** <code>            ref_model = self.config.ref.get(&quot;model&quot;, None)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `ref_model`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L709** <code>            if ref_model is not None:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L710** <code>                ref_model_path = ref_model.get(&quot;path&quot;, self.config.model.path)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `ref_model_path`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L711** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L712** <code>            if self.rank == 0:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L713** <code>                print(&quot;reference model:&quot;, ref_model_path)</code>
+  - 语法与作用：日志/输出调用；把调试、状态或错误信息写入输出系统。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L714** <code>            local_path = copy_to_local(ref_model_path, use_shm=use_shm)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `local_path`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L715** <code>            self.ref_module_fsdp = self._build_model_optimizer(</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L716** <code>                model_path=local_path,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model_path`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L717** <code>                fsdp_config=omega_conf_to_dataclass(self.config.ref.fsdp_config),</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `fsdp_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L718** <code>                optim_config=None,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `optim_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L719** <code>                override_model_config=override_model_config,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `override_model_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L720** <code>                use_remove_padding=use_remove_padding,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `use_remove_padding`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L721** <code>                use_fused_kernels=use_fused_kernels,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `use_fused_kernels`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L722** <code>                trust_remote_code=self.config.model.get(&quot;trust_remote_code&quot;, False),</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `trust_remote_code`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L723** <code>                use_liger=self.config.model.get(&quot;use_liger&quot;, False),</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `use_liger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L724** <code>                role=&quot;ref&quot;,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `role`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L725** <code>            )[0]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L726** <code>            OmegaConf.set_struct(self.config.ref, True)</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L727** <code>            with open_dict(self.config.ref):</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开块时执行清理。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L728** <code>                self.config.ref.use_remove_padding = use_remove_padding</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.config.ref.use_remove_padding`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L729** <code>                self.config.ref.use_fused_kernels = use_fused_kernels</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `self.config.ref.use_fused_kernels`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L730** <code>            self.ref_policy = DataParallelPPOActor(config=self.config.ref, actor_module=self.ref_module_fsdp)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L731** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L732** <code>        if self._is_actor:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L733** <code>            self.flops_counter = FlopsCounter(self.actor_model_config)</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L734** <code>            self.checkpoint_manager = FSDPCheckpointManager(</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L735** <code>                model=self.actor_module_fsdp,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L736** <code>                optimizer=self.actor.actor_optimizer,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `optimizer`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L737** <code>                lr_scheduler=self.actor_lr_scheduler,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `lr_scheduler`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L738** <code>                processing_class=self.processor if self.processor is not None else self.tokenizer,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `processing_class`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L739** <code>                checkpoint_config=self.config.actor.checkpoint,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `checkpoint_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L740** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L741** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L742** <code>        if not self._is_actor and self._is_rollout:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L743** <code>            # If ActorRolloutRefWorker is initialized as a standalone rollout,</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L744** <code>            # create a checkpoint manager for FSDP model to allow loading FSDP checkpoints for rollout.</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L745** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L746** <code>            checkpoint_contents = OmegaConf.create({&quot;load_contents&quot;: [&quot;model&quot;], &quot;save_contents&quot;: []})</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `checkpoint_contents`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L747** <code>            self.checkpoint_manager = FSDPCheckpointManager(</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L748** <code>                model=self.actor_module_fsdp,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `model`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L749** <code>                optimizer=None,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `optimizer`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L750** <code>                lr_scheduler=None,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `lr_scheduler`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L751** <code>                processing_class=self.processor if self.processor is not None else self.tokenizer,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `processing_class`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L752** <code>                checkpoint_config=checkpoint_contents,</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `checkpoint_config`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L753** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L754** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L755** <code>    @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name=&quot;actor&quot;))</code>
+  - 语法与作用：装饰器；在下方类/方法定义时注册 Ray、dispatch、profiling 等行为。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+
+#### 原始行 757–836
+- **L757** <code>    def update_actor(self, data: DataProto):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L758** <code>        assert self._is_actor</code>
+  - 语法与作用：assert；验证运行时不变量，失败时抛出 AssertionError。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L759** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L760** <code>            load_fsdp_model_to_gpu(self.actor_module_fsdp)</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L761** <code>        if self._is_offload_optimizer:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L762** <code>            load_fsdp_optimizer(optimizer=self.actor_optimizer, device_id=torch.cuda.current_device())</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `load_fsdp_optimizer(optimizer`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L763** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L764** <code>        log_gpu_memory_usage(&#x27;Before update policy&#x27;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage('Before update policy', logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L765** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L766** <code>        with self.ulysses_sharding_manager:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开块时执行清理。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L767** <code>            data = data.to(&quot;cpu&quot;)  # data will to device with each micro batch on actor.update_policy</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `data`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L768** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L769** <code>            # perform training</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L770** <code>            with Timer(name=&#x27;update_policy&#x27;, logger=None) as timer:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开块时执行清理。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L771** <code>                metrics = self.actor.update_policy(data=data)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `metrics`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L772** <code>            delta_time = timer.last</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `delta_time`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L773** <code>            global_num_tokens = data.meta_info[&#x27;global_token_num&#x27;]</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `global_num_tokens`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L774** <code>            estimated_flops, promised_flops = self.flops_counter.estimate_flops(global_num_tokens, delta_time)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `estimated_flops, promised_flops`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L775** <code>            metrics[&#x27;perf/mfu/actor&#x27;] = (</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `metrics['perf/mfu/actor']`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L776** <code>                estimated_flops * self.config.actor.ppo_epochs / promised_flops / self.world_size</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L777** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L778** <code>            metrics[&#x27;perf/max_memory_allocated_gb&#x27;] = torch.cuda.max_memory_allocated() / (1024**3)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `metrics['perf/max_memory_allocated_gb']`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L779** <code>            metrics[&#x27;perf/max_memory_reserved_gb&#x27;] = torch.cuda.max_memory_reserved() / (1024**3)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `metrics['perf/max_memory_reserved_gb']`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L780** <code>            metrics[&#x27;perf/cpu_memory_used_gb&#x27;] = psutil.virtual_memory().used / (1024**3)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `metrics['perf/cpu_memory_used_gb']`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L781** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L782** <code>            lr = self.actor_lr_scheduler.get_last_lr()[0]</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `lr`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L783** <code>            metrics[&quot;actor/lr&quot;] = lr</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `metrics["actor/lr"]`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L784** <code>            self.actor_lr_scheduler.step()</code>
+  - 语法与作用：实例方法调用；对当前对象执行方法，通常读取/更新 trainer 或 worker 状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L785** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L786** <code>            log_gpu_memory_usage(&#x27;After update policy&#x27;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage('After update policy', logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L787** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L788** <code>            # TODO: here, we should return all metrics</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L789** <code>            output = DataProto(meta_info={&#x27;metrics&#x27;: metrics})</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `output`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L790** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L791** <code>            output = output.to(&#x27;cpu&#x27;)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `output`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L792** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L793** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L794** <code>            offload_fsdp_model_to_cpu(self.actor_module_fsdp)</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L795** <code>            log_gpu_memory_usage(&quot;After offload actor model during update_actor&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage("After offload actor model during update_actor", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L796** <code>        if self._is_offload_optimizer:</code>
+  - 语法与作用：条件分支头；条件成立时执行缩进块，否则继续匹配后续分支。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L797** <code>            offload_fsdp_optimizer(optimizer=self.actor_optimizer)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `offload_fsdp_optimizer(optimizer`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L798** <code>            log_gpu_memory_usage(&quot;After offload actor optimizer during update_actor&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage("After offload actor optimizer during update_actor", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L799** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L800** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并返回结果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L801** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L802** <code>    @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name=&quot;rollout&quot;))</code>
+  - 语法与作用：装饰器；在下方类/方法定义时注册 Ray、dispatch、profiling 等行为。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L803** <code>    @DistProfiler.annotate(color=&quot;red&quot;, role=&quot;rollout_generate&quot;)</code>
+  - 语法与作用：装饰器；在下方类/方法定义时注册 Ray、dispatch、profiling 等行为。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L804** <code>    def generate_sequences(self, prompts: DataProto):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体在调用时才运行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L805** <code>        # Support all hardwares</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L806** <code>        prompts = prompts.to(get_device_id())</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `prompts`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L807** <code>        assert self._is_rollout</code>
+  - 语法与作用：assert；验证运行时不变量，失败时抛出 AssertionError。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L808** <code>        timing_generate = {}</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `timing_generate`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L809** <code>        with self.rollout_sharding_manager:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开块时执行清理。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L810** <code>            log_gpu_memory_usage(&quot;After entering rollout sharding manager&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage("After entering rollout sharding manager", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L811** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L812** <code>            with simple_timer(&quot;generate_sequences&quot;, timing_generate):</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开块时执行清理。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L813** <code>                output = self.rollout.generate_sequences(prompts=prompts)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `output`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L814** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L815** <code>            log_gpu_memory_usage(&quot;After rollout generation&quot;, logger=logger)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `log_gpu_memory_usage("After rollout generation", logger`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L816** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L817** <code>        timing_generate.update(self.rollout_sharding_manager.timing)</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L818** <code>        # We calculate the average timing across all ranks</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L819** <code>        # to make sure meta_info[&quot;timing&quot;] is the same</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L820** <code>        timing_generate_topk_ratio, timing_generate_min, timing_generate_max = topk_reduce_ratio_min_max(</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `timing_generate_topk_ratio, timing_generate_min, timing_generate_max`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L821** <code>            timing_generate[&quot;generate_sequences&quot;]</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L822** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L823** <code>        timing_generate = reduce_timing(timing_generate)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `timing_generate`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L824** <code>        timing_generate.update(</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L825** <code>            {</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L826** <code>                &quot;generation_timing/max&quot;: timing_generate_max,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L827** <code>                &quot;generation_timing/min&quot;: timing_generate_min,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L828** <code>                &quot;generation_timing/topk_ratio&quot;: timing_generate_topk_ratio,</code>
+  - 语法与作用：普通 Python 语句；在当前作用域中求值并按对象语义执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L829** <code>            }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L830** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L831** <code>        output.meta_info[&quot;timing&quot;] = timing_generate</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `output.meta_info["timing"]`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L832** <code>        output = output.to(&quot;cpu&quot;)</code>
+  - 语法与作用：赋值语法；求值右侧表达式并将结果绑定到 `output`，可能创建或更新状态。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L833** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L834** <code>        # clear kv cache</code>
+  - 语法与作用：注释；记录实现意图或限制，解释器不执行。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L835** <code>        get_torch_device().empty_cache()</code>
+  - 语法与作用：函数/构造器调用；向项目代码或第三方边界传入参数并使用其返回值/副作用。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+- **L836** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并返回结果。
+  - 执行状态：当前 FSDP worker 初始化、rollout 构造、actor update/rollout dispatch 会执行；模型 FSDP、PyTorch optimizer 和 VERL dispatch 内部不展开。
+
+
+#### 原始行 1–554
+- **L1** <code># Copyright 2024 Bytedance Ltd. and/or its affiliates</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L2** <code>#</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L3** <code># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L4** <code># you may not use this file except in compliance with the License.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L5** <code># You may obtain a copy of the License at</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L6** <code>#</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L7** <code>#     http://www.apache.org/licenses/LICENSE-2.0</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L8** <code>#</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L9** <code># Unless required by applicable law or agreed to in writing, software</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L10** <code># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L11** <code># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L12** <code># See the License for the specific language governing permissions and</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L13** <code># limitations under the License.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L14** <code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L15** <code>The main entry point to run the PPO algorithm</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L16** <code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L17** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L18** <code>import datetime</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L19** <code>import json</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L20** <code>import logging</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L21** <code>import os</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L22** <code>import warnings</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L23** <code>from dataclasses import asdict</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L24** <code>from typing import Any, Optional</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L25** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L26** <code>import numpy as np</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L27** <code>import psutil</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L28** <code>import torch</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L29** <code>import torch.distributed</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L30** <code>import torch.distributed as dist</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L31** <code>import verl.utils.torch_functional as verl_F</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L32** <code>from codetiming import Timer</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L33** <code>from omegaconf import DictConfig, OmegaConf, open_dict</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L34** <code>from peft import LoraConfig, TaskType, get_peft_model</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L35** <code>from safetensors.torch import save_file</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L36** <code>from torch.distributed.device_mesh import init_device_mesh</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L37** <code>from torch.distributed.fsdp import FullyShardedDataParallel as FSDP</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L38** <code>from verl import DataProto</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L39** <code>from verl.models.transformers.monkey_patch import apply_monkey_patch</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L40** <code>from verl.single_controller.base import Worker</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L41** <code>from verl.single_controller.base.decorator import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L42** <code>    Dispatch,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L43** <code>    make_nd_compute_dataproto_dispatch_fn,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L44** <code>    register,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L45** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L46** <code>from verl.utils import hf_processor, hf_tokenizer</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L47** <code>from verl.utils.activation_offload import enable_activation_offloading</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L48** <code>from verl.utils.checkpoint.fsdp_checkpoint_manager import FSDPCheckpointManager</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L49** <code>from verl.utils.config import omega_conf_to_dataclass</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L50** <code>from verl.utils.device import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L51** <code>    get_device_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L52** <code>    get_device_name,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L53** <code>    get_nccl_backend,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L54** <code>    get_torch_device,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L55** <code>    is_cuda_available,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L56** <code>    is_npu_available,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L57** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L58** <code>from verl.utils.flops_counter import FlopsCounter</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L59** <code>from verl.utils.fs import copy_to_local</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L60** <code>from verl.utils.fsdp_utils import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L61** <code>    CPUOffloadPolicy,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L62** <code>    MixedPrecisionPolicy,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L63** <code>    apply_fsdp2,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L64** <code>    fsdp2_load_full_state_dict,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L65** <code>    fsdp_version,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L66** <code>    get_fsdp_wrap_policy,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L67** <code>    get_init_weight_context_manager,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L68** <code>    get_shard_placement_fn,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L69** <code>    init_fn,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L70** <code>    layered_summon_lora_params,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L71** <code>    load_fsdp_model_to_gpu,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L72** <code>    load_fsdp_optimizer,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L73** <code>    offload_fsdp_model_to_cpu,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L74** <code>    offload_fsdp_optimizer,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L75** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L76** <code>from verl.utils.import_utils import import_external_libs</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L77** <code>from verl.utils.model import compute_position_id_with_mask</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L78** <code>from verl.utils.profiler import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L79** <code>    DistProfiler,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L80** <code>    DistProfilerExtension,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L81** <code>    ProfilerConfig,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L82** <code>    log_gpu_memory_usage,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L83** <code>    simple_timer,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L84** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L85** <code>from verl.utils.profiler.performance import reduce_timing, topk_reduce_ratio_min_max</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L86** <code>from verl.utils.py_functional import convert_to_regular_types</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L87** <code>from verl.workers.sharding_manager.fsdp_ulysses import FSDPUlyssesShardingManager</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L88** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L89** <code>from verl_patch.workers.code.rollout.rollout_worker import RolloutWorker</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L90** <code>from verl_patch.workers.config import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L91** <code>    FSDPCriticConfig,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L92** <code>    FSDPEngineConfig,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L93** <code>    HFModelConfig,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L94** <code>    RolloutConfig,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L95** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L96** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L97** <code>logger = logging.getLogger(__file__)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `logger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L98** <code>logger.setLevel(os.getenv(&#x27;VERL_PPO_LOGGING_LEVEL&#x27;, &#x27;WARN&#x27;))</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L99** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L100** <code>device_name = get_device_name()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_name`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L101** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L102** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L103** <code>def create_device_mesh(world_size, fsdp_size):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L104** <code>    if fsdp_size &lt; 0 or fsdp_size &gt;= world_size:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L105** <code>        device_mesh = init_device_mesh(&#x27;cuda&#x27;, mesh_shape=(world_size,), mesh_dim_names=[&#x27;fsdp&#x27;])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L106** <code>    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L107** <code>        device_mesh = init_device_mesh(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L108** <code>            &#x27;cuda&#x27;, mesh_shape=(world_size // fsdp_size, fsdp_size), mesh_dim_names=[&#x27;ddp&#x27;, &#x27;fsdp&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `'cuda', mesh_shape`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L109** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L110** <code>    return device_mesh</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L111** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L112** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L113** <code>def get_sharding_strategy(device_mesh):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L114** <code>    from torch.distributed.fsdp import ShardingStrategy</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L115** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L116** <code>    if device_mesh.ndim == 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L117** <code>        sharding_strategy = ShardingStrategy.FULL_SHARD</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sharding_strategy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L118** <code>    elif device_mesh.ndim == 2:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L119** <code>        sharding_strategy = ShardingStrategy.HYBRID_SHARD</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sharding_strategy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L120** <code>    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L121** <code>        raise NotImplementedError(f&quot;Get device mesh ndim={device_mesh.ndim}, but only support 1 or 2&quot;)</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L122** <code>    return sharding_strategy</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L123** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L124** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L125** <code>class ActorRolloutRefWorker(Worker, DistProfilerExtension):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L126** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L127** <code>    This worker can be instantiated as a standalone actor or a standalone rollout or a standalone reference policy</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L128** <code>    or a hybrid engine based on the config.rollout</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L129** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L130** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L131** <code>    def __init__(self, config: DictConfig, role: str, **kwargs):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L132** <code>        Worker.__init__(self)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `Worker.__init__`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L133** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L134** <code>        self.config = config</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L135** <code>        import torch.distributed</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L136** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L137** <code>        if not torch.distributed.is_initialized():</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L138** <code>            rank = int(os.environ.get(&quot;RANK&quot;, 0))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rank`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L139** <code>            world_size = int(os.environ.get(&quot;WORLD_SIZE&quot;, 1))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L140** <code>            torch.distributed.init_process_group(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `torch.distributed.init_process_group`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L141** <code>                backend=f&quot;cpu:gloo,{get_device_name()}:{get_nccl_backend()}&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `backend`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L142** <code>                rank=rank,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rank`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L143** <code>                world_size=world_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L144** <code>                timeout=datetime.timedelta(seconds=self.config.get(&quot;nccl_timeout&quot;, 600)),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `timeout`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L145** <code>                init_method=os.environ.get(&quot;DIST_INIT_METHOD&quot;, None),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `init_method`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L146** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L147** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L148** <code>        # build device mesh for FSDP</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L149** <code>        world_size = torch.distributed.get_world_size()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L150** <code>        # TODO(sgm): support FSDP hybrid shard for larger model</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L151** <code>        self.device_mesh = create_device_mesh(world_size=world_size, fsdp_size=self.config.actor.fsdp_config.fsdp_size)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L152** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L153** <code>        # build device mesh for Ulysses Sequence Parallel</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L154** <code>        self.ulysses_device_mesh = None</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L155** <code>        self.ulysses_sequence_parallel_size = self.config.actor.get(&quot;ulysses_sequence_parallel_size&quot;, 1)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_sequence_parallel_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L156** <code>        dp = world_size // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dp`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L157** <code>        if self.ulysses_sequence_parallel_size &gt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L158** <code>            self.ulysses_device_mesh = init_device_mesh(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L159** <code>                device_name, mesh_shape=(dp, self.ulysses_sequence_parallel_size), mesh_dim_names=[&quot;dp&quot;, &quot;sp&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_name, mesh_shape`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L160** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L161** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L162** <code>        # create training dispatch</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L163** <code>        if self.ulysses_device_mesh is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L164** <code>            is_collect = self.ulysses_device_mesh[&quot;sp&quot;].get_local_rank() == 0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_collect`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L165** <code>            self._register_dispatch_collect_info(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self._register_dispatch_collect_info`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L166** <code>                &quot;actor&quot;, dp_rank=self.ulysses_device_mesh[&quot;dp&quot;].get_local_rank(), is_collect=is_collect</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `"actor", dp_rank`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L167** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L168** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L169** <code>            self._register_dispatch_collect_info(&quot;actor&quot;, dp_rank=self.rank, is_collect=True)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._register_dispatch_collect_info("actor", dp_rank`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L170** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L171** <code>        self.ulysses_sharding_manager = FSDPUlyssesShardingManager(self.ulysses_device_mesh)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_sharding_manager`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L172** <code>        self._lora_rank = self.config.model.get(&quot;lora_rank&quot;, 0)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._lora_rank`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L173** <code>        self._is_lora = self._lora_rank &gt; 0</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_lora`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L174** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L175** <code>        self.role = role</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.role`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L176** <code>        assert self.role in [&quot;actor&quot;, &quot;rollout&quot;, &quot;ref&quot;, &quot;actor_rollout&quot;, &quot;actor_rollout_ref&quot;]</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L177** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L178** <code>        self._is_actor = self.role in [&quot;actor&quot;, &quot;actor_rollout&quot;, &quot;actor_rollout_ref&quot;]</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_actor`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L179** <code>        self._is_rollout = self.role in [&quot;rollout&quot;, &quot;actor_rollout&quot;, &quot;actor_rollout_ref&quot;]</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_rollout`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L180** <code>        self._is_ref = self.role in [&quot;ref&quot;, &quot;actor_rollout_ref&quot;]</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_ref`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L181** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L182** <code>        # TODO(haibin.lin):</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L183** <code>        # As of now the type of config is DictConfig, if we assign config.profiler with ProfilerConfig,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L184** <code>        # it will actually convert the ProfilerConfig dataclass back to a DictConfig.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L185** <code>        # We can still use ProfilerConfig for testing purpose (tests/utils/test_nvtx_profile.py)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L186** <code>        # as they provides DictConfig-like interface</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L187** <code>        # The benefit of creating the dataclass config is to perform validation during __post_init__</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L188** <code>        if self._is_actor:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L189** <code>            omega_profiler_config = config.actor.get(&quot;profiler&quot;, {})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `omega_profiler_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L190** <code>        elif self._is_rollout:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L191** <code>            # NOTE: In colocation mode, rollout config may not take effect (follow the actor config)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L192** <code>            # This is for extendability in AsyncRL cases</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L193** <code>            omega_profiler_config = config.rollout.get(&quot;profiler&quot;, {})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `omega_profiler_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L194** <code>        elif self._is_ref:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L195** <code>            omega_profiler_config = config.ref.get(&quot;profiler&quot;, {})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `omega_profiler_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L196** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L197** <code>            raise ValueError(</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L198** <code>                f&quot;Invalid role {self.role}, should be one of &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L199** <code>                &quot;[&#x27;actor&#x27;, &#x27;rollout&#x27;, &#x27;ref&#x27;, &#x27;actor_rollout&#x27;, &#x27;actor_rollout_ref&#x27;]&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L200** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L201** <code>        # omega_profiler_config is DictConfig</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L202** <code>        # profiler_config is a ProfilerConfig dataclass</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L203** <code>        profiler_config = omega_conf_to_dataclass(omega_profiler_config, dataclass_type=ProfilerConfig)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `profiler_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L204** <code>        if omega_profiler_config.get(&quot;tool&quot;, None) in [&quot;npu&quot;, &quot;nsys&quot;, &quot;torch&quot;, &quot;torch_memory&quot;]:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L205** <code>            tool_config = omega_conf_to_dataclass(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tool_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L206** <code>                omega_profiler_config.get(&quot;tool_config&quot;, {}).get(omega_profiler_config.get(&quot;tool&quot;))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `omega_profiler_config.get`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L207** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L208** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L209** <code>            tool_config = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tool_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L210** <code>        DistProfilerExtension.__init__(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `DistProfilerExtension.__init__`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L211** <code>            self, DistProfiler(rank=self.rank, config=profiler_config, tool_config=tool_config)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `self, DistProfiler(rank`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L212** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L213** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L214** <code>        self._is_offload_param = False</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_offload_param`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L215** <code>        self._is_offload_optimizer = False</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_offload_optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L216** <code>        if self._is_actor:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L217** <code>            self._is_offload_param = self.config.actor.fsdp_config.get(&quot;param_offload&quot;, False)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_offload_param`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L218** <code>            self._is_offload_optimizer = self.config.actor.fsdp_config.get(&quot;optimizer_offload&quot;, False)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_offload_optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L219** <code>        elif self._is_ref:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L220** <code>            # TODO: it seems that manual offload is slowly than FSDP offload</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L221** <code>            self._is_offload_param = self.config.ref.fsdp_config.get(&quot;param_offload&quot;, False)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_offload_param`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L222** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L223** <code>        # normalize config</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L224** <code>        if self._is_actor:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L225** <code>            self.config.actor.ppo_mini_batch_size *= self.config.rollout.n</code>
+  - 语法与作用：属性/变量赋值（`*=`）；计算右侧表达式并更新 `self.config.actor.ppo_mini_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L226** <code>            # In multi-turn setup, we should multiply mini batch size by max_turns to keep it as on policy update</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L227** <code>            if self.config.rollout.multi_turn.enable:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L228** <code>                self.config.actor.ppo_mini_batch_size *= self.config.rollout.multi_turn.max_user_turns</code>
+  - 语法与作用：属性/变量赋值（`*=`）；计算右侧表达式并更新 `self.config.actor.ppo_mini_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L229** <code>            self.config.actor.ppo_mini_batch_size //= self.device_mesh.size() // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：属性/变量赋值（`//=`）；计算右侧表达式并更新 `self.config.actor.ppo_mini_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L230** <code>            assert self.config.actor.ppo_mini_batch_size &gt; 0, (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L231** <code>                f&quot;ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than 0 after &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L232** <code>                f&quot;normalization&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L233** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L234** <code>            # micro bsz</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L235** <code>            if self.config.actor.ppo_micro_batch_size is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L236** <code>                self.config.actor.ppo_micro_batch_size //= (</code>
+  - 语法与作用：属性/变量赋值（`//=`）；计算右侧表达式并更新 `self.config.actor.ppo_micro_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L237** <code>                    self.device_mesh.size() // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.device_mesh.size`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L238** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L239** <code>                self.config.actor.ppo_micro_batch_size_per_gpu = self.config.actor.ppo_micro_batch_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.actor.ppo_micro_batch_size_per_gpu`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L240** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L241** <code>            if self.config.actor.ppo_micro_batch_size_per_gpu is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L242** <code>                assert self.config.actor.ppo_mini_batch_size % self.config.actor.ppo_micro_batch_size_per_gpu == 0, (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L243** <code>                    f&quot;normalized ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be divisible by &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L244** <code>                    f&quot;ppo_micro_batch_size_per_gpu {self.config.actor.ppo_micro_batch_size_per_gpu}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L245** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L246** <code>                assert self.config.actor.ppo_mini_batch_size // self.config.actor.ppo_micro_batch_size_per_gpu &gt; 0, (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L247** <code>                    f&quot;normalized ppo_mini_batch_size {self.config.actor.ppo_mini_batch_size} should be larger than &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L248** <code>                    f&quot;ppo_micro_batch_size_per_gpu {self.config.actor.ppo_micro_batch_size_per_gpu}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L249** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L250** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L251** <code>        # normalize rollout config</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L252** <code>        if self._is_rollout and self.config.rollout.log_prob_micro_batch_size is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L253** <code>            self.config.rollout.log_prob_micro_batch_size //= (</code>
+  - 语法与作用：属性/变量赋值（`//=`）；计算右侧表达式并更新 `self.config.rollout.log_prob_micro_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L254** <code>                self.device_mesh.size() // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.device_mesh.size`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L255** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L256** <code>            self.config.rollout.log_prob_micro_batch_size_per_gpu = self.config.rollout.log_prob_micro_batch_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.rollout.log_prob_micro_batch_size_per_gpu`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L257** <code>        # normalize ref config</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L258** <code>        if self._is_ref and self.config.ref.log_prob_micro_batch_size is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L259** <code>            self.config.ref.log_prob_micro_batch_size //= self.device_mesh.size() // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：属性/变量赋值（`//=`）；计算右侧表达式并更新 `self.config.ref.log_prob_micro_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L260** <code>            self.config.ref.log_prob_micro_batch_size_per_gpu = self.config.ref.log_prob_micro_batch_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.ref.log_prob_micro_batch_size_per_gpu`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L261** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L262** <code>    def _build_model_optimizer(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L263** <code>        self,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L264** <code>        model_path,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L265** <code>        fsdp_config: FSDPEngineConfig,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L266** <code>        optim_config,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L267** <code>        override_model_config,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L268** <code>        use_remove_padding=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_remove_padding`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L269** <code>        use_fused_kernels=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_fused_kernels`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L270** <code>        enable_gradient_checkpointing=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `enable_gradient_checkpointing`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L271** <code>        trust_remote_code=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trust_remote_code`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L272** <code>        use_liger=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_liger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L273** <code>        role=&quot;actor&quot;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `role`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L274** <code>        enable_activation_offload=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `enable_activation_offload`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L275** <code>    ):</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L276** <code>        from torch import optim</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L277** <code>        from torch.distributed.fsdp import CPUOffload, MixedPrecision</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L278** <code>        from transformers import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L279** <code>            AutoConfig,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L280** <code>            AutoModel,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L281** <code>            AutoModelForCausalLM,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L282** <code>            AutoModelForVision2Seq,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L283** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L284** <code>        from verl.utils.model import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L285** <code>            get_generation_config,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L286** <code>            print_model_size,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L287** <code>            update_model_config,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L288** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L289** <code>        from verl.utils.torch_dtypes import PrecisionType</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L290** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L291** <code>        assert role in [&quot;actor&quot;, &quot;ref&quot;]</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L292** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L293** <code>        log_gpu_memory_usage(f&quot;Before init {role} from HF AutoModel&quot;, logger=logger)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_gpu_memory_usage(f"Before init {role} from HF AutoModel", logger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L294** <code>        local_path = model_path</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L295** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L296** <code>        # note that we have to create model in fp32. Otherwise, the optimizer is in bf16, which is incorrect</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L297** <code>        # TODO(zhangchi.usc1992): 1. support create from random initialized model. 2. Support init with FSDP directly</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L298** <code>        self.tokenizer = hf_tokenizer(local_path, trust_remote_code=trust_remote_code)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L299** <code>        self.processor = hf_processor(local_path, trust_remote_code=trust_remote_code)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.processor`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L300** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L301** <code>        if self.config.model.get(&quot;custom_chat_template&quot;, None) is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L302** <code>            if self.processor is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L303** <code>                self.processor.chat_template = self.config.model.custom_chat_template</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.processor.chat_template`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L304** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L305** <code>                self.tokenizer.chat_template = self.config.model.custom_chat_template</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer.chat_template`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L306** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L307** <code>        torch_dtype = fsdp_config.get(&quot;model_dtype&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `torch_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L308** <code>        if torch_dtype is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L309** <code>            torch_dtype = torch.float32 if self._is_actor else torch.bfloat16</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `torch_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L310** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L311** <code>            torch_dtype = PrecisionType.to_dtype(torch_dtype)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `torch_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L312** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L313** <code>        # override model kwargs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L314** <code>        actor_model_config = AutoConfig.from_pretrained(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_model_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L315** <code>            local_path, trust_remote_code=trust_remote_code, attn_implementation=&quot;flash_attention_2&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_path, trust_remote_code`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L316** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L317** <code>        # TODO: VL models use VisionAttention, which directly uses flash_attention in transformers&gt;=4.53</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L318** <code>        # which will be patched by _ulysses_flash_attention_forward, but errorly misses position_ids</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L319** <code>        # Maybe support Ulysses in VisionAttention in the future and remove this patch</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L320** <code>        if self.ulysses_sequence_parallel_size &gt; 1 and hasattr(actor_model_config, &quot;vision_config&quot;):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L321** <code>            actor_model_config.vision_config._attn_implementation = &quot;eager&quot;</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `actor_model_config.vision_config._attn_implementation`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L322** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L323** <code>        # patch for kimi-vl</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L324** <code>        if getattr(actor_model_config, &quot;model_type&quot;, None) == &quot;kimi_vl&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L325** <code>            actor_model_config.text_config.topk_method = &quot;greedy&quot;</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `actor_model_config.text_config.topk_method`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L326** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L327** <code>        self.generation_config = get_generation_config(local_path, trust_remote_code=trust_remote_code)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.generation_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L328** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L329** <code>        override_config_kwargs = {</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `override_config_kwargs`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L330** <code>            &quot;bos_token_id&quot;: self.tokenizer.bos_token_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L331** <code>            &quot;eos_token_id&quot;: self.tokenizer.eos_token_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L332** <code>            &quot;pad_token_id&quot;: self.tokenizer.pad_token_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L333** <code>        }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L334** <code>        override_config_kwargs.update(override_model_config)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `override_config_kwargs.update`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L335** <code>        update_model_config(actor_model_config, override_config_kwargs=override_config_kwargs)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `update_model_config(actor_model_config, override_config_kwargs`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L336** <code>        if self.rank == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L337** <code>            print(f&quot;Model config after override: {actor_model_config}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L338** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L339** <code>        # NOTE(fix me): tie_word_embedding causes meta_tensor init to hang</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L340** <code>        init_context = get_init_weight_context_manager(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `init_context`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L341** <code>            use_meta_tensor=not actor_model_config.tie_word_embeddings, mesh=self.device_mesh</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_meta_tensor`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L342** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L343** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L344** <code>        with init_context(), warnings.catch_warnings():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L345** <code>            warnings.simplefilter(&quot;ignore&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `warnings.simplefilter`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L346** <code>            has_remote_code = hasattr(actor_model_config, &quot;auto_map&quot;) and any(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `has_remote_code`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L347** <code>                actor_model_config.architectures[0] in val for val in actor_model_config.auto_map.values()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `actor_model_config.architectures[0] in val for val in actor_model_config.auto_map.values`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L348** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L349** <code>            if has_remote_code:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L350** <code>                auto_class = next(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `auto_class`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L351** <code>                    k for k, v in actor_model_config.auto_map.items() if actor_model_config.architectures[0] in v</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `k for k, v in actor_model_config.auto_map.items`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L352** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L353** <code>                # match auto_class:</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L354** <code>                #     case &quot;AutoModelForVision2Seq&quot;:</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L355** <code>                #         actor_module_class = AutoModelForVision2Seq</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L356** <code>                #     case &quot;AutoModelForCausalLM&quot;:</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L357** <code>                #         actor_module_class = AutoModelForCausalLM</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L358** <code>                #     case _:</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L359** <code>                #         actor_module_class = AutoModel</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L360** <code>                if auto_class == &quot;AutoModelForVision2Seq&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L361** <code>                    actor_module_class = AutoModelForVision2Seq</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module_class`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L362** <code>                elif auto_class == &quot;AutoModelForCausalLM&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L363** <code>                    actor_module_class = AutoModelForCausalLM</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module_class`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L364** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L365** <code>                    actor_module_class = AutoModel</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module_class`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L366** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L367** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L368** <code>                if type(actor_model_config) in AutoModelForVision2Seq._model_mapping.keys():</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L369** <code>                    actor_module_class = AutoModelForVision2Seq</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module_class`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L370** <code>                elif type(actor_model_config) in AutoModelForCausalLM._model_mapping.keys():</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L371** <code>                    actor_module_class = AutoModelForCausalLM</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module_class`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L372** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L373** <code>                    actor_module_class = AutoModel</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module_class`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L374** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L375** <code>            actor_module = actor_module_class.from_pretrained(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L376** <code>                pretrained_model_name_or_path=local_path,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pretrained_model_name_or_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L377** <code>                torch_dtype=torch_dtype,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `torch_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L378** <code>                config=actor_model_config,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L379** <code>                trust_remote_code=trust_remote_code,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trust_remote_code`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L380** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L381** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L382** <code>            # Apply Liger kernel to the model if use_liger is set to True</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L383** <code>            if use_liger:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L384** <code>                from liger_kernel.transformers.monkey_patch import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L385** <code>                    _apply_liger_kernel_to_instance,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L386** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L387** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L388** <code>                _apply_liger_kernel_to_instance(model=actor_module)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `_apply_liger_kernel_to_instance(model`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L389** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L390** <code>            fused_kernel_options = self.config.model.get(&quot;fused_kernel_options&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fused_kernel_options`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L391** <code>            fused_kernels_backend = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fused_kernels_backend`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L392** <code>                fused_kernel_options.get(&quot;impl_backend&quot;, None) if fused_kernel_options is not None else None</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `fused_kernel_options.get`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L393** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L394** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L395** <code>            apply_monkey_patch(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `apply_monkey_patch`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L396** <code>                model=actor_module,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L397** <code>                use_remove_padding=use_remove_padding,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_remove_padding`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L398** <code>                ulysses_sp_size=self.ulysses_sequence_parallel_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ulysses_sp_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L399** <code>                use_fused_kernels=use_fused_kernels,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_fused_kernels`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L400** <code>                fused_kernels_backend=fused_kernels_backend,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fused_kernels_backend`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L401** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L402** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L403** <code>            # some parameters may not in torch_dtype. TODO(zhangchi.usc1992) remove this after we switch to fsdp2</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L404** <code>            actor_module.to(torch_dtype)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `actor_module.to`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L405** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L406** <code>            if enable_gradient_checkpointing:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L407** <code>                actor_module.gradient_checkpointing_enable(gradient_checkpointing_kwargs={&quot;use_reentrant&quot;: False})</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `actor_module.gradient_checkpointing_enable(gradient_checkpointing_kwargs`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L408** <code>            if self._is_lora:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L409** <code>                print(&quot;Applying LoRA to actor module&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L410** <code>                actor_module.enable_input_require_grads()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `actor_module.enable_input_require_grads`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L411** <code>                # Convert config to regular Python types before creating PEFT model</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L412** <code>                lora_config = {</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lora_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L413** <code>                    &quot;task_type&quot;: TaskType.CAUSAL_LM,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L414** <code>                    &quot;r&quot;: self.config.model.lora_rank,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L415** <code>                    &quot;lora_alpha&quot;: self.config.model.lora_alpha,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L416** <code>                    &quot;target_modules&quot;: convert_to_regular_types(self.config.model.target_modules),</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `"target_modules": convert_to_regular_types`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L417** <code>                    &quot;exclude_modules&quot;: convert_to_regular_types(self.config.model.exclude_modules),</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `"exclude_modules": convert_to_regular_types`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L418** <code>                    &quot;bias&quot;: &quot;none&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L419** <code>                }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L420** <code>                actor_module = get_peft_model(actor_module, LoraConfig(**lora_config))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L421** <code>        torch.distributed.barrier()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `torch.distributed.barrier`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L422** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L423** <code>        if self.rank == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L424** <code>            print_model_size(actor_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `print_model_size`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L425** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L426** <code>        log_gpu_memory_usage(f&quot;After init {role} from HF AutoModel&quot;, logger=logger)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_gpu_memory_usage(f"After init {role} from HF AutoModel", logger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L427** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L428** <code>        # We wrap FSDP for rollout as well</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L429** <code>        mixed_precision_config = fsdp_config.get(&quot;mixed_precision&quot;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mixed_precision_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L430** <code>        if mixed_precision_config is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L431** <code>            param_dtype = PrecisionType.to_dtype(mixed_precision_config.get(&quot;param_dtype&quot;, &quot;bf16&quot;))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `param_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L432** <code>            reduce_dtype = PrecisionType.to_dtype(mixed_precision_config.get(&quot;reduce_dtype&quot;, &quot;fp32&quot;))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reduce_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L433** <code>            buffer_dtype = PrecisionType.to_dtype(mixed_precision_config.get(&quot;buffer_dtype&quot;, &quot;fp32&quot;))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `buffer_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L434** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L435** <code>            param_dtype = torch.bfloat16</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `param_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L436** <code>            reduce_dtype = torch.float32</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reduce_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L437** <code>            buffer_dtype = torch.float32</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `buffer_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L438** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L439** <code>        mixed_precision = MixedPrecision(param_dtype=param_dtype, reduce_dtype=reduce_dtype, buffer_dtype=buffer_dtype)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mixed_precision`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L440** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L441** <code>        auto_wrap_policy = get_fsdp_wrap_policy(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `auto_wrap_policy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L442** <code>            module=actor_module,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `module`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L443** <code>            config=fsdp_config.get(&quot;wrap_policy&quot;, None),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L444** <code>            is_lora=self.config.model.get(&quot;lora_rank&quot;, 0) &gt; 0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_lora`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L445** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L446** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L447** <code>        if self._is_rollout and self.config.rollout.name == &quot;hf&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L448** <code>            # TODO(zhangchi.usc1992, shengguangming) fix me. Current, auto_wrap_policy causes HFRollout to hang in Gemma</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L449** <code>            auto_wrap_policy = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `auto_wrap_policy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L450** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L451** <code>        if self.rank == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L452** <code>            print(f&quot;wrap_policy: {auto_wrap_policy}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L453** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L454** <code>        fsdp_mesh = self.device_mesh</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fsdp_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L455** <code>        sharding_strategy = get_sharding_strategy(fsdp_mesh)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sharding_strategy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L456** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L457** <code>        # TODO: add transformer policy</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L458** <code>        # We force reference policy to use CPUOffload to save memory.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L459** <code>        # We force turn off CPUOffload for actor because it causes incorrect results when using grad accumulation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L460** <code>        cpu_offload = None if role == &quot;actor&quot; else CPUOffload(offload_params=True)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cpu_offload`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L461** <code>        fsdp_strategy = self.config.actor.strategy</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fsdp_strategy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L462** <code>        if fsdp_strategy == &quot;fsdp&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L463** <code>            actor_module_fsdp = FSDP(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module_fsdp`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L464** <code>                actor_module,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L465** <code>                cpu_offload=cpu_offload,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cpu_offload`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L466** <code>                param_init_fn=init_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `param_init_fn`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L467** <code>                auto_wrap_policy=auto_wrap_policy,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `auto_wrap_policy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L468** <code>                device_id=get_device_id(),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_id`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L469** <code>                sharding_strategy=sharding_strategy,  # zero3</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sharding_strategy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L470** <code>                mixed_precision=mixed_precision,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mixed_precision`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L471** <code>                sync_module_states=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sync_module_states`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L472** <code>                device_mesh=self.device_mesh,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L473** <code>                use_orig_params=fsdp_config.get(&quot;use_orig_params&quot;, False),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_orig_params`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L474** <code>                forward_prefetch=fsdp_config.get(&quot;forward_prefetch&quot;, False),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `forward_prefetch`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L475** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L476** <code>        elif fsdp_strategy == &quot;fsdp2&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L477** <code>            assert CPUOffloadPolicy is not None, &quot;PyTorch version &gt;= 2.4 is required for using fully_shard API (FSDP2)&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L478** <code>            mp_policy = MixedPrecisionPolicy(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mp_policy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L479** <code>                param_dtype=param_dtype, reduce_dtype=reduce_dtype, cast_forward_inputs=True</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `param_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L480** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L481** <code>            if role == &quot;actor&quot; and fsdp_config.offload_policy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L482** <code>                cpu_offload = CPUOffloadPolicy(pin_memory=True)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cpu_offload`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L483** <code>                self._is_offload_param = False</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_offload_param`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L484** <code>                self._is_offload_optimizer = False</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_offload_optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L485** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L486** <code>                cpu_offload = None if role == &quot;actor&quot; else CPUOffloadPolicy(pin_memory=True)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cpu_offload`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L487** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L488** <code>            fsdp_kwargs = {</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fsdp_kwargs`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L489** <code>                &quot;mesh&quot;: fsdp_mesh,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L490** <code>                &quot;mp_policy&quot;: mp_policy,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L491** <code>                &quot;offload_policy&quot;: cpu_offload,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L492** <code>                &quot;reshard_after_forward&quot;: fsdp_config.reshard_after_forward,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L493** <code>                &quot;shard_placement_fn&quot;: get_shard_placement_fn(fsdp_size=self.device_mesh.shape[-1]),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `"shard_placement_fn": get_shard_placement_fn(fsdp_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L494** <code>            }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L495** <code>            full_state = actor_module.state_dict()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `full_state`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L496** <code>            apply_fsdp2(actor_module, fsdp_kwargs, fsdp_config)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `apply_fsdp2`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L497** <code>            fsdp2_load_full_state_dict(actor_module, full_state, fsdp_mesh, cpu_offload)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `fsdp2_load_full_state_dict`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L498** <code>            actor_module_fsdp = actor_module</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_module_fsdp`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L499** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L500** <code>            raise NotImplementedError(f&quot;not implement {fsdp_strategy}&quot;)</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L501** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L502** <code>        if enable_activation_offload:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L503** <code>            enable_activation_offloading(actor_module_fsdp, fsdp_strategy, enable_gradient_checkpointing)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `enable_activation_offloading`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L504** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L505** <code>        log_gpu_memory_usage(f&quot;After {role} FSDP init&quot;, logger=logger)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_gpu_memory_usage(f"After {role} FSDP init", logger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L506** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L507** <code>        # TODO: add more optimizer args into config</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L508** <code>        if role == &quot;actor&quot; and optim_config is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L509** <code>            from verl.utils.torch_functional import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L510** <code>                get_constant_schedule_with_warmup,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L511** <code>                get_cosine_schedule_with_warmup,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L512** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L513** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L514** <code>            actor_optimizer = optim.AdamW(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L515** <code>                actor_module_fsdp.parameters(),</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `actor_module_fsdp.parameters`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L516** <code>                lr=optim_config.lr,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lr`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L517** <code>                betas=optim_config.get(&quot;betas&quot;, (0.9, 0.999)),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `betas`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L518** <code>                weight_decay=optim_config.get(&quot;weight_decay&quot;, 1e-2),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `weight_decay`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L519** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L520** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L521** <code>            total_steps = optim_config.get(&quot;total_training_steps&quot;, 0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_steps`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L522** <code>            num_warmup_steps = int(optim_config.get(&quot;lr_warmup_steps&quot;, -1))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_warmup_steps`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L523** <code>            warmup_style = optim_config.get(&quot;warmup_style&quot;, &quot;constant&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `warmup_style`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L524** <code>            min_lr_ratio = optim_config.get(&quot;min_lr_ratio&quot;, 0.0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `min_lr_ratio`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L525** <code>            num_cycles = optim_config.get(&quot;num_cycles&quot;, 0.5)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_cycles`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L526** <code>            if num_warmup_steps &lt; 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L527** <code>                num_warmup_steps_ratio = optim_config.get(&quot;lr_warmup_steps_ratio&quot;, 0.0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_warmup_steps_ratio`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L528** <code>                num_warmup_steps = int(num_warmup_steps_ratio * total_steps)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_warmup_steps`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L529** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L530** <code>            if self.rank == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L531** <code>                print(f&quot;Total steps: {total_steps}, num_warmup_steps: {num_warmup_steps}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L532** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L533** <code>            if warmup_style == &quot;constant&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L534** <code>                actor_lr_scheduler = get_constant_schedule_with_warmup(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_lr_scheduler`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L535** <code>                    optimizer=actor_optimizer, num_warmup_steps=num_warmup_steps</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L536** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L537** <code>            elif warmup_style == &quot;cosine&quot;:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L538** <code>                actor_lr_scheduler = get_cosine_schedule_with_warmup(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_lr_scheduler`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L539** <code>                    optimizer=actor_optimizer,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L540** <code>                    num_warmup_steps=num_warmup_steps,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_warmup_steps`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L541** <code>                    num_training_steps=total_steps,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_training_steps`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L542** <code>                    min_lr_ratio=min_lr_ratio,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `min_lr_ratio`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L543** <code>                    num_cycles=num_cycles,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_cycles`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L544** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L545** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L546** <code>                raise NotImplementedError(f&quot;Warmup style {warmup_style} is not supported&quot;)</code>
+  - 语法与作用：raise；抛出或重新抛出异常，停止当前正常控制流。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L547** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L548** <code>            log_gpu_memory_usage(f&quot;After {role} optimizer init&quot;, logger=logger)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_gpu_memory_usage(f"After {role} optimizer init", logger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L549** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L550** <code>            actor_optimizer = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L551** <code>            actor_lr_scheduler = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `actor_lr_scheduler`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L552** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L553** <code>        return actor_module_fsdp, actor_optimizer, actor_lr_scheduler, actor_model_config</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L554** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+#### 原始行 632–632
+- **L632** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+#### 原始行 837–1622
+- **L837** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L838** <code>    @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name=&quot;actor&quot;))</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L839** <code>    @DistProfiler.annotate(color=&quot;blue&quot;, role=&quot;actor_compute_log_prob&quot;)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L840** <code>    def compute_log_prob(self, data: DataProto):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L841** <code>        # when is_lora is True, we use the actor without lora applied to calculate the log_prob</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L842** <code>        # which is mostly used for ref log_prob calculation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L843** <code>        assert self._is_actor</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L844** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L845** <code>            load_fsdp_model_to_gpu(self.actor_module_fsdp)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `load_fsdp_model_to_gpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L846** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L847** <code>        # Support all hardwares</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L848** <code>        from contextlib import nullcontext</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L849** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L850** <code>        is_lora = data.meta_info.pop(&quot;is_lora&quot;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_lora`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L851** <code>        adapter_ctx = self.actor.actor_module.disable_adapter() if is_lora else nullcontext()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `adapter_ctx`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L852** <code>        # we should always recompute old_log_probs when it is HybridEngine</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L853** <code>        data.meta_info[&quot;micro_batch_size&quot;] = self.config.rollout.log_prob_micro_batch_size_per_gpu</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["micro_batch_size"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L854** <code>        data.meta_info[&quot;max_token_len&quot;] = self.config.rollout.log_prob_max_token_len_per_gpu</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["max_token_len"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L855** <code>        data.meta_info[&quot;use_dynamic_bsz&quot;] = self.config.rollout.log_prob_use_dynamic_bsz</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["use_dynamic_bsz"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L856** <code>        data.meta_info[&quot;temperature&quot;] = self.config.rollout.temperature</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["temperature"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L857** <code>        # perform recompute log_prob</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L858** <code>        compute_sum_pi_squared = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `compute_sum_pi_squared`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L859** <code>            hasattr(self.config.actor, &#x27;compute_sum_pi_squared&#x27;) and self.config.actor.compute_sum_pi_squared</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `hasattr`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L860** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L861** <code>        with self.ulysses_sharding_manager:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L862** <code>            with adapter_ctx:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L863** <code>                # Actor returns tuple: (log_probs, entropys, sum_pi_squared)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L864** <code>                # sum_pi_squared is None when not requested</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L865** <code>                log_probs, entropys, sum_pi_squared = self.actor.compute_log_prob(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_probs, entropys, sum_pi_squared`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L866** <code>                    data=data, calculate_entropy=True, compute_sum_pi_squared=compute_sum_pi_squared</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L867** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L868** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L869** <code>                # Build DataProto with available tensors</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L870** <code>                tensors = {&quot;old_log_probs&quot;: log_probs, &quot;entropys&quot;: entropys}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tensors`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L871** <code>                if sum_pi_squared is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L872** <code>                    tensors[&quot;sum_pi_squared&quot;] = sum_pi_squared</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tensors["sum_pi_squared"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L873** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L874** <code>                output = DataProto.from_dict(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L875** <code>                    tensors=tensors,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tensors`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L876** <code>                    meta_info={&quot;temperature&quot;: self.config.rollout.temperature},</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `meta_info`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L877** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L878** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L879** <code>        output = output.to(&quot;cpu&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L880** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L881** <code>        # https://pytorch.org/docs/stable/notes/fsdp.html#fsdp-notes</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L882** <code>        # unshard the root FSDP module</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L883** <code>        if self.world_size &gt; 1 and fsdp_version(self.actor.actor_module) == 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L884** <code>            self.actor.actor_module._handle.reshard(True)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.actor.actor_module._handle.reshard`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L885** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L886** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L887** <code>            offload_fsdp_model_to_cpu(self.actor_module_fsdp)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_model_to_cpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L888** <code>            log_gpu_memory_usage(&quot;After offload actor model during compute_log_prob&quot;, logger=logger)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_gpu_memory_usage("After offload actor model during compute_log_prob", logger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L889** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L890** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L891** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L892** <code>    @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name=&quot;actor&quot;))</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L893** <code>    @DistProfiler.annotate(color=&quot;olive&quot;, role=&quot;ref_compute_log_prob&quot;)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L894** <code>    def compute_ref_log_prob(self, data: DataProto):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L895** <code>        if self._is_lora:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L896** <code>            # if _is_lora, actor without lora applied is the ref</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L897** <code>            data.meta_info[&quot;is_lora&quot;] = True</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["is_lora"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L898** <code>            data = self.compute_log_prob(data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L899** <code>            # this old_log_probs is in fact ref_log_prob</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L900** <code>            data = DataProto.from_dict(tensors={&quot;ref_log_prob&quot;: data.batch[&quot;old_log_probs&quot;]})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L901** <code>            return data</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L902** <code>        assert self._is_ref</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L903** <code>        # else:</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L904** <code>        # otherwise, the class have a standalone ref model</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L905** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L906** <code>        micro_batch_size = self.config.ref.log_prob_micro_batch_size_per_gpu</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `micro_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L907** <code>        data.meta_info[&quot;micro_batch_size&quot;] = micro_batch_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["micro_batch_size"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L908** <code>        data.meta_info[&quot;temperature&quot;] = self.config.rollout.temperature</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["temperature"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L909** <code>        data.meta_info[&quot;max_token_len&quot;] = self.config.ref.log_prob_max_token_len_per_gpu</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["max_token_len"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L910** <code>        data.meta_info[&quot;use_dynamic_bsz&quot;] = self.config.ref.log_prob_use_dynamic_bsz</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info["use_dynamic_bsz"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L911** <code>        with self.ulysses_sharding_manager:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L912** <code>            data = data.to(&quot;cpu&quot;)  # data will to device with each micro batch on ref.compute_log_prob</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L913** <code>            output, _, _ = self.ref_policy.compute_log_prob(data=data, calculate_entropy=False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output, _, _`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L914** <code>            output = DataProto.from_dict(tensors={&quot;ref_log_prob&quot;: output})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L915** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L916** <code>        output = output.to(&quot;cpu&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L917** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L918** <code>        # https://pytorch.org/docs/stable/notes/fsdp.html#fsdp-notes</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L919** <code>        # unshard the root FSDP module</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L920** <code>        if self.world_size &gt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L921** <code>            if fsdp_version(self.ref_policy.actor_module) == 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L922** <code>                self.ref_policy.actor_module._handle.reshard(True)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.ref_policy.actor_module._handle.reshard`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L923** <code>            elif fsdp_version(self.ref_policy.actor_module) == 2:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L924** <code>                self.ref_policy.actor_module.reshard()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.ref_policy.actor_module.reshard`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L925** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L926** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L927** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L928** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L929** <code>    def save_checkpoint(self, local_path, hdfs_path=None, global_step=0, max_ckpt_to_keep=None):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L930** <code>        from verl.utils.logger import log_with_rank</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L931** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L932** <code>        # only support save and load ckpt for actor</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L933** <code>        assert self._is_actor</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L934** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L935** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L936** <code>            load_fsdp_model_to_gpu(self.actor_module_fsdp)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `load_fsdp_model_to_gpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L937** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L938** <code>        self.checkpoint_manager.save_checkpoint(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.checkpoint_manager.save_checkpoint`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L939** <code>            local_path=local_path, hdfs_path=hdfs_path, global_step=global_step, max_ckpt_to_keep=max_ckpt_to_keep</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L940** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L941** <code>        dist.barrier()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `dist.barrier`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L942** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L943** <code>        if self._is_lora and hasattr(getattr(self, &quot;actor_module&quot;, self.actor_module_fsdp), &quot;peft_config&quot;):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L944** <code>            lora_save_path = os.path.join(local_path, &quot;lora_adapter&quot;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lora_save_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L945** <code>            peft_model = getattr(self, &quot;actor_module&quot;, self.actor_module_fsdp)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `peft_model`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L946** <code>            peft_config = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `peft_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L947** <code>            if dist.get_rank() == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L948** <code>                os.makedirs(lora_save_path, exist_ok=True)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `os.makedirs(lora_save_path, exist_ok`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L949** <code>                peft_config = asdict(peft_model.peft_config.get(&quot;default&quot;, {}))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `peft_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L950** <code>                peft_config[&quot;task_type&quot;] = peft_config[&quot;task_type&quot;].value</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `peft_config["task_type"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L951** <code>                peft_config[&quot;peft_type&quot;] = peft_config[&quot;peft_type&quot;].value</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `peft_config["peft_type"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L952** <code>                peft_config[&quot;target_modules&quot;] = list(peft_config[&quot;target_modules&quot;])</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `peft_config["target_modules"]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L953** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L954** <code>                if fsdp_version(self.actor_module_fsdp) &gt; 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L955** <code>                    self.actor_module_fsdp = self.actor_module_fsdp.to(get_device_name())</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.actor_module_fsdp`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L956** <code>                    lora_params = layered_summon_lora_params(self.actor_module_fsdp)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lora_params`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L957** <code>                    if dist.get_rank() == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L958** <code>                        save_file(lora_params, os.path.join(lora_save_path, &quot;adapter_model.safetensors&quot;))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `save_file`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L959** <code>                        with open(os.path.join(lora_save_path, &quot;adapter_config.json&quot;), &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L960** <code>                            json.dump(peft_config, f, ensure_ascii=False, indent=4)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `json.dump(peft_config, f, ensure_ascii`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L961** <code>            except Exception as e:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L962** <code>                log_with_rank(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `log_with_rank`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L963** <code>                    f&quot;Save LoRA Adapter Error ({e})&quot;, rank=dist.get_rank(), logger=logger, log_only_rank_0=True</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `f"Save LoRA Adapter Error ({e})", rank`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L964** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L965** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L966** <code>            dist.barrier()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `dist.barrier`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L967** <code>            log_with_rank(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `log_with_rank`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L968** <code>                f&quot;[rank-{self.rank}]: Saved LoRA adapter to: {lora_save_path}&quot;,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L969** <code>                rank=dist.get_rank(),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rank`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L970** <code>                logger=logger,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `logger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L971** <code>                log_only_rank_0=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_only_rank_0`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L972** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L973** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L974** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L975** <code>            offload_fsdp_model_to_cpu(self.actor_module_fsdp)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_model_to_cpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L976** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L977** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L978** <code>    def load_checkpoint(self, local_path, hdfs_path=None, del_local_after_load=False):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L979** <code>        assert self._is_actor or (not self._is_actor and self._is_rollout), (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L980** <code>            f&quot;Checkpoint loading is only supported for Actor or standalone Rollout Workers, but got &quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L981** <code>            f&quot;{self._is_actor} and {self._is_rollout}&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L982** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L983** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L984** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L985** <code>            load_fsdp_model_to_gpu(self.actor_module_fsdp)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `load_fsdp_model_to_gpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L986** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L987** <code>        self.checkpoint_manager.load_checkpoint(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.checkpoint_manager.load_checkpoint`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L988** <code>            local_path=local_path, hdfs_path=hdfs_path, del_local_after_load=del_local_after_load</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L989** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L990** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L991** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L992** <code>            offload_fsdp_model_to_cpu(self.actor_module_fsdp)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_model_to_cpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L993** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L994** <code>        if self._is_offload_optimizer:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L995** <code>            offload_fsdp_optimizer(self.actor_optimizer)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_optimizer`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L996** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L997** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L998** <code>    def start_profile(self, **kwargs) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L999** <code>        &quot;&quot;&quot;Start profiling for the current rank in the current training step.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1000** <code>        self.profiler.start(**kwargs)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.profiler.start`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1001** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1002** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1003** <code>    def stop_profile(self) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1004** <code>        &quot;&quot;&quot;Stop profiling for the current rank in the current training step.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1005** <code>        self.profiler.stop()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.profiler.stop`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1006** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1007** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1008** <code>    def dump_memory_snapshot(self, tag: str = &quot;manual&quot;, sub_dir: str = None) -&gt; None:</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1009** <code>        &quot;&quot;&quot;Manually trigger a CUDA memory snapshot dump on all ranks.&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1010** <code>        # Memory snapshot is now handled by the profiler system</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1011** <code>        # This method is kept for backward compatibility but delegates to profiler</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1012** <code>        if hasattr(self, &quot;profiler&quot;) and hasattr(self.profiler, &quot;_impl&quot;):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1013** <code>            try:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1014** <code>                # Try to use the profiler&#x27;s memory snapshot functionality</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1015** <code>                if hasattr(self.profiler._impl, &quot;sampler&quot;):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1016** <code>                    out_dir = OmegaConf.select(self.config, &quot;actor.profiler.save_path&quot;) or &quot;.&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `out_dir`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1017** <code>                    self.profiler._impl.sampler.dump_memory_snapshot(out_dir=out_dir, tag=tag, sub_dir=sub_dir)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.profiler._impl.sampler.dump_memory_snapshot(out_dir`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1018** <code>            except Exception:</code>
+  - 语法与作用：异常控制结构；捕获、重新抛出或清理异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1019** <code>                # silently ignore if profiler doesn&#x27;t support memory snapshots</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1020** <code>                pass</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1021** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1022** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1023** <code>class CriticWorker(Worker):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1024** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1025** <code>    def __init__(self, config):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1026** <code>        super().__init__()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `super`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1027** <code>        import torch.distributed</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1028** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1029** <code>        if not torch.distributed.is_initialized():</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1030** <code>            torch.distributed.init_process_group(backend=&quot;nccl&quot;)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `torch.distributed.init_process_group(backend`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1031** <code>        self.config = config</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1032** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1033** <code>        # build device mesh for Ulysses Sequence Parallel</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1034** <code>        world_size = torch.distributed.get_world_size()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1035** <code>        from torch.distributed.device_mesh import init_device_mesh</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1036** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1037** <code>        fsdp_size = self.config.model.fsdp_config.fsdp_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fsdp_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1038** <code>        self.device_mesh = create_device_mesh(world_size=world_size, fsdp_size=fsdp_size)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1039** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1040** <code>        self.ulysses_device_mesh = None</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1041** <code>        self.ulysses_sequence_parallel_size = self.config.get(&#x27;ulysses_sequence_parallel_size&#x27;, 1)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_sequence_parallel_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1042** <code>        dp = world_size // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dp`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1043** <code>        if self.ulysses_sequence_parallel_size &gt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1044** <code>            self.ulysses_device_mesh = init_device_mesh(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1045** <code>                &#x27;cuda&#x27;, mesh_shape=(dp, self.ulysses_sequence_parallel_size), mesh_dim_names=[&#x27;dp&#x27;, &#x27;sp&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `'cuda', mesh_shape`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1046** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1047** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1048** <code>        self.ulysses_sharding_manager = FSDPUlyssesShardingManager(self.ulysses_device_mesh)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_sharding_manager`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1049** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1050** <code>        # set FSDP offload params</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1051** <code>        self._is_offload_param = self.config.model.fsdp_config.param_offload</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_offload_param`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1052** <code>        self._is_offload_optimizer = self.config.model.fsdp_config.optimizer_offload</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._is_offload_optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1053** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1054** <code>        # normalize config</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1055** <code>        self.config.ppo_mini_batch_size *= self.config.rollout_n</code>
+  - 语法与作用：属性/变量赋值（`*=`）；计算右侧表达式并更新 `self.config.ppo_mini_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1056** <code>        self.config.ppo_mini_batch_size //= torch.distributed.get_world_size() // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：属性/变量赋值（`//=`）；计算右侧表达式并更新 `self.config.ppo_mini_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1057** <code>        if self.config.ppo_micro_batch_size is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1058** <code>            self.config.ppo_micro_batch_size //= (</code>
+  - 语法与作用：属性/变量赋值（`//=`）；计算右侧表达式并更新 `self.config.ppo_micro_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1059** <code>                torch.distributed.get_world_size() // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `torch.distributed.get_world_size`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1060** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1061** <code>            self.config.forward_micro_batch_size //= (</code>
+  - 语法与作用：属性/变量赋值（`//=`）；计算右侧表达式并更新 `self.config.forward_micro_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1062** <code>                torch.distributed.get_world_size() // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `torch.distributed.get_world_size`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1063** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1064** <code>            self.config.ppo_micro_batch_size_per_gpu = self.config.ppo_micro_batch_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.ppo_micro_batch_size_per_gpu`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1065** <code>            self.config.forward_micro_batch_size_per_gpu = self.config.forward_micro_batch_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.forward_micro_batch_size_per_gpu`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1066** <code>            assert (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1067** <code>                self.config.ppo_mini_batch_size % self.config.ppo_micro_batch_size_per_gpu == 0</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.ppo_mini_batch_size % self.config.ppo_micro_batch_size_per_gpu`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1068** <code>            ), f&#x27;normalized ppo_mini_batch_size {self.config.ppo_mini_batch_size} should be divisible by ppo_micro_batch_size_per_gpu {self.config.ppo_micro_batch_size_per_gpu}&#x27;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1069** <code>            assert (</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1070** <code>                self.config.ppo_mini_batch_size // self.config.ppo_micro_batch_size_per_gpu &gt; 0</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1071** <code>            ), f&#x27;normalized ppo_mini_batch_size {self.config.ppo_mini_batch_size} should be larger than ppo_micro_batch_size_per_gpu {self.config.ppo_micro_batch_size_per_gpu}&#x27;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1072** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1073** <code>    def _build_critic_model_optimizer(self, config):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1074** <code>        # the following line is necessary</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1075** <code>        from torch import optim</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1076** <code>        from torch.distributed.fsdp import FullyShardedDataParallel as FSDP</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1077** <code>        from torch.distributed.fsdp import MixedPrecision, ShardingStrategy</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1078** <code>        from verl.utils.model import LambdaLayer, print_model_size, squeeze</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1079** <code>        from verl.utils.torch_dtypes import PrecisionType</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1080** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1081** <code>        local_path = copy_to_local(config.model.path)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1082** <code>        # note that the tokenizer between actor and critic may be different. So override tokenizer info with actor info</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1083** <code>        # using random initialized model from any architecture. May not be the same as Actor.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1084** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1085** <code>        tokenizer_path = copy_to_local(config.model.tokenizer_path)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tokenizer_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1086** <code>        self.tokenizer = hf_tokenizer(tokenizer_path, trust_remote_code=config.model.get(&#x27;trust_remote_code&#x27;, False))</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1087** <code>        self.processor = hf_processor(tokenizer_path, trust_remote_code=config.model.get(&#x27;trust_remote_code&#x27;, False))</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.processor`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1088** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1089** <code>        from omegaconf import OmegaConf</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1090** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1091** <code>        override_config = OmegaConf.to_container(self.config.model.get(&#x27;override_config&#x27;, OmegaConf.create()))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `override_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1092** <code>        override_config_kwargs = {</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `override_config_kwargs`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1093** <code>            &#x27;bos_token_id&#x27;: self.tokenizer.bos_token_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1094** <code>            &#x27;eos_token_id&#x27;: self.tokenizer.eos_token_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1095** <code>            &#x27;pad_token_id&#x27;: self.tokenizer.pad_token_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1096** <code>        }</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1097** <code>        override_config_kwargs.update(override_config)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `override_config_kwargs.update`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1098** <code>        if self.rank == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1099** <code>            print(f&#x27;Critic overriding config {override_config_kwargs}&#x27;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1100** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1101** <code>        torch_dtype = self.config.model.fsdp_config.get(&#x27;model_dtype&#x27;, &#x27;fp32&#x27;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `torch_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1102** <code>        torch_dtype = PrecisionType.to_dtype(torch_dtype)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `torch_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1103** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1104** <code>        from torch import nn</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1105** <code>        from transformers import AutoConfig, AutoModelForTokenClassification</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1106** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1107** <code>        trust_remote_code = False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trust_remote_code`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1108** <code>        critic_model_config = AutoConfig.from_pretrained(local_path, trust_remote_code=trust_remote_code)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `critic_model_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1109** <code>        critic_model_config.num_labels = 1</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `critic_model_config.num_labels`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1110** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1111** <code>        init_context = get_init_weight_context_manager(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `init_context`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1112** <code>            use_meta_tensor=not critic_model_config.tie_word_embeddings, mesh=self.device_mesh</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_meta_tensor`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1113** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1114** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1115** <code>        with init_context(), warnings.catch_warnings():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1116** <code>            warnings.simplefilter(&quot;ignore&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `warnings.simplefilter`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1117** <code>            setattr(critic_model_config, &#x27;classifier_dropout&#x27;, 0.0)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `setattr`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1118** <code>            setattr(critic_model_config, &#x27;hidden_dropout&#x27;, &#x27;0&#x27;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `setattr`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1119** <code>            critic_module = AutoModelForTokenClassification.from_pretrained(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `critic_module`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1120** <code>                pretrained_model_name_or_path=local_path,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pretrained_model_name_or_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1121** <code>                torch_dtype=torch_dtype,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `torch_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1122** <code>                config=critic_model_config,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1123** <code>                attn_implementation=&#x27;flash_attention_2&#x27;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attn_implementation`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1124** <code>                trust_remote_code=trust_remote_code,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trust_remote_code`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1125** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1126** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1127** <code>            use_remove_padding = config.model.get(&#x27;use_remove_padding&#x27;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_remove_padding`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1128** <code>            if use_remove_padding or self.ulysses_sequence_parallel_size &gt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1129** <code>                from verl.models.transformers.monkey_patch import apply_monkey_patch</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1130** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1131** <code>                apply_monkey_patch(model=critic_module, ulysses_sp_size=self.ulysses_sequence_parallel_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `apply_monkey_patch(model`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1132** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1133** <code>            # some parameters may not in torch_dtype</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1134** <code>            critic_module.to(torch_dtype)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `critic_module.to`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1135** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1136** <code>            if config.model.get(&#x27;enable_gradient_checkpointing&#x27;, False):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1137** <code>                critic_module.gradient_checkpointing_enable(gradient_checkpointing_kwargs={&#x27;use_reentrant&#x27;: False})</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `critic_module.gradient_checkpointing_enable(gradient_checkpointing_kwargs`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1138** <code>        if self.rank == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1139** <code>            print_model_size(critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `print_model_size`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1140** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1141** <code>        self.critic_model_config = critic_model_config</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.critic_model_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1142** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1143** <code>        fsdp_config = self.config.model.fsdp_config</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fsdp_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1144** <code>        mixed_precision_config = fsdp_config.get(&#x27;mixed_precision&#x27;, None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mixed_precision_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1145** <code>        if mixed_precision_config is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1146** <code>            param_dtype = PrecisionType.to_dtype(mixed_precision_config.get(&#x27;param_dtype&#x27;, &#x27;bf16&#x27;))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `param_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1147** <code>            reduce_dtype = PrecisionType.to_dtype(mixed_precision_config.get(&#x27;reduce_dtype&#x27;, &#x27;fp32&#x27;))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reduce_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1148** <code>            buffer_dtype = PrecisionType.to_dtype(mixed_precision_config.get(&#x27;buffer_dtype&#x27;, &#x27;fp32&#x27;))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `buffer_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1149** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1150** <code>            param_dtype = torch.bfloat16</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `param_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1151** <code>            reduce_dtype = torch.float32</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reduce_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1152** <code>            buffer_dtype = torch.float32</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `buffer_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1153** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1154** <code>        mixed_precision = MixedPrecision(param_dtype=param_dtype, reduce_dtype=reduce_dtype, buffer_dtype=buffer_dtype)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mixed_precision`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1155** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1156** <code>        auto_wrap_policy = get_fsdp_wrap_policy(module=critic_module, config=self.config.model.fsdp_config.wrap_policy)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `auto_wrap_policy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1157** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1158** <code>        log_gpu_memory_usage(&#x27;Before critic FSDP&#x27;, logger=None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_gpu_memory_usage('Before critic FSDP', logger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1159** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1160** <code>        fsdp_mesh = self.device_mesh</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fsdp_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1161** <code>        sharding_strategy = get_sharding_strategy(fsdp_mesh)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sharding_strategy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1162** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1163** <code>        # Note: We force turn off CPUOffload for critic because it causes incorrect results when using grad accumulation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1164** <code>        critic_module = FSDP(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `critic_module`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1165** <code>            critic_module,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1166** <code>            param_init_fn=init_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `param_init_fn`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1167** <code>            use_orig_params=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_orig_params`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1168** <code>            auto_wrap_policy=auto_wrap_policy,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `auto_wrap_policy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1169** <code>            device_id=torch.cuda.current_device(),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_id`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1170** <code>            sharding_strategy=sharding_strategy,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sharding_strategy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1171** <code>            mixed_precision=mixed_precision,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `mixed_precision`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1172** <code>            sync_module_states=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sync_module_states`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1173** <code>            forward_prefetch=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `forward_prefetch`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1174** <code>            device_mesh=self.device_mesh,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1175** <code>            cpu_offload=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cpu_offload`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1176** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1177** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1178** <code>        log_gpu_memory_usage(&#x27;After critic FSDP&#x27;, logger=None)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_gpu_memory_usage('After critic FSDP', logger`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1179** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1180** <code>        critic_optimizer = optim.AdamW(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `critic_optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1181** <code>            critic_module.parameters(),</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `critic_module.parameters`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1182** <code>            lr=config.optim.lr,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lr`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1183** <code>            betas=config.optim.get(&#x27;betas&#x27;, (0.9, 0.999)),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `betas`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1184** <code>            weight_decay=config.optim.get(&#x27;weight_decay&#x27;, 1e-2),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `weight_decay`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1185** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1186** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1187** <code>        total_steps = config.optim.get(&#x27;total_training_steps&#x27;, 0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `total_steps`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1188** <code>        num_warmup_steps = int(config.optim.get(&#x27;lr_warmup_steps&#x27;, -1))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_warmup_steps`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1189** <code>        if num_warmup_steps &lt; 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1190** <code>            num_warmup_steps_ratio = config.optim.get(&#x27;lr_warmup_steps_ratio&#x27;, 0.0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_warmup_steps_ratio`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1191** <code>            num_warmup_steps = int(num_warmup_steps_ratio * total_steps)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `num_warmup_steps`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1192** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1193** <code>        print(f&#x27;Total steps: {total_steps}, num_warmup_steps: {num_warmup_steps}&#x27;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1194** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1195** <code>        from verl.utils.torch_functional import get_constant_schedule_with_warmup</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1196** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1197** <code>        critic_lr_scheduler = get_constant_schedule_with_warmup(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `critic_lr_scheduler`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1198** <code>            optimizer=critic_optimizer, num_warmup_steps=num_warmup_steps</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1199** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1200** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1201** <code>        return critic_module, critic_optimizer, critic_lr_scheduler</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1202** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1203** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1204** <code>    def init_model(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1205** <code>        # This is used to import external_lib into the huggingface systems</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1206** <code>        import_external_libs(self.config.model.get(&#x27;external_lib&#x27;, None))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `import_external_libs`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1207** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1208** <code>        from verl.workers.critic import DataParallelPPOCritic</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1209** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1210** <code>        self.critic_module, self.critic_optimizer, self.critic_lr_scheduler = self._build_critic_model_optimizer(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.critic_module, self.critic_optimizer, self.critic_lr_scheduler`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1211** <code>            self.config</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1212** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1213** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1214** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1215** <code>            offload_fsdp_model_to_cpu(self.critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_model_to_cpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1216** <code>        if self._is_offload_optimizer:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1217** <code>            offload_fsdp_optimizer(optimizer=self.critic_optimizer)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `offload_fsdp_optimizer(optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1218** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1219** <code>        self.critic = DataParallelPPOCritic(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.critic`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1220** <code>            config=self.config, critic_module=self.critic_module, critic_optimizer=self.critic_optimizer</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1221** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1222** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1223** <code>        self.flops_counter = FlopsCounter(self.critic_model_config)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.flops_counter`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1224** <code>        self.checkpoint_manager = FSDPCheckpointManager(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.checkpoint_manager`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1225** <code>            model=self.critic_module,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1226** <code>            optimizer=self.critic_optimizer,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1227** <code>            lr_scheduler=self.critic_lr_scheduler,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lr_scheduler`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1228** <code>            processing_class=self.processor if self.processor is not None else self.tokenizer,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `processing_class`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1229** <code>            checkpoint_contents=self.config.checkpoint.contents,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `checkpoint_contents`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1230** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1231** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1232** <code>    @register(dispatch_mode=Dispatch.DP_COMPUTE_PROTO)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1233** <code>    def compute_values(self, data: DataProto):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1234** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1235** <code>        # Support all hardwares</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1236** <code>        data = data.to(torch.cuda.current_device())</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1237** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1238** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1239** <code>            load_fsdp_model_to_gpu(self.critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `load_fsdp_model_to_gpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1240** <code>        micro_batch_size = self.config.forward_micro_batch_size_per_gpu</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `micro_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1241** <code>        data.meta_info[&#x27;micro_batch_size&#x27;] = micro_batch_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info['micro_batch_size']`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1242** <code>        data.meta_info[&#x27;max_token_len&#x27;] = self.config.forward_max_token_len_per_gpu</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info['max_token_len']`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1243** <code>        data.meta_info[&#x27;use_dynamic_bsz&#x27;] = self.config.use_dynamic_bsz</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `data.meta_info['use_dynamic_bsz']`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1244** <code>        # perform forward computation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1245** <code>        with self.ulysses_sharding_manager:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1246** <code>            data = self.ulysses_sharding_manager.preprocess_data(data=data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1247** <code>            values = self.critic.compute_values(data=data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `values`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1248** <code>            output = DataProto.from_dict(tensors={&#x27;values&#x27;: values})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1249** <code>            output = self.ulysses_sharding_manager.postprocess_data(data=output)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1250** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1251** <code>        output = output.to(&#x27;cpu&#x27;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1252** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1253** <code>            offload_fsdp_model_to_cpu(self.critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_model_to_cpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1254** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1255** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1256** <code>    @register(dispatch_mode=Dispatch.DP_COMPUTE_PROTO)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1257** <code>    def update_critic(self, data: DataProto):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1258** <code>        # Support all hardwares</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1259** <code>        data = data.to(torch.cuda.current_device())</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1260** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1261** <code>            load_fsdp_model_to_gpu(self.critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `load_fsdp_model_to_gpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1262** <code>        if self._is_offload_optimizer:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1263** <code>            load_fsdp_optimizer(optimizer=self.critic_optimizer, device_id=torch.cuda.current_device())</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `load_fsdp_optimizer(optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1264** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1265** <code>        # perform forward computation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1266** <code>        with self.ulysses_sharding_manager:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1267** <code>            data = self.ulysses_sharding_manager.preprocess_data(data=data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1268** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1269** <code>            with Timer(name=&#x27;update_critic&#x27;, logger=None) as timer:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1270** <code>                metrics = self.critic.update_critic(data=data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metrics`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1271** <code>            delta_time = timer.last</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `delta_time`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1272** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1273** <code>            global_num_tokens = data.meta_info[&#x27;global_token_num&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `global_num_tokens`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1274** <code>            estimated_flops, promised_flops = self.flops_counter.estimate_flops(global_num_tokens, delta_time)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `estimated_flops, promised_flops`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1275** <code>            metrics[&#x27;perf/mfu/critic&#x27;] = estimated_flops * self.config.ppo_epochs / promised_flops / self.world_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metrics['perf/mfu/critic']`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1276** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1277** <code>            self.critic_lr_scheduler.step()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.critic_lr_scheduler.step`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1278** <code>            lr = self.critic_lr_scheduler.get_last_lr()[0]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `lr`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1279** <code>            metrics[&#x27;critic/lr&#x27;] = lr</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `metrics['critic/lr']`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1280** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1281** <code>            output = DataProto(batch=None, meta_info={&#x27;metrics&#x27;: metrics})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1282** <code>            output = self.ulysses_sharding_manager.postprocess_data(data=output)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1283** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1284** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1285** <code>            offload_fsdp_model_to_cpu(self.critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_model_to_cpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1286** <code>        if self._is_offload_optimizer:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1287** <code>            offload_fsdp_optimizer(optimizer=self.critic_optimizer)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `offload_fsdp_optimizer(optimizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1288** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1289** <code>        output = output.to(&#x27;cpu&#x27;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1290** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1291** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1292** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1293** <code>    def save_checkpoint(self, local_path, hdfs_path=None, global_step=0, max_ckpt_to_keep=None):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1294** <code>        import torch</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1295** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1296** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1297** <code>            load_fsdp_model_to_gpu(self.critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `load_fsdp_model_to_gpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1298** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1299** <code>        self.checkpoint_manager.save_checkpoint(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.checkpoint_manager.save_checkpoint`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1300** <code>            local_path=local_path, hdfs_path=hdfs_path, global_step=global_step, max_ckpt_to_keep=max_ckpt_to_keep</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1301** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1302** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1303** <code>        torch.distributed.barrier()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `torch.distributed.barrier`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1304** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1305** <code>            offload_fsdp_model_to_cpu(self.critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_model_to_cpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1306** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1307** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1308** <code>    def load_checkpoint(self, local_path, hdfs_path=None, del_local_after_load=True):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1309** <code>        import torch</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1310** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1311** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1312** <code>            load_fsdp_model_to_gpu(self.critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `load_fsdp_model_to_gpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1313** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1314** <code>        self.checkpoint_manager.load_checkpoint(</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.checkpoint_manager.load_checkpoint`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1315** <code>            local_path=local_path, hdfs_path=hdfs_path, del_local_after_load=del_local_after_load</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1316** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1317** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1318** <code>        torch.distributed.barrier()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `torch.distributed.barrier`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1319** <code>        if self._is_offload_param:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1320** <code>            offload_fsdp_model_to_cpu(self.critic_module)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_model_to_cpu`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1321** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1322** <code>        if self._is_offload_optimizer:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1323** <code>            offload_fsdp_optimizer(self.critic_optimizer)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `offload_fsdp_optimizer`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1324** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1325** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1326** <code># TODO(sgm): we may need to extract it to dp_reward_model.py</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1327** <code>class RewardModelWorker(Worker):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1328** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1329** <code>    Note that we only implement the reward model that is subclass of AutoModelForTokenClassification.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1330** <code>    &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1331** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1332** <code>    def __init__(self, config):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1333** <code>        super().__init__()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `super`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1334** <code>        import torch.distributed</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1335** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1336** <code>        if not torch.distributed.is_initialized():</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1337** <code>            torch.distributed.init_process_group(backend=&quot;nccl&quot;)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `torch.distributed.init_process_group(backend`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1338** <code>        self.config = config</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1339** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1340** <code>        # build device mesh for Ulysses Sequence Parallel</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1341** <code>        world_size = torch.distributed.get_world_size()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `world_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1342** <code>        from torch.distributed.device_mesh import init_device_mesh</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1343** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1344** <code>        fsdp_size = self.config.model.fsdp_config.fsdp_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fsdp_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1345** <code>        self.device_mesh = create_device_mesh(world_size=world_size, fsdp_size=fsdp_size)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1346** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1347** <code>        self.ulysses_device_mesh = None</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1348** <code>        self.ulysses_sequence_parallel_size = self.config.get(&#x27;ulysses_sequence_parallel_size&#x27;, 1)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_sequence_parallel_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1349** <code>        dp = world_size // self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `dp`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1350** <code>        if self.ulysses_sequence_parallel_size &gt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1351** <code>            self.ulysses_device_mesh = init_device_mesh(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1352** <code>                &#x27;cuda&#x27;, mesh_shape=(dp, self.ulysses_sequence_parallel_size), mesh_dim_names=[&#x27;dp&#x27;, &#x27;sp&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `'cuda', mesh_shape`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1353** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1354** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1355** <code>        self.ulysses_sharding_manager = FSDPUlyssesShardingManager(self.ulysses_device_mesh)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_sharding_manager`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1356** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1357** <code>        self.use_remove_padding = self.config.model.get(&#x27;use_remove_padding&#x27;, False)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.use_remove_padding`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1358** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1359** <code>        # normalize config</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1360** <code>        if self.config.micro_batch_size is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1361** <code>            self.config.micro_batch_size //= torch.distributed.get_world_size()</code>
+  - 语法与作用：属性/变量赋值（`//=`）；计算右侧表达式并更新 `self.config.micro_batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1362** <code>            self.config.micro_batch_size_per_gpu = self.config.micro_batch_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.config.micro_batch_size_per_gpu`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1363** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1364** <code>    def _build_model(self, config):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1365** <code>        # the following line is necessary</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1366** <code>        from torch.distributed.fsdp import CPUOffload</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1367** <code>        from torch.distributed.fsdp import FullyShardedDataParallel as FSDP</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1368** <code>        from torch.distributed.fsdp import ShardingStrategy</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1369** <code>        from transformers import AutoConfig, AutoModelForTokenClassification</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1370** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1371** <code>        # download the checkpoint from hdfs</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1372** <code>        local_path = copy_to_local(config.model.path)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `local_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1373** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1374** <code>        if self.config.model.input_tokenizer is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1375** <code>            self._do_switch_chat_template = False</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._do_switch_chat_template`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1376** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1377** <code>            self._do_switch_chat_template = True</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self._do_switch_chat_template`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1378** <code>            input_tokenizer_local_path = copy_to_local(config.model.input_tokenizer)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_tokenizer_local_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1379** <code>            self.input_tokenizer = hf_tokenizer(</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.input_tokenizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1380** <code>                input_tokenizer_local_path, trust_remote_code=config.model.get(&#x27;trust_remote_code&#x27;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_tokenizer_local_path, trust_remote_code`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1381** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1382** <code>            self.tokenizer = hf_tokenizer(local_path, trust_remote_code=config.model.get(&#x27;trust_remote_code&#x27;, False))</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.tokenizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1383** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1384** <code>        trust_remote_code = config.model.get(&#x27;trust_remote_code&#x27;, False)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trust_remote_code`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1385** <code>        model_config = AutoConfig.from_pretrained(local_path, trust_remote_code=trust_remote_code)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model_config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1386** <code>        model_config.num_labels = 1</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `model_config.num_labels`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1387** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1388** <code>        # note that we have to create model in fp32. Otherwise, the optimizer is in bf16, which is incorrect</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1389** <code>        init_context = get_init_weight_context_manager(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `init_context`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1390** <code>            use_meta_tensor=not model_config.tie_word_embeddings, mesh=self.device_mesh</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_meta_tensor`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1391** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1392** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1393** <code>        with init_context(), warnings.catch_warnings():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1394** <code>            warnings.simplefilter(&quot;ignore&quot;)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `warnings.simplefilter`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1395** <code>            setattr(model_config, &#x27;classifier_dropout&#x27;, 0.0)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `setattr`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1396** <code>            reward_module = AutoModelForTokenClassification.from_pretrained(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_module`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1397** <code>                pretrained_model_name_or_path=local_path,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pretrained_model_name_or_path`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1398** <code>                config=model_config,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `config`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1399** <code>                torch_dtype=torch.bfloat16,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `torch_dtype`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1400** <code>                attn_implementation=&#x27;flash_attention_2&#x27;,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attn_implementation`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1401** <code>                trust_remote_code=trust_remote_code,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `trust_remote_code`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1402** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1403** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1404** <code>            if config.model.get(&#x27;use_remove_padding&#x27;, False) or self.ulysses_sequence_parallel_size &gt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1405** <code>                from verl.models.transformers.monkey_patch import apply_monkey_patch</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1406** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1407** <code>                apply_monkey_patch(model=reward_module, ulysses_sp_size=self.ulysses_sequence_parallel_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `apply_monkey_patch(model`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1408** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1409** <code>            reward_module.to(torch.bfloat16)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `reward_module.to`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1410** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1411** <code>        auto_wrap_policy = get_fsdp_wrap_policy(module=reward_module, config=self.config.model.fsdp_config)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `auto_wrap_policy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1412** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1413** <code>        fsdp_mesh = self.device_mesh</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `fsdp_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1414** <code>        sharding_strategy = get_sharding_strategy(fsdp_mesh)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sharding_strategy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1415** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1416** <code>        reward_module = FSDP(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_module`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1417** <code>            reward_module,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1418** <code>            param_init_fn=init_fn,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `param_init_fn`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1419** <code>            use_orig_params=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_orig_params`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1420** <code>            auto_wrap_policy=auto_wrap_policy,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `auto_wrap_policy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1421** <code>            device_id=torch.cuda.current_device(),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_id`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1422** <code>            sharding_strategy=sharding_strategy,  # zero3</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sharding_strategy`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1423** <code>            sync_module_states=True,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sync_module_states`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1424** <code>            cpu_offload=CPUOffload(offload_params=True),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `cpu_offload`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1425** <code>            forward_prefetch=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `forward_prefetch`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1426** <code>            device_mesh=self.device_mesh,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `device_mesh`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1427** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1428** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1429** <code>        return reward_module</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1430** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1431** <code>    @register(dispatch_mode=Dispatch.ONE_TO_ALL)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1432** <code>    def init_model(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1433** <code>        # This is used to import external_lib into the huggingface systems</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1434** <code>        import_external_libs(self.config.model.get(&#x27;external_lib&#x27;, None))</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `import_external_libs`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1435** <code>        self.reward_module = self._build_model(config=self.config)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.reward_module`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1436** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1437** <code>    def _forward_micro_batch(self, micro_batch):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1438** <code>        from flash_attn.bert_padding import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1439** <code>            index_first_axis,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1440** <code>            pad_input,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1441** <code>            rearrange,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1442** <code>            unpad_input,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1443** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1444** <code>        from verl.utils.ulysses import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1445** <code>            gather_outpus_and_unpad,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1446** <code>            ulysses_pad_and_slice_inputs,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1447** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1448** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1449** <code>        with torch.no_grad(), torch.autocast(device_type=&#x27;cuda&#x27;, dtype=torch.bfloat16):</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1450** <code>            input_ids = micro_batch[&#x27;input_ids&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1451** <code>            batch_size, seqlen = input_ids.shape</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_size, seqlen`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1452** <code>            attention_mask = micro_batch[&#x27;attention_mask&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attention_mask`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1453** <code>            position_ids = micro_batch[&#x27;position_ids&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1454** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1455** <code>            if self.use_remove_padding:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1456** <code>                input_ids_rmpad, indices, *_ = unpad_input(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad, indices, *_`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1457** <code>                    input_ids.unsqueeze(-1), attention_mask</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `input_ids.unsqueeze`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1458** <code>                )  # input_ids_rmpad (total_nnz, ...)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `)  # input_ids_rmpad`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1459** <code>                input_ids_rmpad = input_ids_rmpad.transpose(0, 1)  # (1, total_nnz)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1460** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1461** <code>                # unpad the position_ids to align the rotary</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1462** <code>                position_ids_rmpad = index_first_axis(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids_rmpad`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1463** <code>                    rearrange(position_ids.unsqueeze(-1), &quot;b s ... -&gt; (b s) ...&quot;), indices</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rearrange`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1464** <code>                ).transpose(0, 1)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `).transpose`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1465** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1466** <code>                # pad and slice the inputs if sp &gt; 1</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1467** <code>                if self.ulysses_sequence_parallel_size &gt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1468** <code>                    input_ids_rmpad, position_ids_rmpad, pad_size = ulysses_pad_and_slice_inputs(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad, position_ids_rmpad, pad_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1469** <code>                        input_ids_rmpad, position_ids_rmpad, sp_size=self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad, position_ids_rmpad, sp_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1470** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1471** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1472** <code>                # only pass input_ids and position_ids to enable flash_attn_varlen</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1473** <code>                output = self.reward_module(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1474** <code>                    input_ids=input_ids_rmpad, attention_mask=None, position_ids=position_ids_rmpad, use_cache=False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1475** <code>                )  # prevent model thinks we are generating</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1476** <code>                reward_rmpad = output.logits</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_rmpad`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1477** <code>                reward_rmpad = reward_rmpad.squeeze(0)  # (total_nnz)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_rmpad`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1478** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1479** <code>                # gather output if sp &gt; 1</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1480** <code>                if self.ulysses_sequence_parallel_size &gt; 1:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1481** <code>                    reward_rmpad = gather_outpus_and_unpad(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_rmpad`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1482** <code>                        reward_rmpad, gather_dim=0, unpad_dim=0, padding_size=pad_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `reward_rmpad, gather_dim`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1483** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1484** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1485** <code>                # pad it back</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1486** <code>                rm_score = pad_input(reward_rmpad, indices=indices, batch=batch_size, seqlen=seqlen).squeeze(-1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_score`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1487** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1488** <code>                output = self.reward_module(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1489** <code>                    input_ids=input_ids, attention_mask=attention_mask, position_ids=position_ids, use_cache=False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1490** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1491** <code>                rm_score = output.logits  # (batch_size, seq_len, 1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_score`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1492** <code>                rm_score = rm_score.squeeze(-1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_score`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1493** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1494** <code>            # extract the result of the last valid token</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1495** <code>            eos_mask_idx = torch.argmax(position_ids * attention_mask, dim=-1)  # (bsz,)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `eos_mask_idx`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1496** <code>            rm_score = rm_score[torch.arange(batch_size), eos_mask_idx]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_score`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1497** <code>            return rm_score</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1498** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1499** <code>    def _expand_to_token_level(self, data: DataProto, scores: torch.Tensor):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1500** <code>        batch_size = data.batch.batch_size[0]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_size`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1501** <code>        # expand as token_level_reward</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1502** <code>        attention_mask = data.batch[&#x27;attention_mask&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attention_mask`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1503** <code>        position_ids = data.batch[&#x27;position_ids&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1504** <code>        response_length = data.batch[&#x27;responses&#x27;].shape[-1]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_length`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1505** <code>        eos_mask_idx = torch.argmax(position_ids * attention_mask, dim=-1)  # (bsz,)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `eos_mask_idx`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1506** <code>        token_level_scores = torch.zeros_like(attention_mask, dtype=scores.dtype)  # (bsz, seqlen)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_scores`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1507** <code>        token_level_scores[torch.arange(batch_size), eos_mask_idx] = scores</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `token_level_scores[torch.arange(batch_size), eos_mask_idx]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1508** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1509** <code>        # select the response part</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1510** <code>        token_level_scores = token_level_scores[:, -response_length:]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_scores`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1511** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1512** <code>        return token_level_scores</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1513** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1514** <code>    def _switch_chat_template(self, data: DataProto):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1515** <code>        src_max_length = data.batch[&#x27;attention_mask&#x27;].shape[-1]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `src_max_length`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1516** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1517** <code>        src_tokenizer = self.input_tokenizer</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `src_tokenizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1518** <code>        target_tokenizer = self.tokenizer</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `target_tokenizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1519** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1520** <code>        rm_input_ids = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_input_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1521** <code>        rm_attention_mask = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_attention_mask`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1522** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1523** <code>        for i in range(data.batch.batch_size[0]):</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1524** <code>            # extract raw prompt</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1525** <code>            chat: list = data.non_tensor_batch[&#x27;raw_prompt&#x27;][i].tolist()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `chat: list`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1526** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1527** <code>            # extract response</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1528** <code>            response_ids = data.batch[&#x27;responses&#x27;][i]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1529** <code>            response_length = response_ids.shape[-1]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_length`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1530** <code>            valid_response_length = data.batch[&#x27;attention_mask&#x27;][i][-response_length:].sum()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_response_length`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1531** <code>            valid_response_ids = response_ids[:valid_response_length]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `valid_response_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1532** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1533** <code>            # decode</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1534** <code>            response = src_tokenizer.decode(valid_response_ids)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1535** <code>            # remove bos and eos</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1536** <code>            response = response.replace(src_tokenizer.eos_token, &#x27;&#x27;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1537** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1538** <code>            chat.append({&#x27;role&#x27;: &#x27;assistant&#x27;, &#x27;content&#x27;: response})</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `chat.append`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1539** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1540** <code>            prompt_with_chat_template = target_tokenizer.apply_chat_template(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt_with_chat_template`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1541** <code>                chat, add_generation_prompt=False, tokenize=False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `chat, add_generation_prompt`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1542** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1543** <code>            if self.rank == 0 and i == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1544** <code>                # for debugging purpose</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1545** <code>                print(f&#x27;Switch template. chat: {prompt_with_chat_template}&#x27;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1546** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1547** <code>            # the maximum length is actually determined by the reward model itself</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1548** <code>            max_length = self.config.get(&#x27;max_length&#x27;, src_max_length)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_length`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1549** <code>            if max_length is None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1550** <code>                max_length = src_max_length</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_length`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1551** <code>            input_ids, attention_mask = verl_F.tokenize_and_postprocess_data(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids, attention_mask`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1552** <code>                prompt=prompt_with_chat_template,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `prompt`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1553** <code>                tokenizer=target_tokenizer,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `tokenizer`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1554** <code>                max_length=max_length,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_length`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1555** <code>                pad_token_id=target_tokenizer.pad_token_id,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `pad_token_id`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1556** <code>                left_pad=False,  # right padding</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `left_pad`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1557** <code>                truncation=self.config.get(&#x27;truncation&#x27;, &#x27;right&#x27;),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `truncation`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1558** <code>            )  # truncate from the right</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1559** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1560** <code>            rm_input_ids.append(input_ids)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rm_input_ids.append`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1561** <code>            rm_attention_mask.append(attention_mask)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rm_attention_mask.append`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1562** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1563** <code>        rm_input_ids = torch.cat(rm_input_ids, dim=0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_input_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1564** <code>        rm_attention_mask = torch.cat(rm_attention_mask, dim=0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_attention_mask`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1565** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1566** <code>        rm_position_ids = compute_position_id_with_mask(rm_attention_mask)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_position_ids`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1567** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1568** <code>        rm_inputs = {&#x27;input_ids&#x27;: rm_input_ids, &#x27;attention_mask&#x27;: rm_attention_mask, &#x27;position_ids&#x27;: rm_position_ids}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_inputs`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1569** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1570** <code>        return DataProto.from_dict(rm_inputs)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1571** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1572** <code>    @register(dispatch_mode=Dispatch.DP_COMPUTE_PROTO)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1573** <code>    def compute_rm_score(self, data: DataProto):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1574** <code>        import itertools</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1575** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1576** <code>        from verl.utils.seqlen_balancing import get_reverse_idx, rearrange_micro_batches</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1577** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1578** <code>        # Support all hardwares</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1579** <code>        data = data.to(torch.cuda.current_device())</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1580** <code>        if self._do_switch_chat_template:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1581** <code>            rm_data = self._switch_chat_template(data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1582** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1583** <code>        # Support all hardwares</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1584** <code>        rm_data.batch = rm_data.batch.to(torch.cuda.current_device())</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `rm_data.batch`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1585** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1586** <code>        # perform forward computation</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1587** <code>        with self.ulysses_sharding_manager:</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1588** <code>            rm_data = self.ulysses_sharding_manager.preprocess_data(data=rm_data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1589** <code>            data = self.ulysses_sharding_manager.preprocess_data(data=data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1590** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1591** <code>            use_dynamic_bsz = self.config.use_dynamic_bsz</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_dynamic_bsz`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1592** <code>            if use_dynamic_bsz:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1593** <code>                max_token_len = self.config.forward_max_token_len_per_gpu * self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_token_len`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1594** <code>                micro_batches, indices = rearrange_micro_batches(batch=rm_data.batch, max_token_len=max_token_len)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `micro_batches, indices`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1595** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1596** <code>                micro_batches = rm_data.batch.split(self.config.micro_batch_size_per_gpu)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `micro_batches`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1597** <code>            output = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1598** <code>            for micro_batch in micro_batches:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1599** <code>                rm_score = self._forward_micro_batch(micro_batch)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `rm_score`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1600** <code>                output.append(rm_score)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `output.append`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1601** <code>            scores = torch.cat(output, dim=0)  # (batch_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `scores`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1602** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1603** <code>            if use_dynamic_bsz:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1604** <code>                indices = list(itertools.chain.from_iterable(indices))</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `indices`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1605** <code>                assert len(indices) == scores.size(0), f&quot;{len(indices)} vs. {scores.size()}&quot;</code>
+  - 语法与作用：assert；检查配置、数据或张量不变量，失败抛出 AssertionError。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1606** <code>                revert_indices = torch.tensor(get_reverse_idx(indices), dtype=torch.long)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `revert_indices`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1607** <code>                scores = scores[revert_indices]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `scores`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1608** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1609** <code>            token_level_scores = self._expand_to_token_level(data, scores)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `token_level_scores`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1610** <code>            # Note that this is only the scores, may not be the final rewards used to train RL</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1611** <code>            output = DataProto.from_dict(tensors={&#x27;rm_scores&#x27;: token_level_scores})</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1612** <code>            output = self.ulysses_sharding_manager.postprocess_data(data=output)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1613** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1614** <code>        # https://pytorch.org/docs/stable/notes/fsdp.html#fsdp-notes</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1615** <code>        # unshard the root FSDP module</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1616** <code>        self.reward_module._handle.reshard(True)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.reward_module._handle.reshard`，产生返回值或副作用。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1617** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1618** <code>        output = output.to(&#x27;cpu&#x27;)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1619** <code>        return output</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1620** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1621** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1622** <code># ================================= Async related workers =================================</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+#### 原始行 1623–1660
+- **L1623** <code>class AsyncActorRolloutRefWorker(ActorRolloutRefWorker):</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1624** <code>    def _build_rollout(self, trust_remote_code=False):</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1625** <code>        rollout_worker, rollout_sharding_manager = super()._build_rollout(trust_remote_code)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `rollout_worker, rollout_sharding_manager`，可能更新对象状态。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1626** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1627** <code>        # NOTE: rollout is not actually initialized here, it's deferred</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1628** <code>        # to be initialized by AsyncvLLMServer.</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1629** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1630** <code>        self.vllm_tp_size = self.config.rollout.tensor_model_parallel_size</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.vllm_tp_size`，可能更新对象状态。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1631** <code>        self.vllm_dp_rank = int(os.environ["RANK"]) // self.vllm_tp_size</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.vllm_dp_rank`，可能更新对象状态。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1632** <code>        self.vllm_tp_rank = int(os.environ["RANK"]) % self.vllm_tp_size</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `self.vllm_tp_rank`，可能更新对象状态。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1633** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1634** <code>        # used for sleep/wake_up</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1635** <code>        rollout_worker.rollout.sharding_manager = rollout_sharding_manager</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `rollout_worker.rollout.sharding_manager`，可能更新对象状态。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1636** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1637** <code>        return rollout_worker, rollout_sharding_manager</code>
+  - 语法与作用：return；结束当前函数并向调用者返回结果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1638** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1639** <code>    @register(dispatch_mode=Dispatch.DP_COMPUTE_PROTO)</code>
+  - 语法与作用：装饰器；在下方类/函数定义完成时注册或包装对象。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1640** <code>    def generate_sequences(self, prompts: DataProto):</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1641** <code>        raise NotImplementedError("AsyncActorRolloutRefWorker does not support generate_sequences")</code>
+  - 语法与作用：异常/断言语句；条件不满足时中止当前路径。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1642** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1643** <code>    # ============================ vLLM related ============================</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1644** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1645** <code>    @register(dispatch_mode=Dispatch.DIRECT_ROLLOUT_METHOD)</code>
+  - 语法与作用：装饰器；在下方类/函数定义完成时注册或包装对象。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1646** <code>    def execute_method(self, method: str | bytes, *args, **kwargs):</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1647** <code>        """Called by ExternalRayDistributedExecutor collective_rpc."""</code>
+  - 语法与作用：文档字符串；在模块、函数或类定义中保存说明文本，不作为控制流执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1648** <code>        return self.rollout.execute_method(method, *args, **kwargs)</code>
+  - 语法与作用：return；结束当前函数并向调用者返回结果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1649** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1650** <code>    @register(dispatch_mode=Dispatch.DIRECT_ROLLOUT_METHOD)</code>
+  - 语法与作用：装饰器；在下方类/函数定义完成时注册或包装对象。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1651** <code>    def get_zeromq_address(self):</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1652** <code>        return self.rollout.get_zeromq_address()</code>
+  - 语法与作用：return；结束当前函数并向调用者返回结果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1653** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1654** <code>    # ============================ SGLang related ============================</code>
+  - 语法与作用：注释；解释实现或限制，不执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1655** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1656** <code>    @register(dispatch_mode=Dispatch.DIRECT_ROLLOUT_METHOD, blocking=False)</code>
+  - 语法与作用：装饰器；在下方类/函数定义完成时注册或包装对象。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1657** <code>    async def chat_completion(self, json_request):</code>
+  - 语法与作用：定义语法；创建类或函数对象。函数体只有在调用时执行，类体在定义时执行。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1658** <code>        ret = await self.rollout.chat_completion(json_request)</code>
+  - 语法与作用：赋值语法；计算右侧表达式并把结果绑定到 `ret`，可能更新对象状态。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1659** <code>        return ret</code>
+  - 语法与作用：return；结束当前函数并向调用者返回结果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+- **L1660** <code><空行></code>
+  - 语法与作用：空行；只用于排版，无运行时效果。
+  - 执行状态：当前 FSDP async actor worker 初始化/调用时执行；具体 PyTorch/VERL worker 父类内部不展开。
+
+
+#### 原始行 1661–1682
+- **L1661** <code>    @register(dispatch_mode=Dispatch.DIRECT_ROLLOUT_METHOD, blocking=False)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1662** <code>    async def generate(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1663** <code>        self,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1664** <code>        prompt_ids: list[int],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1665** <code>        sampling_params: dict[str, Any],</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1666** <code>        request_id: str,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1667** <code>        image_data: Optional[list[Any]] = None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `image_data: Optional[list[Any]]`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1668** <code>    ) -&gt; list[int]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1669** <code>        ret = await self.rollout.generate(prompt_ids, sampling_params, request_id, image_data=image_data)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `ret`。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1670** <code>        return ret</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1671** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1672** <code>    @register(dispatch_mode=Dispatch.DIRECT_ROLLOUT_METHOD)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1673** <code>    async def wake_up(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1674** <code>        await self.rollout.wake_up()</code>
+  - 语法与作用：await；暂停当前协程，等待异步操作完成后恢复。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1675** <code>        # return something to block the caller</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1676** <code>        return True</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1677** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1678** <code>    @register(dispatch_mode=Dispatch.DIRECT_ROLLOUT_METHOD)</code>
+  - 语法与作用：装饰器；在下方对象定义时注册 Ray、FastAPI、dispatch 或 profiling 行为。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1679** <code>    async def sleep(self):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1680** <code>        await self.rollout.sleep()</code>
+  - 语法与作用：await；暂停当前协程，等待异步操作完成后恢复。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1681** <code>        # return something to block the caller</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+- **L1682** <code>        return True</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 FSDP worker 初始化、模型/rollout 构建、compute_log_prob/ref/保存加载和非 async worker 分支；当前 actor/async worker 只执行对应条件块。
+
+
+
+#### FSDP boundary line 756
+- **L756** <code>@DistProfiler.annotate(color="red", role="actor_update")</code>：装饰器语法；定义 `update_actor` 时注册 profiling 标记，当前 actor 更新路径会执行。
+
+
+---
+
+**导航**：[上一附录](10-actor-update.md) · [附录目录](index.md) · [下一附录](12-agent-environment.md)

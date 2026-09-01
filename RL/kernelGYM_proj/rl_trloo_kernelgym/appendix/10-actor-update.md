@@ -1,0 +1,2065 @@
+# Actor policy update：PPO loss 与 optimizer
+
+> 返回附录目录：[`index.md`](index.md)
+>
+> 概念教程：[`../03-rollout-reward-training.md`](../03-rollout-reward-training.md)
+
+---
+
+源码文件：`drkernel/verl_patch/workers/code/actor/dp_actor.py`。本篇所有逐行条目均来自 `dp_actor.py`；覆盖当前 actor 的 log-prob、policy loss、反向传播和 optimizer 边界。
+
+#### 原始行 330–380
+- **L330** 源码：<code>                    logits = output.logits</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `logits`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L331** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L332** 源码：<code>                    logits.div_(temperature)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `logits.div_`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L333** 源码：<code>                    logits = logits[:, -response_length - 1 : -1, :]  # (bsz, response_length, vocab_size)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `logits`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L334** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L335** 源码：<code>                    # Compute sum_pi_squared if requested (for optimal baseline)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L336** 源码：<code>                    if compute_sum_pi_squared:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L337** 源码：<code>                        if not self.config.get(&#x27;sum_pi_squared_checkpointing&#x27;, False):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L338** 源码：<code>                            sum_pi_squared = self.compute_sum_pi_squared_from_logits(logits)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sum_pi_squared`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L339** 源码：<code>                        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L340** 源码：<code>                            sum_pi_squared = torch.utils.checkpoint.checkpoint(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `sum_pi_squared`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L341** 源码：<code>                                self.compute_sum_pi_squared_from_logits, logits</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L342** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L343** 源码：<code>                    log_probs = logprobs_from_logits(logits, micro_batch[&quot;responses&quot;])</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `log_probs`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L344** 源码：<code>                    if calculate_entropy:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L345** 源码：<code>                        if not self.config.entropy_checkpointing:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L346** 源码：<code>                            entropy = verl_F.entropy_from_logits(logits)  # (bsz, response_length)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L347** 源码：<code>                        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L348** 源码：<code>                            entropy = torch.utils.checkpoint.checkpoint(verl_F.entropy_from_logits, logits)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L349** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L350** 源码：<code>            return entropy, log_probs, sum_pi_squared</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L351** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L352** 源码：<code>    def _optimizer_step(self):</code>
+  - 语法与作用：函数定义语法；声明 `_optimizer_step` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L353** 源码：<code>        assert self.config.grad_clip is not None</code>
+  - 语法与作用：断言语句；条件为假时抛出 AssertionError，用于保护数据形状或配置不变量。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L354** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L355** 源码：<code>        if isinstance(self.actor_module, FSDP):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L356** 源码：<code>            grad_norm = self.actor_module.clip_grad_norm_(max_norm=self.config.grad_clip)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `grad_norm`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L357** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L358** 源码：<code>            grad_norm = torch.nn.utils.clip_grad_norm_(self.actor_module.parameters(), max_norm=self.config.grad_clip)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `grad_norm`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L359** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L360** 源码：<code>        # if grad_norm is not finite, skip the update</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L361** 源码：<code>        if not torch.isfinite(grad_norm):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L362** 源码：<code>            print(f&quot;WARN: rank {torch.distributed.get_rank()} grad_norm is not finite: {grad_norm}&quot;)</code>
+  - 语法与作用：调用表达式；调用日志、输出或等待函数，产生外部可见输出或时间副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L363** 源码：<code>            self.actor_optimizer.zero_grad()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.actor_optimizer.zero_grad`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L364** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L365** 源码：<code>            self.actor_optimizer.step()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.actor_optimizer.step`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L366** 源码：<code>        return grad_norm</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L367** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L368** 源码：<code>    @GPUMemoryLogger(role=&quot;dp actor&quot;, logger=logger)</code>
+  - 语法与作用：装饰器语法；在定义下面的函数/类时先调用该装饰器，替换或包装定义对象。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L369** 源码：<code>    def compute_log_prob(</code>
+  - 语法与作用：函数定义语法；声明 `compute_log_prob` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L370** 源码：<code>        self, data: DataProto, calculate_entropy=False, compute_sum_pi_squared=False</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L371** 源码：<code>    ) -&gt; tuple[torch.Tensor, torch.Tensor | None, torch.Tensor | None]:</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L372** 源码：<code>        &quot;&quot;&quot;Compute the log probability of the responses given input_ids, attention_mask and position_ids</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L373** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L374** 源码：<code>        Args:</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L375** 源码：<code>            data (DataProto): a DataProto containing keys</code>
+  - 语法与作用：函数/构造器调用语法；调用 `data`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L376** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L377** 源码：<code>                ``input_ids``: tensor of shape [batch_size, sequence_length]. torch.int64. Note that input_ids is the</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L378** 源码：<code>                concatenation of prompt and response. Note that ``sequence_length = prompt_length + response_length``.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L379** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L380** 源码：<code>                ``attention_mask``: tensor of shape [batch_size, sequence_length]. torch.int64.</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+
+#### 原始行 445–681
+- **L445** 源码：<code>    def update_policy(self, data: DataProto):</code>
+  - 语法与作用：函数定义语法；声明 `update_policy` 及其参数，定义时不执行函数体，调用时才执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L446** 源码：<code>        # make sure we are in training mode</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L447** 源码：<code>        self.actor_module.train()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.actor_module.train`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L448** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L449** 源码：<code>        temperature = data.meta_info[&#x27;temperature&#x27;]  # temperature must be in the data.meta_info to avoid slient error</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `temperature`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L450** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L451** 源码：<code>        # Rollout correction mode detection</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L452** 源码：<code>        # bypass_mode: Uses rollout_log_prob as old_log_prob (set by trainer)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L453** 源码：<code>        # use_pure_rollout_correction: Selects loss function (PPO vs pure IS)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L454** 源码：<code>        bypass_mode = data.meta_info.get(&#x27;bypass_old_logprob_for_rollout&#x27;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `bypass_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L455** 源码：<code>        use_pure_rollout_correction = data.meta_info.get(&#x27;use_pure_rollout_correction&#x27;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_pure_rollout_correction`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L456** 源码：<code>        if use_pure_rollout_correction:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L457** 源码：<code>            # Get rollout correction config</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L458** 源码：<code>            max_turns = data.meta_info.get(&#x27;max_turns&#x27;, 1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L459** 源码：<code>            rollout_correction_kwargs = data.meta_info.get(&#x27;rollout_correction_kwargs&#x27;, {})</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_correction_kwargs`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L460** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L461** 源码：<code>        # Modes:</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L462** 源码：<code>        # 1. Legacy (bypass=False): old_log_prob computed by trainer, standard PPO</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L463** 源码：<code>        # 2. PPO_IS (bypass=True, pure=False): old_log_prob=rollout_log_prob, PPO clips against rollout</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L464** 源码：<code>        # 3. Pure IS (bypass=True, pure=True): No PPO clipping, pure policy gradient with IS correction</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L465** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L466** 源码：<code>        # Include rollout_log_probs alongside old_log_probs since both are log probabilities from previous policies</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L467** 源码：<code>        select_keys = [</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `select_keys`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L468** 源码：<code>            &#x27;responses&#x27;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L469** 源码：<code>            &#x27;response_mask&#x27;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L470** 源码：<code>            &#x27;input_ids&#x27;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L471** 源码：<code>            &#x27;attention_mask&#x27;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L472** 源码：<code>            &#x27;position_ids&#x27;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L473** 源码：<code>            &#x27;old_log_probs&#x27;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L474** 源码：<code>            &#x27;advantages&#x27;,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L475** 源码：<code>        ]</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L476** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L477** 源码：<code>        if self.config.use_kl_loss:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L478** 源码：<code>            select_keys.append(&#x27;ref_log_prob&#x27;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `select_keys.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L479** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L480** 源码：<code>        # In bypass mode, include rollout_log_probs for IS/RS computation</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L481** 源码：<code>        # In pure rollout correction mode, we MUST have rollout_log_probs</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L482** 源码：<code>        if (bypass_mode or use_pure_rollout_correction) and &#x27;rollout_log_probs&#x27; in data.batch.keys():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L483** 源码：<code>            select_keys.append(&#x27;rollout_log_probs&#x27;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `select_keys.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L484** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L485** 源码：<code>        # Include pre-computed IS weights if present in batch (legacy mode)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L486** 源码：<code>        # Weights are computed centrally in trainer and added to batch when algorithm.rollout_is=True</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L487** 源码：<code>        if &#x27;rollout_is_weights&#x27; in data.batch.keys():</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L488** 源码：<code>            select_keys.append(&#x27;rollout_is_weights&#x27;)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `select_keys.append`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L489** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L490** 源码：<code>        batch = data.select(batch_keys=select_keys).batch</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `batch`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L491** 源码：<code>        has_multi_modal_inputs = &#x27;multi_modal_inputs&#x27; in data.non_tensor_batch.keys()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `has_multi_modal_inputs`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L492** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L493** 源码：<code>        # Split to make minibatch iterator for updating the actor</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L494** 源码：<code>        # See PPO paper for details. https://arxiv.org/abs/1707.06347</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L495** 源码：<code>        if has_multi_modal_inputs:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L496** 源码：<code>            num_mini_batches = data.batch.batch_size[0] // self.config.ppo_mini_batch_size</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_mini_batches`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L497** 源码：<code>            non_tensor_select_keys = [&#x27;multi_modal_inputs&#x27;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `non_tensor_select_keys`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L498** 源码：<code>            dataloader = data.select(select_keys, non_tensor_select_keys).chunk(num_mini_batches)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `dataloader`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L499** 源码：<code>        else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L500** 源码：<code>            dataloader = batch.split(self.config.ppo_mini_batch_size)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `dataloader`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L501** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L502** 源码：<code>        metrics = {}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L503** 源码：<code>        for epoch in range(self.config.ppo_epochs):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L504** 源码：<code>            for batch_idx, data in enumerate(dataloader):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L505** 源码：<code>                # split batch into micro_batches</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L506** 源码：<code>                mini_batch = data</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `mini_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L507** 源码：<code>                if has_multi_modal_inputs:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L508** 源码：<code>                    self.gradient_accumulation = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.gradient_accumulation`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L509** 源码：<code>                        self.config.ppo_mini_batch_size // self.config.ppo_micro_batch_size_per_gpu</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L510** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L511** 源码：<code>                    num_micro_batches = mini_batch.batch.batch_size[0] // self.config.ppo_micro_batch_size_per_gpu</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `num_micro_batches`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L512** 源码：<code>                    micro_batches = data.select(select_keys, non_tensor_select_keys).chunk(num_micro_batches)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_batches`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L513** 源码：<code>                elif self.config.use_dynamic_bsz:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L514** 源码：<code>                    max_token_len = self.config.ppo_max_token_len_per_gpu * self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_token_len`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L515** 源码：<code>                    micro_batches, _ = rearrange_micro_batches(batch=mini_batch, max_token_len=max_token_len)</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L516** 源码：<code>                else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L517** 源码：<code>                    self.gradient_accumulation = (</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `self.gradient_accumulation`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L518** 源码：<code>                        self.config.ppo_mini_batch_size // self.config.ppo_micro_batch_size_per_gpu</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L519** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L520** 源码：<code>                    # split batch into micro_batches</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L521** 源码：<code>                    micro_batches = mini_batch.split(self.config.ppo_micro_batch_size_per_gpu)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_batches`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L522** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L523** 源码：<code>                self.actor_optimizer.zero_grad()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.actor_optimizer.zero_grad`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L524** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L525** 源码：<code>                for micro_batch in micro_batches:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L526** 源码：<code>                    # Support all hardwares</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L527** 源码：<code>                    if isinstance(micro_batch, DataProto):</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L528** 源码：<code>                        data = {**micro_batch.batch.to(torch.cuda.current_device()), **micro_batch.non_tensor_batch}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L529** 源码：<code>                    else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L530** 源码：<code>                        data = micro_batch.to(torch.cuda.current_device())  # actor device is cpu when using offload</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L531** 源码：<code>                    responses = data[&#x27;responses&#x27;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `responses`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L532** 源码：<code>                    response_length = responses.size(1)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_length`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L533** 源码：<code>                    attention_mask = data[&#x27;attention_mask&#x27;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `attention_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L534** 源码：<code>                    response_mask = data[&#x27;response_mask&#x27;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `response_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L535** 源码：<code>                    old_log_prob = data[&#x27;old_log_probs&#x27;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `old_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L536** 源码：<code>                    advantages = data[&#x27;advantages&#x27;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `advantages`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L537** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L538** 源码：<code>                    # Extract pre-computed rollout importance sampling weights (if present)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L539** 源码：<code>                    # Weights are computed centrally in trainer and added when algorithm.rollout_is=True</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L540** 源码：<code>                    # When rollout_is=False (metrics-only mode), weights are not added → None here → no weight application</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L541** 源码：<code>                    rollout_is_weights = data.get(&#x27;rollout_is_weights&#x27;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_is_weights`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L542** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L543** 源码：<code>                    # NOTE: Both mismatch diagnostic metrics (PPL, KL, etc.) and IS weight metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L544** 源码：<code>                    # are computed centrally in ray_trainer.py for consistency and efficiency.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L545** 源码：<code>                    # This ensures metrics are computed uniformly across all batches at the trainer level</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L546** 源码：<code>                    # and avoids redundant computation across workers and micro-batches.</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L547** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L548** 源码：<code>                    clip_ratio_high = self.config.clip_ratio_high</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_ratio_high`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L549** 源码：<code>                    clip_ratio_low = self.config.clip_ratio_low</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_ratio_low`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L550** 源码：<code>                    entropy_coeff = self.config.entropy_coeff</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy_coeff`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L551** 源码：<code>                    clip_ratio_c = self.config.get(&#x27;clip_ratio_c&#x27;, 3.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_ratio_c`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L552** 源码：<code>                    entropy_clip_rate = self.config.get(&#x27;entropy_clip_rate&#x27;, 0.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy_clip_rate`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L553** 源码：<code>                    use_gspo = self.config.get(&#x27;use_gspo&#x27;, False)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_gspo`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L554** 源码：<code>                    loss_agg_mode = self.config.get(&#x27;loss_agg_mode&#x27;, &#x27;seq-mean-token-sum&#x27;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_agg_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L555** 源码：<code>                    loss_scale_factor = self.config.get(&#x27;loss_scale_factor&#x27;, 1.0)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_scale_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L556** 源码：<code>                    extreme_risk_prob_threshold = self.config.get(&#x27;extreme_risk_prob_threshold&#x27;, None)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_prob_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L557** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L558** 源码：<code>                    # all return: (bsz, response_length)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L559** 源码：<code>                    entropy, log_prob, _ = self._forward_micro_batch(</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L560** 源码：<code>                        micro_batch=data, temperature=temperature, calculate_entropy=True</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `micro_batch`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L561** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L562** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L563** 源码：<code>                    # Choose loss computation based on mode</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L564** 源码：<code>                    if use_pure_rollout_correction:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L565** 源码：<code>                        # MODE 3: Pure rollout correction (no PPO clipping)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L566** 源码：<code>                        # Loss: L = -E[w * A] where w = exp(log_prob - rollout_log_prob).clamp(max=threshold)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L567** 源码：<code>                        # Computes IS/RS on-the-fly in this function</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L568** 源码：<code>                        # Requires rollout_log_probs in batch (set by trainer in bypass mode)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L569** 源码：<code>                        rollout_log_prob = data.get(&#x27;rollout_log_probs&#x27;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L570** 源码：<code>                        if rollout_log_prob is None:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L571** 源码：<code>                            raise ValueError(</code>
+  - 语法与作用：异常抛出语句；立即中止当前控制流，把指定异常交给上层处理。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L572** 源码：<code>                                &quot;use_pure_rollout_correction=True requires rollout_log_probs in batch. &quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L573** 源码：<code>                                &quot;Ensure bypass_old_logprob_for_rollout=True in trainer.&quot;</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L574** 源码：<code>                            )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L575** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L576** 源码：<code>                        policy_output = core_algos.compute_policy_loss_with_rollout_correction(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `policy_output`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L577** 源码：<code>                            rollout_log_prob=rollout_log_prob,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L578** 源码：<code>                            log_prob=log_prob,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L579** 源码：<code>                            advantages=advantages,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `advantages`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L580** 源码：<code>                            eos_mask=response_mask,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `eos_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L581** 源码：<code>                            loss_agg_mode=loss_agg_mode,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_agg_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L582** 源码：<code>                            loss_scale_factor=loss_scale_factor,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_scale_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L583** 源码：<code>                            rollout_is=rollout_correction_kwargs[&#x27;rollout_is&#x27;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_is`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L584** 源码：<code>                            rollout_is_threshold=rollout_correction_kwargs[&#x27;rollout_is_kwargs&#x27;].get(&#x27;upper&#x27;, None),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_is_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L585** 源码：<code>                            rollout_rs=rollout_correction_kwargs[&#x27;rollout_rs&#x27;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_rs`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L586** 源码：<code>                            rollout_rs_threshold=rollout_correction_kwargs[&#x27;rollout_rs_kwargs&#x27;].get(&#x27;upper&#x27;, None),</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_rs_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L587** 源码：<code>                            rollout_rs_threshold_lower=rollout_correction_kwargs[&#x27;rollout_rs_kwargs&#x27;].get(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_rs_threshold_lower`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L588** 源码：<code>                                &#x27;lower&#x27;, None</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L589** 源码：<code>                            ),</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L590** 源码：<code>                            rollout_token_veto_threshold=rollout_correction_kwargs[&#x27;rollout_token_veto_threshold&#x27;],</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_token_veto_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L591** 源码：<code>                            max_turns=max_turns,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `max_turns`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L592** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L593** 源码：<code>                    else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L594** 源码：<code>                        # MODE 1 (legacy) or MODE 2 (PPO_IS): Standard PPO with clipping</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L595** 源码：<code>                        # MODE 1: old_log_prob computed by trainer, standard PPO semantics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L596** 源码：<code>                        # MODE 2 (bypass): old_log_prob = rollout_log_prob (set by trainer)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L597** 源码：<code>                        #   - PPO clips ratio = π_current / π_rollout (instead of π_current / π_old)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L598** 源码：<code>                        #   - IS correction happens implicitly through the ratio</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L599** 源码：<code>                        #   - No pre-computed rollout_is_weights (will be None)</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L600** 源码：<code>                        policy_output = core_algos.compute_policy_loss(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `policy_output`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L601** 源码：<code>                            old_log_prob=old_log_prob,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `old_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L602** 源码：<code>                            log_prob=log_prob,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L603** 源码：<code>                            advantages=advantages,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `advantages`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L604** 源码：<code>                            eos_mask=response_mask,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `eos_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L605** 源码：<code>                            cliprange_high=clip_ratio_high,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `cliprange_high`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L606** 源码：<code>                            cliprange_low=clip_ratio_low,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `cliprange_low`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L607** 源码：<code>                            clip_ratio_c=clip_ratio_c,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `clip_ratio_c`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L608** 源码：<code>                            entropy_clip_rate=entropy_clip_rate,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy_clip_rate`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L609** 源码：<code>                            entropy=entropy if entropy_clip_rate &gt; 0 else None,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L610** 源码：<code>                            use_gspo=use_gspo,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `use_gspo`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L611** 源码：<code>                            loss_agg_mode=loss_agg_mode,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_agg_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L612** 源码：<code>                            loss_scale_factor=loss_scale_factor,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_scale_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L613** 源码：<code>                            rollout_is_weights=rollout_is_weights,  # Pre-computed weights (legacy mode only)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `rollout_is_weights`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L614** 源码：<code>                            extreme_risk_prob_threshold=extreme_risk_prob_threshold,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `extreme_risk_prob_threshold`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L615** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L616** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L617** 源码：<code>                    # Extract main loss</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L618** 源码：<code>                    pg_loss = policy_output.loss</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `pg_loss`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L619** 源码：<code>                    # compute entropy loss using the same aggregation mode</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L620** 源码：<code>                    entropy_loss = core_algos.agg_loss(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `entropy_loss`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L621** 源码：<code>                        loss_mat=entropy,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_mat`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L622** 源码：<code>                        loss_mask=response_mask,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L623** 源码：<code>                        loss_agg_mode=loss_agg_mode,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_agg_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L624** 源码：<code>                        scale_factor=loss_scale_factor,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `scale_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L625** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L626** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L627** 源码：<code>                    # For metrics, compute average entropy for interpretability</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L628** 源码：<code>                    avg_entropy = verl_F.masked_mean(entropy.detach(), response_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `avg_entropy`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L629** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L630** 源码：<code>                    # compute policy loss</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L631** 源码：<code>                    policy_loss = pg_loss - entropy_loss * entropy_coeff</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `policy_loss`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L632** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L633** 源码：<code>                    if self.config.use_kl_loss:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L634** 源码：<code>                        ref_log_prob = data[&#x27;ref_log_prob&#x27;]</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `ref_log_prob`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L635** 源码：<code>                        # compute kl loss</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L636** 源码：<code>                        kld = core_algos.kl_penalty(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `kld`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L637** 源码：<code>                            logprob=log_prob, ref_logprob=ref_log_prob, kl_penalty=self.config.kl_loss_type</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `logprob`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L638** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L639** 源码：<code>                        # Use the same aggregation mode for KL loss consistency</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L640** 源码：<code>                        kl_loss = core_algos.agg_loss(</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `kl_loss`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L641** 源码：<code>                            loss_mat=kld,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_mat`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L642** 源码：<code>                            loss_mask=response_mask,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_mask`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L643** 源码：<code>                            loss_agg_mode=loss_agg_mode,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss_agg_mode`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L644** 源码：<code>                            scale_factor=loss_scale_factor,</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `scale_factor`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L645** 源码：<code>                        )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L646** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L647** 源码：<code>                        # For metrics, compute average KL for interpretability</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L648** 源码：<code>                        avg_kl = verl_F.masked_mean(kld.detach(), response_mask)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `avg_kl`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L649** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L650** 源码：<code>                        policy_loss = policy_loss + kl_loss * self.config.kl_loss_coef</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `policy_loss`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L651** 源码：<code>                        # Log KL metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L652** 源码：<code>                        metrics[&#x27;actor/avg_kl&#x27;] = avg_kl.item()</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L653** 源码：<code>                        metrics[&#x27;actor/kl_loss&#x27;] = kl_loss.detach().item()</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L654** 源码：<code>                        metrics[&#x27;actor/kl_coef&#x27;] = self.config.kl_loss_coef</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L655** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L656** 源码：<code>                    if self.config.use_dynamic_bsz:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L657** 源码：<code>                        # relative to the dynamic bsz</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L658** 源码：<code>                        loss = policy_loss * (len(data) / self.config.ppo_mini_batch_size)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L659** 源码：<code>                    else:</code>
+  - 语法与作用：控制流语法；根据条件、迭代、异常或上下文管理器决定后续代码是否执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L660** 源码：<code>                        loss = policy_loss / self.gradient_accumulation</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `loss`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L661** 源码：<code>                    loss.backward()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `loss.backward`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L662** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L663** 源码：<code>                    # Collect all actor metrics using unified system</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L664** 源码：<code>                    actor_metrics = policy_output.to_scalars(prefix=&#x27;actor/&#x27;)</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `actor_metrics`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L665** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L666** 源码：<code>                    # Add entropy metrics</code>
+  - 语法与作用：注释行；解释设计、参数或已知限制，解释器不会执行。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L667** 源码：<code>                    actor_metrics.update(</code>
+  - 语法与作用：函数/构造器调用语法；调用 `actor_metrics.update`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L668** 源码：<code>                        {</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L669** 源码：<code>                            &#x27;actor/avg_entropy&#x27;: avg_entropy.item(),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L670** 源码：<code>                            &#x27;actor/entropy_loss&#x27;: entropy_loss.detach().item(),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L671** 源码：<code>                            &#x27;actor/entropy_coeff&#x27;: entropy_coeff,</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L672** 源码：<code>                            &#x27;actor/policy_loss&#x27;: policy_loss.detach().item(),</code>
+  - 语法与作用：普通表达式/语句；按 Python 或 Bash 语法求值，具体输入输出由所在函数上下文决定。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L673** 源码：<code>                        }</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L674** 源码：<code>                    )</code>
+  - 语法与作用：多行表达式的闭合行；结束上一行开启的调用、列表、字典或代码块。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L675** 源码：<code>                    append_to_dict(metrics, actor_metrics)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `append_to_dict`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L676** 源码：<code><空行></code>
+  - 语法与作用：空行；仅用于源码排版，不产生运行时效果。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L677** 源码：<code>                grad_norm = self._optimizer_step()</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `grad_norm`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L678** 源码：<code>                data = {&#x27;actor/grad_norm&#x27;: grad_norm.detach().item()}</code>
+  - 语法与作用：赋值/复合赋值语法；计算右侧表达式并写入 `data`，可能创建、覆盖或累加状态。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L679** 源码：<code>            append_to_dict(metrics, data)</code>
+  - 语法与作用：函数/构造器调用语法；调用 `append_to_dict`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L680** 源码：<code>        self.actor_optimizer.zero_grad()</code>
+  - 语法与作用：函数/构造器调用语法；调用 `self.actor_optimizer.zero_grad`，把括号内参数传入并使用返回值或副作用。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+- **L681** 源码：<code>        return metrics</code>
+  - 语法与作用：return 语句；结束当前函数并把右侧表达式的值交给调用者。
+  - 当前路径：actor update 是当前训练器的参数更新边界；模型 forward、optimizer 实现属于 PyTorch/VERL，不展开其依赖源码。
+
+#### 原始行 1–329
+- **L1** <code># Copyright 2024 Bytedance Ltd. and/or its affiliates</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L2** <code>#</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L3** <code># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L4** <code># you may not use this file except in compliance with the License.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L5** <code># You may obtain a copy of the License at</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L6** <code>#</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L7** <code>#     http://www.apache.org/licenses/LICENSE-2.0</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L8** <code>#</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L9** <code># Unless required by applicable law or agreed to in writing, software</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L10** <code># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L11** <code># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L12** <code># See the License for the specific language governing permissions and</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L13** <code># limitations under the License.</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L14** <code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L15** <code>Single Process Actor</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L16** <code>&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L17** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L18** <code>import logging</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L19** <code>import os</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L20** <code>from typing import Iterable, Tuple</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L21** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L22** <code>import torch</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L23** <code>import verl.utils.torch_functional as verl_F</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L24** <code>from flash_attn.bert_padding import index_first_axis, pad_input, rearrange, unpad_input</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L25** <code>from torch import nn</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L26** <code>from torch.distributed.fsdp import FullyShardedDataParallel as FSDP</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L27** <code>from verl import DataProto</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L28** <code>from verl.utils.device import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L29** <code>    get_device_id,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L30** <code>    get_device_name,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L31** <code>    is_cuda_available,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L32** <code>    is_npu_available,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L33** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L34** <code>from verl.utils.profiler import GPUMemoryLogger</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L35** <code>from verl.utils.py_functional import append_to_dict</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L36** <code>from verl.utils.seqlen_balancing import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L37** <code>    get_reverse_idx,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L38** <code>    prepare_dynamic_batch,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L39** <code>    rearrange_micro_batches,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L40** <code>    restore_dynamic_batch,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L41** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L42** <code>from verl.utils.torch_functional import logprobs_from_logits, masked_mean</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L43** <code>from verl.utils.ulysses import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L44** <code>    gather_outputs_and_unpad,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L45** <code>    ulysses_pad,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L46** <code>    ulysses_pad_and_slice_inputs,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L47** <code>)</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L48** <code>from verl.workers.actor import BasePPOActor</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L49** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L50** <code>from verl_patch.trainer.code.ppo import core_algos</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L51** <code>from verl_patch.utils.metric import PolicyOutput</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L52** <code>from verl_patch.utils.torch_functional import compute_sum_pi_squared_from_logits</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L53** <code>from verl_patch.workers.config.actor import ActorConfig</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L54** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L55** <code>__all__ = [&#x27;CodeDataParallelPPOActor&#x27;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `__all__`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L56** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L57** <code>logger = logging.getLogger(__file__)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `logger`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L58** <code>logger.setLevel(os.getenv(&quot;VERL_LOGGING_LEVEL&quot;, &quot;WARN&quot;))</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L59** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L60** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L61** <code>class CodeDataParallelPPOActor(BasePPOActor):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L62** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L63** <code>    def __init__(self, config: ActorConfig, actor_module: nn.Module, actor_optimizer: torch.optim.Optimizer = None):</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L64** <code>        &quot;&quot;&quot;When optimizer is None, it is Reference Policy&quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L65** <code>        super().__init__(config)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `super`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L66** <code>        self.actor_module = actor_module</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.actor_module`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L67** <code>        self.actor_optimizer = actor_optimizer</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.actor_optimizer`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L68** <code>        role = &quot;Ref&quot; if actor_optimizer is None else &quot;Actor&quot;</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `role`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L69** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L70** <code>        self.use_remove_padding = self.config.get(&quot;use_remove_padding&quot;, False)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.use_remove_padding`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L71** <code>        if torch.distributed.get_rank() == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L72** <code>            print(f&quot;{role} use_remove_padding={self.use_remove_padding}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L73** <code>        self.use_fused_kernels = self.config.get(&quot;use_fused_kernels&quot;, False)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.use_fused_kernels`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L74** <code>        if torch.distributed.get_rank() == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L75** <code>            print(f&quot;{role} use_fused_kernels={self.use_fused_kernels}&quot;)</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L76** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L77** <code>        self.ulysses_sequence_parallel_size = self.config.ulysses_sequence_parallel_size</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.ulysses_sequence_parallel_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L78** <code>        self.use_ulysses_sp = self.ulysses_sequence_parallel_size &gt; 1</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.use_ulysses_sp`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L79** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L80** <code>        if self.config.entropy_from_logits_with_chunking:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L81** <code>            entropy_from_logits = verl_F.entropy_from_logits_with_chunking</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy_from_logits`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L82** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L83** <code>            entropy_from_logits = verl_F.entropy_from_logits</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy_from_logits`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L84** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L85** <code>        self.compute_entropy_from_logits = (</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.compute_entropy_from_logits`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L86** <code>            torch.compile(entropy_from_logits, dynamic=True)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `torch.compile(entropy_from_logits, dynamic`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L87** <code>            if self.config.get(&quot;use_torch_compile&quot;, True)  #  use torch compile by default</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L88** <code>            else entropy_from_logits</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L89** <code>        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L90** <code>        self.device_name = get_device_name()</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.device_name`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L91** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L92** <code>        # Sum of squared probabilities computation (for optimal baseline variance reduction)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L93** <code>        # Only initialize if compute_sum_pi_squared config is enabled</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L94** <code>        if self.config.get(&#x27;compute_sum_pi_squared&#x27;, False):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L95** <code>            self.compute_sum_pi_squared_from_logits = (</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `self.compute_sum_pi_squared_from_logits`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L96** <code>                torch.compile(compute_sum_pi_squared_from_logits, dynamic=True)</code>
+  - 语法与作用：属性/变量赋值（`=`）；计算右侧表达式并更新 `torch.compile(compute_sum_pi_squared_from_logits, dynamic`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L97** <code>                if self.config.get(&#x27;use_torch_compile&#x27;, True)</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L98** <code>                else compute_sum_pi_squared_from_logits</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L99** <code>            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L100** <code>            if torch.distributed.get_rank() == 0:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L101** <code>                print(</code>
+  - 语法与作用：日志/输出调用；记录当前状态、调试信息或异常。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L102** <code>                    f&quot;{role} Sum_pi_squared computation enabled: {&#x27;compiled&#x27; if self.config.get(&#x27;use_torch_compile&#x27;, True) else &#x27;uncompiled&#x27;}&quot;</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `f"{role} Sum_pi_squared computation enabled: {'compiled' if self.config.get`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L103** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L104** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L105** <code>    def _forward_micro_batch(</code>
+  - 语法与作用：定义语法；创建类/函数对象；函数体要等调用时才执行，类体在定义阶段执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L106** <code>        self, micro_batch, temperature, calculate_entropy=False, compute_sum_pi_squared=False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `self, micro_batch, temperature, calculate_entropy`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L107** <code>    ) -&gt; tuple[torch.Tensor | None, torch.Tensor, torch.Tensor | None]:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L108** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L109** <code>        Args:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L110** <code>            micro_batch: Input batch data</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L111** <code>            temperature: Temperature for logits</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L112** <code>            calculate_entropy: Whether to compute entropy</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L113** <code>            compute_sum_pi_squared: Whether to compute sum of squared probabilities (for optimal baseline)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `compute_sum_pi_squared: Whether to compute sum of squared probabilities`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L114** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L115** <code>        Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L116** <code>            entropy: (bs, response_len) or None if calculate_entropy=False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy: (bs, response_len) or None if calculate_entropy`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L117** <code>            log_probs: (bs, response_len) - always computed</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `log_probs:`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L118** <code>            sum_pi_squared: (bs, response_len) or None if compute_sum_pi_squared=False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared: (bs, response_len) or None if compute_sum_pi_squared`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L119** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L120** <code>        response_length = micro_batch[&quot;responses&quot;].size(-1)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `response_length`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L121** <code>        sum_pi_squared = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L122** <code>        multi_modal_inputs = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `multi_modal_inputs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L123** <code>        if &quot;multi_modal_inputs&quot; in micro_batch.keys():</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L124** <code>            if &quot;image_bound&quot; in micro_batch[&quot;multi_modal_inputs&quot;][0]:  # minicpm-o logic</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L125** <code>                for key in micro_batch[&quot;multi_modal_inputs&quot;][0].keys():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L126** <code>                    multi_modal_inputs[key] = [inputs[key] for inputs in micro_batch[&quot;multi_modal_inputs&quot;]]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `multi_modal_inputs[key]`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L127** <code>            else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L128** <code>                for key in micro_batch[&quot;multi_modal_inputs&quot;][0].keys():</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L129** <code>                    multi_modal_inputs[key] = torch.cat(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `multi_modal_inputs[key]`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L130** <code>                        [inputs[key] for inputs in micro_batch[&quot;multi_modal_inputs&quot;]], dim=0</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `[inputs[key] for inputs in micro_batch["multi_modal_inputs"]], dim`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L131** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L132** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L133** <code>        with torch.autocast(device_type=self.device_name, dtype=torch.bfloat16):</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L134** <code>            input_ids = micro_batch[&quot;input_ids&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L135** <code>            batch_size, seqlen = input_ids.shape</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch_size, seqlen`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L136** <code>            attention_mask = micro_batch[&quot;attention_mask&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attention_mask`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L137** <code>            position_ids = micro_batch[&quot;position_ids&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L138** <code>            entropy = None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L139** <code>            if position_ids.dim() == 3:  # qwen2vl mrope</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L140** <code>                position_ids = position_ids.transpose(0, 1)  # (bsz, 3, seqlen) -&gt; (3, bsz, seqlen)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L141** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L142** <code>            if self.use_remove_padding:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L143** <code>                input_ids_rmpad, indices, cu_seqlens, *_ = unpad_input(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad, indices, cu_seqlens, *_`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L144** <code>                    input_ids.unsqueeze(-1), attention_mask</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `input_ids.unsqueeze`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L145** <code>                )  # input_ids_rmpad (total_nnz, ...)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `)  # input_ids_rmpad`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L146** <code>                input_ids_rmpad = input_ids_rmpad.transpose(0, 1)  # (1, total_nnz)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L147** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L148** <code>                # unpad the position_ids to align the rotary</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L149** <code>                if position_ids.dim() == 3:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L150** <code>                    position_ids_rmpad = (</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L151** <code>                        index_first_axis(rearrange(position_ids, &quot;c b s ... -&gt; (b s) c ...&quot;), indices)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `index_first_axis`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L152** <code>                        .transpose(0, 1)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `.transpose`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L153** <code>                        .unsqueeze(1)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `.unsqueeze`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L154** <code>                    )  # (3, bsz, seqlen) -&gt; (3, 1, bsz * seqlen)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `)  #`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L155** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L156** <code>                    position_ids_rmpad = index_first_axis(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L157** <code>                        rearrange(position_ids.unsqueeze(-1), &quot;b s ... -&gt; (b s) ...&quot;), indices</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `rearrange`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L158** <code>                    ).transpose(0, 1)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `).transpose`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L159** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L160** <code>                if &quot;image_bound&quot; in multi_modal_inputs:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L161** <code>                    from verl.utils.dataset.vision_utils import (</code>
+  - 语法与作用：导入语句；模块加载时导入依赖并创建名称绑定；缺依赖会阻断启动。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L162** <code>                        process_multi_modal_inputs_for_minicpmo,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L163** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L164** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L165** <code>                    multi_modal_inputs = process_multi_modal_inputs_for_minicpmo(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `multi_modal_inputs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L166** <code>                        input_ids, attention_mask, position_ids, cu_seqlens, multi_modal_inputs</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L167** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L168** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L169** <code>                # for compute the log_prob</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L170** <code>                input_ids_rmpad_rolled = torch.roll(input_ids_rmpad, shifts=-1, dims=1)  # (1, total_nnz)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad_rolled`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L171** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L172** <code>                # pad and slice the inputs if sp &gt; 1</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L173** <code>                if self.use_ulysses_sp:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L174** <code>                    is_vlm_model = &quot;multi_modal_inputs&quot; in micro_batch.keys()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `is_vlm_model`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L175** <code>                    if is_vlm_model:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L176** <code>                        # vlm model&#x27;s inputs will be sliced after embedding</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L177** <code>                        input_ids_rmpad, position_ids_rmpad, pad_size = ulysses_pad(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad, position_ids_rmpad, pad_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L178** <code>                            input_ids_rmpad,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L179** <code>                            position_ids_rmpad=position_ids_rmpad,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L180** <code>                            sp_size=self.ulysses_sequence_parallel_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sp_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L181** <code>                        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L182** <code>                    else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L183** <code>                        input_ids_rmpad, position_ids_rmpad, pad_size = ulysses_pad_and_slice_inputs(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad, position_ids_rmpad, pad_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L184** <code>                            input_ids_rmpad,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L185** <code>                            position_ids_rmpad=position_ids_rmpad,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L186** <code>                            sp_size=self.ulysses_sequence_parallel_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sp_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L187** <code>                        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L188** <code>                    input_ids_rmpad_rolled, _, _ = ulysses_pad_and_slice_inputs(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad_rolled, _, _`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L189** <code>                        input_ids_rmpad_rolled,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L190** <code>                        position_ids_rmpad=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L191** <code>                        sp_size=self.ulysses_sequence_parallel_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sp_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L192** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L193** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L194** <code>                input_ids_rmpad_rolled = input_ids_rmpad_rolled.squeeze(0)  # ((total_nnz / sp) + pad)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids_rmpad_rolled`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L195** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L196** <code>                # only pass input_ids and position_ids to enable flash_attn_varlen</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L197** <code>                extra_args = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_args`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L198** <code>                if self.use_fused_kernels:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L199** <code>                    extra_args[&quot;temperature&quot;] = temperature</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_args["temperature"]`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L200** <code>                    extra_args[&quot;return_dict&quot;] = True</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_args["return_dict"]`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L201** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L202** <code>                output = self.actor_module(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L203** <code>                    input_ids=input_ids_rmpad,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L204** <code>                    attention_mask=None,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attention_mask`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L205** <code>                    position_ids=position_ids_rmpad,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L206** <code>                    **multi_modal_inputs,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L207** <code>                    use_cache=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_cache`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L208** <code>                    **extra_args,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L209** <code>                )  # prevent model thinks we are generating</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L210** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L211** <code>                if self.use_fused_kernels:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L212** <code>                    log_probs = output.log_probs.squeeze(0)  # (total_nnz,)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_probs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L213** <code>                    if calculate_entropy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L214** <code>                        entropy_rmpad = output.entropy.squeeze(0)  # (total_nnz,)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L215** <code>                    # Note: Fused kernels don&#x27;t provide logits, so sum_pi_squared cannot be computed</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L216** <code>                    # sum_pi_squared stays None (initialized at line 127)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L217** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L218** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L219** <code>                    logits_rmpad = output.logits.squeeze(0)  # (total_nnz, vocab_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `logits_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L220** <code>                    logits_rmpad.div_(temperature)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `logits_rmpad.div_`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L221** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L222** <code>                    # Compute sum_pi_squared if requested (for optimal baseline)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L223** <code>                    if compute_sum_pi_squared:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L224** <code>                        if not self.config.get(&#x27;sum_pi_squared_checkpointing&#x27;, False):</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L225** <code>                            sum_pi_squared_rmpad = self.compute_sum_pi_squared_from_logits(logits_rmpad)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L226** <code>                        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L227** <code>                            sum_pi_squared_rmpad = torch.utils.checkpoint.checkpoint(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L228** <code>                                self.compute_sum_pi_squared_from_logits, logits_rmpad</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L229** <code>                            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L230** <code>                    # if use_sp: ((total_nnz / sp) + pad) ; if not use_sp: (batch, seqlen)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L231** <code>                    inplace_backward = True</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `inplace_backward`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L232** <code>                    if calculate_entropy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L233** <code>                        inplace_backward = False</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `inplace_backward`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L234** <code>                    log_probs = logprobs_from_logits(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_probs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L235** <code>                        logits=logits_rmpad,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `logits`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L236** <code>                        labels=input_ids_rmpad_rolled,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `labels`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L237** <code>                        inplace_backward=inplace_backward,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `inplace_backward`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L238** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L239** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L240** <code>                    # compute entropy</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L241** <code>                    if calculate_entropy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L242** <code>                        if not self.config.entropy_checkpointing:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L243** <code>                            entropy_rmpad = self.compute_entropy_from_logits(logits_rmpad)  # ((total_nnz / sp) + pad)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L244** <code>                        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L245** <code>                            entropy_rmpad = torch.utils.checkpoint.checkpoint(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L246** <code>                                self.compute_entropy_from_logits, logits_rmpad</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L247** <code>                            )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L248** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L249** <code>                # gather log_prob if sp &gt; 1</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L250** <code>                if self.use_ulysses_sp:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L251** <code>                    # gather and unpad for the ulysses sp</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L252** <code>                    log_probs = gather_outputs_and_unpad(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_probs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L253** <code>                        log_probs,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L254** <code>                        gather_dim=0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `gather_dim`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L255** <code>                        unpad_dim=0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `unpad_dim`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L256** <code>                        padding_size=pad_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `padding_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L257** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L258** <code>                    if calculate_entropy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L259** <code>                        entropy_rmpad = gather_outputs_and_unpad(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L260** <code>                            entropy_rmpad,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L261** <code>                            gather_dim=0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `gather_dim`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L262** <code>                            unpad_dim=0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `unpad_dim`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L263** <code>                            padding_size=pad_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `padding_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L264** <code>                        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L265** <code>                    if compute_sum_pi_squared and not self.use_fused_kernels:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L266** <code>                        # sum_pi_squared_rmpad only exists if use_fused_kernels=False</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L267** <code>                        sum_pi_squared_rmpad = gather_outputs_and_unpad(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared_rmpad`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L268** <code>                            sum_pi_squared_rmpad,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L269** <code>                            gather_dim=0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `gather_dim`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L270** <code>                            unpad_dim=0,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `unpad_dim`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L271** <code>                            padding_size=pad_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `padding_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L272** <code>                        )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L273** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L274** <code>                # pad back to (bsz, seqlen)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L275** <code>                if calculate_entropy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L276** <code>                    full_entropy = pad_input(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `full_entropy`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L277** <code>                        hidden_states=entropy_rmpad.unsqueeze(-1),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `hidden_states`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L278** <code>                        indices=indices,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `indices`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L279** <code>                        batch=batch_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L280** <code>                        seqlen=seqlen,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seqlen`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L281** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L282** <code>                full_log_probs = pad_input(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `full_log_probs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L283** <code>                    hidden_states=log_probs.unsqueeze(-1),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `hidden_states`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L284** <code>                    indices=indices,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `indices`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L285** <code>                    batch=batch_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L286** <code>                    seqlen=seqlen,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seqlen`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L287** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L288** <code>                if compute_sum_pi_squared and not self.use_fused_kernels:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L289** <code>                    # sum_pi_squared_rmpad only exists if use_fused_kernels=False</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L290** <code>                    full_sum_pi_squared = pad_input(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `full_sum_pi_squared`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L291** <code>                        hidden_states=sum_pi_squared_rmpad.unsqueeze(-1),</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `hidden_states`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L292** <code>                        indices=indices,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `indices`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L293** <code>                        batch=batch_size,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `batch`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L294** <code>                        seqlen=seqlen,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `seqlen`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L295** <code>                    )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L296** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L297** <code>                # only return response part:</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L298** <code>                if calculate_entropy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L299** <code>                    entropy = full_entropy.squeeze(-1)[:, -response_length - 1 : -1]  # (bsz, response_length)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L300** <code>                log_probs = full_log_probs.squeeze(-1)[:, -response_length - 1 : -1]  # (bsz, response_length)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_probs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L301** <code>                if compute_sum_pi_squared and not self.use_fused_kernels:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L302** <code>                    # full_sum_pi_squared only exists if use_fused_kernels=False</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L303** <code>                    sum_pi_squared = full_sum_pi_squared.squeeze(-1)[</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L304** <code>                        :, -response_length - 1 : -1</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L305** <code>                    ]  # (bsz, response_length)</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `]  #`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L306** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L307** <code>            else:  # not using rmpad and no ulysses sp</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L308** <code>                extra_args = {}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_args`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L309** <code>                if self.use_fused_kernels:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L310** <code>                    extra_args[&quot;temperature&quot;] = temperature</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_args["temperature"]`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L311** <code>                    extra_args[&quot;return_dict&quot;] = True</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `extra_args["return_dict"]`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L312** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L313** <code>                output = self.actor_module(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `output`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L314** <code>                    input_ids=input_ids,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `input_ids`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L315** <code>                    attention_mask=attention_mask,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `attention_mask`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L316** <code>                    position_ids=position_ids,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `position_ids`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L317** <code>                    **multi_modal_inputs,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L318** <code>                    use_cache=False,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_cache`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L319** <code>                    **extra_args,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L320** <code>                )  # prevent model thinks we are generating</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L321** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L322** <code>                if self.use_fused_kernels:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L323** <code>                    log_probs = output.log_probs[:, -response_length - 1 : -1]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_probs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L324** <code>                    if calculate_entropy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L325** <code>                        entropy = output.entropy[:, -response_length - 1 : -1]  # (bsz, response_length)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L326** <code>                    # Note: Fused kernels don&#x27;t provide logits, so sum_pi_squared cannot be computed</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L327** <code>                    # sum_pi_squared stays None (initialized at line 127)</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L328** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L329** <code>                else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+#### 原始行 381–444
+- **L381** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L382** <code>                ``position_ids``: tensor of shape [batch_size, sequence_length]. torch.int64.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L383** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L384** <code>                ``responses``:  tensor of shape [batch_size, response_length]. torch.int64.</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L385** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L386** <code>            calculate_entropy (bool): whether to compute entropy</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `calculate_entropy`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L387** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L388** <code>            compute_sum_pi_squared (bool): whether to compute sum of squared probabilities</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `compute_sum_pi_squared`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L389** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L390** <code>        Returns:</code>
+  - 语法与作用：代码块头；冒号后的缩进内容属于该控制流/定义块。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L391** <code>            tuple: (log_probs, entropys, sum_pi_squared) where entropys and sum_pi_squared can be None</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `tuple:`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L392** <code>        &quot;&quot;&quot;</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L393** <code>        # set to eval</code>
+  - 语法与作用：注释；记录版权、设计意图、TODO 或限制，解释器不执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L394** <code>        self.actor_module.eval()</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `self.actor_module.eval`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L395** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L396** <code>        micro_batch_size = data.meta_info[&quot;micro_batch_size&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `micro_batch_size`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L397** <code>        temperature = data.meta_info[&quot;temperature&quot;]  # temperature must be in the data.meta_info to avoid silent error</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `temperature`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L398** <code>        use_dynamic_bsz = data.meta_info[&quot;use_dynamic_bsz&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `use_dynamic_bsz`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L399** <code>        has_multi_modal_inputs = &quot;multi_modal_inputs&quot; in data.non_tensor_batch.keys()</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `has_multi_modal_inputs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L400** <code>        select_keys = [&quot;responses&quot;, &quot;input_ids&quot;, &quot;attention_mask&quot;, &quot;position_ids&quot;]</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `select_keys`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L401** <code>        non_tensor_select_keys = [&quot;multi_modal_inputs&quot;] if has_multi_modal_inputs else []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `non_tensor_select_keys`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L402** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L403** <code>        data = data.select(batch_keys=select_keys, non_tensor_batch_keys=non_tensor_select_keys)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `data`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L404** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L405** <code>        if use_dynamic_bsz:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L406** <code>            max_token_len = data.meta_info[&quot;max_token_len&quot;] * self.ulysses_sequence_parallel_size</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `max_token_len`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L407** <code>            micro_batches, batch_idx_list = prepare_dynamic_batch(data, max_token_len=max_token_len)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `micro_batches, batch_idx_list`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L408** <code>        else:</code>
+  - 语法与作用：else 分支；前面分支都不成立时执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L409** <code>            micro_batches = data.split(micro_batch_size)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `micro_batches`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L410** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L411** <code>        log_probs_lst = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_probs_lst`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L412** <code>        entropy_lst = []</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropy_lst`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L413** <code>        sum_pi_squared_lst = [] if compute_sum_pi_squared else None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared_lst`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L414** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L415** <code>        for micro_batch in micro_batches:</code>
+  - 语法与作用：循环头；遍历对象或按条件重复执行缩进块。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L416** <code>            micro_batch = micro_batch.to(get_device_id())</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `micro_batch`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L417** <code>            model_inputs = {**micro_batch.batch, **micro_batch.non_tensor_batch}</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `model_inputs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L418** <code>            with torch.no_grad():</code>
+  - 语法与作用：上下文管理器；进入资源上下文，离开代码块时自动清理。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L419** <code>                result = self._forward_micro_batch(</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `result`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L420** <code>                    model_inputs,</code>
+  - 语法与作用：普通 Python 表达式；在当前作用域求值并按对象语义执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L421** <code>                    temperature=temperature,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `temperature`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L422** <code>                    calculate_entropy=calculate_entropy,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `calculate_entropy`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L423** <code>                    compute_sum_pi_squared=compute_sum_pi_squared,</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `compute_sum_pi_squared`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L424** <code>                )</code>
+  - 语法与作用：多行表达式闭合；结束前面开始的调用或容器构造。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L425** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L426** <code>            log_probs_lst.append(result[1])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `log_probs_lst.append`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L427** <code>            if calculate_entropy:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L428** <code>                entropy_lst.append(result[0])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `entropy_lst.append`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L429** <code>            if compute_sum_pi_squared:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L430** <code>                sum_pi_squared_lst.append(result[2])</code>
+  - 语法与作用：函数/方法/构造器调用；调用 `sum_pi_squared_lst.append`，产生返回值或副作用。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L431** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L432** <code>        log_probs = torch.concat(log_probs_lst, dim=0)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_probs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L433** <code>        entropys = torch.concat(entropy_lst, dim=0) if calculate_entropy else None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropys`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L434** <code>        sum_pi_squared = torch.concat(sum_pi_squared_lst, dim=0) if compute_sum_pi_squared else None</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L435** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L436** <code>        if use_dynamic_bsz:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L437** <code>            log_probs = restore_dynamic_batch(log_probs, batch_idx_list)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `log_probs`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L438** <code>            if entropys is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L439** <code>                entropys = restore_dynamic_batch(entropys, batch_idx_list)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `entropys`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L440** <code>            if sum_pi_squared is not None:</code>
+  - 语法与作用：条件分支头；求值布尔条件，决定缩进块是否执行。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L441** <code>                sum_pi_squared = restore_dynamic_batch(sum_pi_squared, batch_idx_list)</code>
+  - 语法与作用：变量/容器赋值（`=`）；计算右侧表达式并绑定或更新 `sum_pi_squared`。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L442** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L443** <code>        return log_probs, entropys, sum_pi_squared</code>
+  - 语法与作用：return；结束当前函数并向调用者返回右侧值。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+- **L444** <code><空行></code>
+  - 语法与作用：空行；只用于排版，不产生运行时效果。
+  - 执行状态：包含 actor 初始化、forward/log-prob 等辅助方法；当前 update_policy 通过这些边界取得当前策略 log-prob，依赖模型 forward 的内部实现不展开。
+
+
+
+---
+
+**导航**：[上一附录](09-trloo-ppo-core.md) · [附录目录](index.md) · [下一附录](11-fsdp-boundaries.md)
