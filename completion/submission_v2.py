@@ -164,11 +164,16 @@ def _kv_rmsnorm_rope_cache_kernel(
     # One program owns one (batch, head, token) row. This exposes the full
     # sequence parallelism needed by the long (up to 2048 token) cases.
     program = tl.program_id(0)
-    tokens_per_batch = num_heads * seq_len
-    batch = program // tokens_per_batch
-    within_batch = program - batch * tokens_per_batch
-    head = within_batch // seq_len
-    token = within_batch - head * seq_len
+    if num_heads == 1:
+        batch = program // seq_len
+        head = 0
+        token = program - batch * seq_len
+    else:
+        tokens_per_batch = num_heads * seq_len
+        batch = program // tokens_per_batch
+        within_batch = program - batch * tokens_per_batch
+        head = within_batch // seq_len
+        token = within_batch - head * seq_len
 
     c_cols = tl.arange(0, 512)
     r_cols = tl.arange(0, 64)
@@ -303,6 +308,53 @@ def _kv_rmsnorm_rope_cache_kernel(
     tl.store(c_dst, ckv_out, mask=valid)
 
 
+@triton.jit
+def _kv_rmsnorm_rope_cache_pa_tiled_kernel(
+    kv_ptr,
+    gamma_ptr,
+    cos_ptr,
+    sin_ptr,
+    index_ptr,
+    k_cache_ptr,
+    ckv_cache_ptr,
+    epsilon: tl.constexpr,
+    TILES_PER_CORE: tl.constexpr,
+    BLOCK_M: tl.constexpr,
+):
+    core = tl.program_id(0)
+    cols = tl.arange(0, 512)
+    rope_cols = tl.arange(0, 64)
+    half_cols = tl.arange(0, 32)
+    gamma = tl.load(gamma_ptr + cols).to(tl.float32)
+
+    for tile_offset in range(TILES_PER_CORE):
+        tile = core * TILES_PER_CORE + tile_offset
+        rows = tile * BLOCK_M + tl.arange(0, BLOCK_M)
+
+        kv_rows = kv_ptr + rows[:, None] * 576
+        ckv = tl.load(kv_rows + cols[None, :]).to(tl.float32)
+        square_sum = tl.sum(ckv * ckv, axis=1)
+        rms = tl.sqrt(square_sum * (1.0 / 512.0) + epsilon)
+        ckv_out = ckv / rms[:, None] * gamma[None, :]
+
+        rope_64 = tl.load(kv_rows + (512 + rope_cols)[None, :]).to(tl.float32)
+        real, imag = tl.split(tl.reshape(rope_64, [BLOCK_M, 32, 2]))
+        trig_rows = rows[:, None] * 64 + half_cols[None, :]
+        cos_lo = tl.load(cos_ptr + trig_rows).to(tl.float32)
+        sin_lo = tl.load(sin_ptr + trig_rows).to(tl.float32)
+        cos_hi = tl.load(cos_ptr + trig_rows + 32).to(tl.float32)
+        sin_hi = tl.load(sin_ptr + trig_rows + 32).to(tl.float32)
+        rope_lo = real * cos_lo - imag * sin_lo
+        rope_hi = imag * cos_hi + real * sin_hi
+
+        position = tl.load(index_ptr + rows).to(tl.int32)
+        k_dst = k_cache_ptr + position[:, None] * 64 + half_cols[None, :]
+        c_dst = ckv_cache_ptr + position[:, None] * 512 + cols[None, :]
+        tl.store(k_dst, rope_lo)
+        tl.store(k_dst + 32, rope_hi)
+        tl.store(c_dst, ckv_out)
+
+
 def kv_rmsnorm_rope_cache(
     kv: torch.Tensor,
     gamma: torch.Tensor,
@@ -394,7 +446,42 @@ def kv_rmsnorm_rope_cache(
 
     cache_slots = k_cache.shape[0] if mode in (3, 4) else k_cache.shape[0] * k_cache.shape[1]
 
-    _kv_rmsnorm_rope_cache_kernel[(batch_size * num_heads * seq_len,)](
+    total_rows = batch_size * num_heads * seq_len
+    if (
+        mode == 1
+        and num_heads == 1
+        and total_rows % 32 == 0
+        and kv.is_contiguous()
+        and cos.is_contiguous()
+        and sin.is_contiguous()
+        and index.is_contiguous()
+        and k_cache.is_contiguous()
+        and ckv_cache.is_contiguous()
+        and k_rope_scale is None
+        and c_kv_scale is None
+        and k_rope_offset is None
+        and c_kv_offset is None
+    ):
+        block_m = 32
+        num_tiles = total_rows // block_m
+        grid_size = min(num_tiles, 32)
+        tiles_per_core = num_tiles // grid_size
+        _kv_rmsnorm_rope_cache_pa_tiled_kernel[(grid_size,)](
+            kv,
+            gamma,
+            cos,
+            sin,
+            index,
+            k_cache,
+            ckv_cache,
+            epsilon,
+            TILES_PER_CORE=tiles_per_core,
+            BLOCK_M=block_m,
+            multibuffer=True,
+        )
+        return k_cache, ckv_cache
+
+    _kv_rmsnorm_rope_cache_kernel[(total_rows,)](
         kv,
         gamma,
         cos,
@@ -436,45 +523,3 @@ def kv_rmsnorm_rope_cache(
         c_kv_offset is not None,
     )
     return k_cache, ckv_cache
-
-
-# ========== 新增 ModelNew 类，满足平台接口要求 ==========
-class ModelNew:
-    def __init__(self):
-        # 根据平台需要，可以在这里进行必要的初始化
-        pass
-
-    def forward(
-        self,
-        kv: torch.Tensor,
-        gamma: torch.Tensor,
-        cos: torch.Tensor,
-        sin: torch.Tensor,
-        index: torch.Tensor,
-        k_cache: torch.Tensor,
-        ckv_cache: torch.Tensor,
-        k_rope_scale: torch.Tensor = None,
-        c_kv_scale: torch.Tensor = None,
-        k_rope_offset: torch.Tensor = None,
-        c_kv_offset: torch.Tensor = None,
-        epsilon: float = 1e-5,
-        cache_mode: str = "Norm",
-        is_output_kv: bool = False,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
-        """直接调用已有的 kv_rmsnorm_rope_cache 函数"""
-        return kv_rmsnorm_rope_cache(
-            kv,
-            gamma,
-            cos,
-            sin,
-            index,
-            k_cache,
-            ckv_cache,
-            k_rope_scale,
-            c_kv_scale,
-            k_rope_offset,
-            c_kv_offset,
-            epsilon,
-            cache_mode,
-            is_output_kv,
-        )
