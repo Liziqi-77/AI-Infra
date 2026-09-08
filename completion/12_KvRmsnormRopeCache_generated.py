@@ -82,3 +82,19 @@ class ModelNew(nn.Module):
             KV_ROW=D, BN=Dv, BR=Dk, BLOCK_M=BLOCK_M,
         )
         return (k_cache_out, ckv_cache_out, k_rope_out, c_kv_out)
+
+
+# ========== 新增顶层入口函数 run，满足平台要求 ==========
+def run(kv, gamma, cos, sin, index, k_cache, ckv_cache,
+        k_rope_scale=None, c_kv_scale=None, k_rope_offset=None, c_kv_offset=None,
+        epsilon=1e-5, cache_mode='Norm', is_output_kv=False):
+    """
+    平台要求的顶层入口函数。
+    参数与 ModelNew.forward 完全一致，直接转发调用。
+    """
+    model = ModelNew()
+    return model.forward(
+        kv, gamma, cos, sin, index, k_cache, ckv_cache,
+        k_rope_scale, c_kv_scale, k_rope_offset, c_kv_offset,
+        epsilon, cache_mode, is_output_kv
+    )
