@@ -523,3 +523,18 @@ def kv_rmsnorm_rope_cache(
         c_kv_offset is not None,
     )
     return k_cache, ckv_cache
+
+
+# ========== 框架要求的入口封装 ==========
+class ModelNew:
+    def __init__(self):
+        pass
+
+    def forward(self, kv, gamma, cos, sin, index, k_cache, ckv_cache,
+                k_rope_scale=None, c_kv_scale=None, k_rope_offset=None, c_kv_offset=None,
+                epsilon=1e-5, cache_mode="Norm", is_output_kv=False):
+        return kv_rmsnorm_rope_cache(
+            kv, gamma, cos, sin, index, k_cache, ckv_cache,
+            k_rope_scale, c_kv_scale, k_rope_offset, c_kv_offset,
+            epsilon, cache_mode, is_output_kv
+        )
