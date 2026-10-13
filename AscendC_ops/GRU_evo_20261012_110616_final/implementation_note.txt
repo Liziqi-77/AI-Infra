@@ -1,0 +1,19 @@
+GRU 变体 x1_x1_x1 — 以全局最优 x1_x1 (1.9632x) 为起点，把混合精度扩展到反向 GEMM/反向数据流。
+最终：编译通过、精度 4/4 通过、加速比 2.0501x（time_us=32167.4，baseline=65945.7），突破 2.0x 目标。
+
+## 改动一（Phase 1，混合精度下沉到反向路径）
+父变体已把反向 GEMM 的“操作数”(dgx/dgh/xf/hp/whh) 降为 fp16、fp32 累加，因此本变体把剩余仍在 fp32 的反向张量收窄：
+1) cell 携带的隐梯度 dha 与 DH GEMM 输出 dhb 由 fp32 降为 fp16（GM 上），cell 读出后 Cast 回 fp32 参与 dht=dy+dha+dhb；dht*z 的 dha' 以 fp16 存回。二者都无额外 host 侧 cast（dy 保持 fp32：其 host cast 约 4ms，远超 cell 侧省下的 ~1.3ms MTE2，净亏，故不收窄）。
+2) 反向 cube 入口的输出类型规则由 `(!TA&&TB)` 改为 `TA`（cTypeOf: transA=F → fp16；仅 WI/WH 的 transA=T 保留 fp32 累加，含 split-K 部分和），cgElem 同步；host 端 FillMatmulTilingEx 的 `c16 = !transA`；host 把 dha/dhb 的分配 dtype 由 float 改为 half。
+该改动把 GM↔UB 的 MTE2/MTE3 流量减半，case0 由 117.0ms 降到 114.5ms，但每步多 2 次 Cast 调用，使小 case 各自回退 2~3%。
+
+## 改动二（Phase 2 Local Refinement，目标：夺回回退并冲过 2.0x）
+反向 bias 归约 kernel `gru_bwd_colsum_partial` 为 QDEPTH=1 的“load→cast→8 次串行 Add”结构：MTE2 拷贝延迟与 VEC 完全串行，读满 6.3GB 的 dgx 却只跑出约一半带宽（26.7ms，占 7.8%）。
+将其改为软件流水：prologue 预取首块，循环内先发射下一块的 DataCopy（EnQue）再消费当前块（DeQue→Cast→Add），并把 qLoad 队列加深到 2。
+注意：必须同时把 `TQue<QuePosition::VECIN, N>` 的模板 N 与 InitBuffer 的深度改成一致的 2；只改 InitBuffer 而模板仍为 1 会让第 2 次 AllocTensor 永久阻塞（该缓冲只有在本轮 DeQue/Free 后才释放）而引发 vector core 超时 (507034) 挂死 —— 首次尝试即因此失败。
+修订后 colsum 由 26.7ms(7.8%) 降至 17.5ms(5.2%)，case0 111.4ms；小 case 全部回正（12.57/3.21/1.52）。
+
+## 结果
+per-case (ms): 111.373 / 12.570 / 3.210 / 1.516，均通过（rel_l2 ≈ 4.0e-4，cos 达标）。
+speedup 2.0501x；local_refinement_rounds=2，local_refinement_gain=1.027。
+定向：仅动 kernel/ 内实现，未改 model.py / model_new_ascendc.py / 测试用例 JSON；算子接口签名不变。

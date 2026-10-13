@@ -1,0 +1,16 @@
+{
+  "inputs": [
+    {
+      "name": "x",
+      "shape": [
+        8000,
+        256,
+        128
+      ],
+      "dtype": "float32"
+    }
+  ],
+  "scalar_args": {},
+  "tensor_kwargs": {},
+  "case_count": 4
+}

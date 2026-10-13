@@ -1,0 +1,190 @@
+{
+  "tag": "evolved",
+  "op_name": "GRU",
+  "n_cases_total": 4,
+  "n_cases_passed": 4,
+  "baseline": {
+    "time_us": 65945.71574999999
+  },
+  "evolved": {
+    "time_us": 32167.3907,
+    "pipeline": {
+      "aiv_mte2_ratio": 0.28824,
+      "aiv_mte3_ratio": 0.08717,
+      "aiv_vec_ratio": 0.34391,
+      "aiv_scalar_ratio": 0.1268,
+      "aic_mac_ratio": 0.32699,
+      "aic_mte2_ratio": 0.4082,
+      "kernel_ms_total": 334.479
+    }
+  },
+  "comparison": {
+    "compilation_success": true,
+    "precision_passed": true,
+    "speedup": 2.05008,
+    "precision_message": "all cases within tol",
+    "measurement_quality": "good"
+  },
+  "shared_object": "/workspace/Quantitave_firm/evo_kernel_a5_hf32/GRU_evo_20261012_110616/round_3/parallel_3/kernel/build/gru_ext.cpython-312-x86_64-linux-gnu.so",
+  "per_case": [
+    {
+      "case": 0,
+      "shape": [
+        8000,
+        256,
+        128
+      ],
+      "dtype": "fp32",
+      "passed": true,
+      "error": "",
+      "metrics": {
+        "out": {
+          "rel_l2": 0.00040474713750758757,
+          "max_abs": 0.001093849539756775,
+          "cos": 1.5201442241668701
+        },
+        "dW_ih": {
+          "rel_l2": 0.0004369671295479812,
+          "max_abs": 1.4022216796875,
+          "cos": 1.000000238418579
+        },
+        "dW_hh": {
+          "rel_l2": 0.0005875724476928356,
+          "max_abs": 0.4109039306640625,
+          "cos": 1.000004529953003
+        },
+        "db_ih": {
+          "rel_l2": 0.0002670916264242312,
+          "max_abs": 1.09564208984375,
+          "cos": 1.0
+        },
+        "db_hh": {
+          "rel_l2": 0.0003105970590557082,
+          "max_abs": 0.6013870239257812,
+          "cos": 0.9999999403953552
+        }
+      },
+      "time_ms": 111.37313197832555
+    },
+    {
+      "case": 1,
+      "shape": [
+        1024,
+        128,
+        128
+      ],
+      "dtype": "fp32",
+      "passed": true,
+      "error": "",
+      "metrics": {
+        "out": {
+          "rel_l2": 0.00040552554500933617,
+          "max_abs": 0.0010338276624679565,
+          "cos": 1.0116469860076904
+        },
+        "dW_ih": {
+          "rel_l2": 0.00043420470957185217,
+          "max_abs": 0.363677978515625,
+          "cos": 1.0
+        },
+        "dW_hh": {
+          "rel_l2": 0.0005865142083703597,
+          "max_abs": 0.10122108459472656,
+          "cos": 1.0000022649765015
+        },
+        "db_ih": {
+          "rel_l2": 0.00028524530380211904,
+          "max_abs": 0.256195068359375,
+          "cos": 1.0
+        },
+        "db_hh": {
+          "rel_l2": 0.0003223273850703308,
+          "max_abs": 0.1510467529296875,
+          "cos": 0.9999998807907104
+        }
+      },
+      "time_ms": 12.57026707753539
+    },
+    {
+      "case": 2,
+      "shape": [
+        256,
+        64,
+        256
+      ],
+      "dtype": "fp32",
+      "passed": true,
+      "error": "",
+      "metrics": {
+        "out": {
+          "rel_l2": 0.00039698448193864044,
+          "max_abs": 0.0010387115180492401,
+          "cos": 1.000152349472046
+        },
+        "dW_ih": {
+          "rel_l2": 0.00044760034369428943,
+          "max_abs": 0.11430501937866211,
+          "cos": 1.0000004768371582
+        },
+        "dW_hh": {
+          "rel_l2": 0.0006005143662707821,
+          "max_abs": 0.03758394718170166,
+          "cos": 1.000000238418579
+        },
+        "db_ih": {
+          "rel_l2": 0.0002776687951835894,
+          "max_abs": 0.0732421875,
+          "cos": 0.9999999403953552
+        },
+        "db_hh": {
+          "rel_l2": 0.000346585857746802,
+          "max_abs": 0.038768768310546875,
+          "cos": 0.9999999403953552
+        }
+      },
+      "time_ms": 3.210328985005617
+    },
+    {
+      "case": 3,
+      "shape": [
+        64,
+        32,
+        128
+      ],
+      "dtype": "fp16",
+      "passed": true,
+      "error": "",
+      "metrics": {
+        "out": {
+          "rel_l2": 0.0002948807739063905,
+          "max_abs": 0.0005196332931518555,
+          "cos": 0.9999984502792358
+        },
+        "dW_ih": {
+          "rel_l2": 0.0002788351941096178,
+          "max_abs": 0.027662277221679688,
+          "cos": 1.0000001192092896
+        },
+        "dW_hh": {
+          "rel_l2": 0.00038995036734452456,
+          "max_abs": 0.007461071014404297,
+          "cos": 0.9999998807907104
+        },
+        "db_ih": {
+          "rel_l2": 0.00021637070466702725,
+          "max_abs": 0.02289581298828125,
+          "cos": 0.9999998807907104
+        },
+        "db_hh": {
+          "rel_l2": 0.00023614857888310762,
+          "max_abs": 0.010463714599609375,
+          "cos": 0.9999998807907104
+        }
+      },
+      "time_ms": 1.5158349415287375
+    }
+  ],
+  "local_refinement_rounds": 2,
+  "local_refinement_gain": 1.0269,
+  "implementation_note": "以 x1_x1 为起点把混合精度下沉到反向路径：cell 的 dha 与 DH-GEMM 输出 dhb 由 fp32 收窄为 fp16（读回后 Cast 回 fp32；cube 输出类型规则由 (!TA&&TB) 改为 TA，仅 WI/WH 保留 fp32 累加），GM 的 MTE2/MTE3 减半；随后在 Local Refinement 中把 gru_bwd_colsum_partial 由 QDEPTH=1 改为预取式双缓冲（qLoad 模板与 InitBuffer 深度同步改为 2，否则二次 Alloc 死锁挂死），colsum 26.7ms->17.5ms。result: 4/4 精度通过, speedup 2.0501x (time_us=32167.4)."
+}

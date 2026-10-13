@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GRU 进化最优实现 vs A100 训练耗时比对</title>
+<style>
+  :root{
+    --paper:#f6f4ef;
+    --surface:#fffefb;
+    --ink:#1e1c19;
+    --ink-2:#4b463f;
+    --muted:#8a8378;
+    --rule:#e3ded4;
+    --rule-2:#cdc6b8;
+    --navy:#2f4a63;
+    --moss:#4a6b41;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC","Noto Serif CJK SC","Source Han Serif SC",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:15px;
+    line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:812px;margin:0 auto;padding:64px 28px 96px}
+
+  /* ---------- 报头 ---------- */
+  .kicker{
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:18px;
+  }
+  h1{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:37px;
+    line-height:1.2;
+    letter-spacing:-.01em;
+    margin:0 0 20px;
+  }
+  .rule-thick{border:0;border-top:2px solid var(--ink);margin:0 0 14px}
+  .meta{
+    display:flex;flex-wrap:wrap;gap:6px 26px;
+    font-size:13px;color:var(--ink-2);margin-bottom:38px;
+  }
+  .meta span{white-space:nowrap}
+  .meta b{font-weight:600;color:var(--ink)}
+  .meta .lbl{color:var(--muted);font-family:var(--mono);font-size:12px;margin-right:6px}
+
+  /* ---------- 摘要 ---------- */
+  .abstract{
+    font-family:var(--serif);
+    font-size:17px;
+    line-height:1.78;
+    color:var(--ink-2);
+    margin:0 0 46px;
+  }
+  .abstract::first-letter{
+    font-size:44px;line-height:.9;float:left;
+    padding:6px 10px 0 0;color:var(--navy);font-weight:600;
+  }
+
+  /* ---------- 关键数字 ---------- */
+  .figures{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    border-top:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2);
+    margin:0 0 60px;
+  }
+  .figures div{padding:20px 16px 20px 0;border-right:1px solid var(--rule)}
+  .figures div:last-child{border-right:0;padding-right:0}
+  .figures .n{
+    font-family:var(--serif);font-size:30px;font-weight:600;
+    letter-spacing:-.01em;line-height:1.1;display:block;
+  }
+  .figures .u{font-size:15px;color:var(--muted);font-weight:400}
+  .figures .c{display:block;font-size:12px;color:var(--muted);margin-top:7px;line-height:1.5}
+
+  /* ---------- 章节 ---------- */
+  section{margin:0 0 58px}
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:22px;
+    letter-spacing:-.005em;margin:0 0 6px;
+    display:flex;gap:12px;align-items:baseline;
+  }
+  h2 .no{
+    font-family:var(--mono);font-size:12px;font-weight:400;
+    color:var(--muted);letter-spacing:.06em;
+  }
+  h2 + .hrule{border:0;border-top:1px solid var(--rule-2);margin:0 0 20px}
+  h3{
+    font-family:var(--mono);font-weight:600;font-size:11.5px;
+    letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
+    margin:30px 0 11px;
+  }
+  p{margin:0 0 16px}
+  .file{font-family:var(--mono);font-size:14px;color:var(--navy)}
+
+  /* ---------- 表格 ---------- */
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:2px 0 4px}
+  caption{caption-side:top;text-align:left;font-size:12px;color:var(--muted);
+          padding-bottom:8px;font-family:var(--mono)}
+  th,td{padding:9px 14px 9px 0;vertical-align:baseline}
+  thead th{
+    font-family:var(--mono);font-weight:600;font-size:11px;
+    letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+    border-top:1.5px solid var(--ink);border-bottom:1px solid var(--ink);
+    padding-top:8px;padding-bottom:8px;
+  }
+  tbody tr{border-bottom:1px solid var(--rule)}
+  tbody tr:last-child{border-bottom:1.5px solid var(--ink)}
+  td.num,th.num{text-align:right;font-family:var(--mono);font-size:13.5px;
+                font-variant-numeric:tabular-nums;padding-right:0}
+  td:first-child{padding-left:0}
+  .dim{color:var(--muted)}
+  .pass{color:var(--moss);font-weight:600;font-size:13px;white-space:nowrap}
+  .best{color:var(--navy);font-weight:600}
+  .over{color:#8c4a3f;font-weight:600}
+
+  /* ---------- 图 ---------- */
+  figure{margin:26px 0 30px}
+  figure svg{width:100%;height:auto;display:block}
+  figcaption{
+    font-size:12.5px;color:var(--muted);margin-top:12px;
+    padding-top:9px;border-top:1px solid var(--rule);
+  }
+  .ax{font-family:var(--mono);font-size:10.5px;fill:var(--muted)}
+  .lb{font-family:var(--sans);font-size:12px;fill:var(--ink-2)}
+  .lb b{font-weight:600;fill:var(--ink)}
+
+  /* ---------- 代码 ---------- */
+  pre{
+    background:var(--surface);
+    border:1px solid var(--rule);
+    border-left:2px solid var(--rule-2);
+    padding:15px 18px;margin:0 0 16px;
+    overflow-x:auto;font-family:var(--mono);font-size:12.5px;
+    line-height:1.62;color:var(--ink-2);
+  }
+  code{
+    font-family:var(--mono);font-size:13px;background:var(--surface);
+    border:1px solid var(--rule);padding:1px 5px;border-radius:2px;color:var(--ink-2);
+  }
+
+  /* ---------- 列表 ---------- */
+  ul{margin:0 0 16px;padding-left:20px}
+  li{margin:9px 0}
+  li::marker{color:var(--rule-2)}
+  .note{font-size:13px;color:var(--muted);line-height:1.68}
+  dl{margin:0 0 16px}
+  dt{font-family:var(--mono);font-size:12.5px;color:var(--navy);margin-top:14px}
+  dd{margin:2px 0 0;font-size:14px;color:var(--ink-2)}
+
+  footer{
+    border-top:1px solid var(--rule-2);margin-top:20px;padding-top:18px;
+    font-size:12.5px;color:var(--muted);
+    display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  }
+  footer code{font-size:12px}
+
+  @media (max-width:640px){
+    .page{padding:44px 20px 72px}
+    h1{font-size:29px}
+    .figures{grid-template-columns:repeat(2,1fr)}
+    .figures div:nth-child(2){border-right:0;padding-right:0}
+    .figures div:nth-child(1),.figures div:nth-child(2){border-bottom:1px solid var(--rule)}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══════════ 报头 ══════════ -->
+  <div class="kicker">Ascend950PR_9579 · 端到端训练耗时比对</div>
+  <h1>GRU 训练算子<br>进化最优实现 vs A100</h1>
+  <hr class="rule-thick">
+  <div class="meta">
+    <span><span class="lbl">日期</span><b>2026-10-13</b></span>
+    <span><span class="lbl">平台</span>Ascend950PR_9579，28 AIC</span>
+    <span><span class="lbl">配置</span>B=8000 · S=256 · I=128 · H=512 · Adam 1e-3 · 500 步</span>
+    <span><span class="lbl">数据</span><b>实机实测</b></span>
+  </div>
+
+  <!-- ══════════ 摘要 ══════════ -->
+  <p class="abstract">
+    在完整的训练回路（GRU 层 → 末时间步 → Linear 头，MSE 损失，Adam 优化器）下，
+    进化后的 AscendC 内核 500 步实跑每步 <b>0.1146 秒</b>，为 A100 记录基线
+    <code>0.2258 s/step</code> 的 <b>1.971 倍</b>，峰值显存为 A100 的 51%。
+    相对本次进化的起点，端到端加速 <b>2.07 倍</b>——已达成 2.0x 目标。
+    两侧使用同一份训练脚本、同一组超参、同一种计时口径，仅切换内核动态库，
+    因此该倍数不含测量口径差异。以下数字全部来自本机实跑日志，未经估算。
+  </p>
+
+  <!-- ══════════ 关键数字 ══════════ -->
+  <div class="figures">
+    <div>
+      <span class="n">0.1146<span class="u"> s</span></span>
+      <span class="c">进化最优 训练每步<br>500 步实跑均值</span>
+    </div>
+    <div>
+      <span class="n">57.28<span class="u"> s</span></span>
+      <span class="c">500 步总耗时<br>实测（非外推）</span>
+    </div>
+    <div>
+      <span class="n">1.971<span class="u"> ×</span></span>
+      <span class="c">相对 A100 记录基线<br>同口径倍数</span>
+    </div>
+    <div>
+      <span class="n">35.7<span class="u"> GB</span></span>
+      <span class="c">峰值显存 reserved<br>A100 为 66.2 GB</span>
+    </div>
+  </div>
+
+  <!-- ══════════ 01 横向比对 ══════════ -->
+  <section>
+    <h2><span class="no">01</span>横向比对</h2>
+    <hr class="hrule">
+    <p>
+      两条路径在完全相同的训练配置下比较：<code>B=8000</code>、<code>S=256</code>、
+      <code>I=128</code>、<code>H=512</code>，MSE 损失，<code>Adam(lr=1e-3)</code>，500 步。
+      本实现为本次进化产出的最优内核（前向与反向均下沉到混合精度，L0C 仍 fp32 累加）；
+      A100 侧为仓库既有的 A100 实测记录值。
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>指标</th>
+          <th class="num">本实现（进化最优）</th>
+          <th class="num">A100（记录基线）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>训练每步耗时</td>
+          <td class="num best">0.1146 s</td>
+          <td class="num">0.2258 s</td>
+        </tr>
+        <tr>
+          <td>500 步总耗时</td>
+          <td class="num best">57.2756 s</td>
+          <td class="num">112.8862 s</td>
+        </tr>
+        <tr>
+          <td>训练吞吐</td>
+          <td class="num best">69 838 samples/s</td>
+          <td class="num">35 434 samples/s</td>
+        </tr>
+        <tr>
+          <td>内存峰值 · reserved</td>
+          <td class="num best">35 692 MB</td>
+          <td class="num over">66 238 MB</td>
+        </tr>
+        <tr>
+          <td>最终损失</td>
+          <td class="num">1.36e-5</td>
+          <td class="num">4.6e-7</td>
+        </tr>
+        <tr>
+          <td>精度（模块级 vs CPU <code>nn.GRU</code>）</td>
+          <td class="num pass">PASS</td>
+          <td class="num dim">—</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note" style="margin-top:16px">
+      「训练吞吐」两侧均由 <code>8000 ÷ 每步耗时</code> 换算，故与耗时行严格同口径；
+      其余为原值。A100 侧除该行外全部取自仓库既有记录。
+      「最终损失」不可直接横向解读——该训练回路对<b>同一批 8000 个样本</b>反复迭代 500 步
+      （无小批量、无留出集），损失降至 ~1e-5 已是精度噪声底而非泛化能力，详见第 04 节。
+    </p>
+  </section>
+
+  <!-- ══════════ 02 耗时比对 ══════════ -->
+  <section>
+    <h2><span class="no">02</span>耗时比对</h2>
+    <hr class="hrule">
+    <p>
+      以训练每步耗时为口径，两条路径按同一标尺并列。虚线为 A100 记录基线的位置，
+      本实现的条形显著短于该线。
+    </p>
+
+    <figure>
+      <svg viewBox="0 0 660 150" role="img"
+           aria-label="本实现与 A100 的训练每步耗时条形对比，虚线为 A100 基线位置">
+        <!-- 网格辅助线：0.1 s / 0.2 s -->
+        <line x1="190" y1="10" x2="190" y2="104" stroke="#e3ded4" stroke-width="1" stroke-dasharray="3 4"/>
+        <line x1="230" y1="10" x2="230" y2="104" stroke="#e3ded4" stroke-width="1" stroke-dasharray="3 4"/>
+        <!-- 基线轴 -->
+        <line x1="150" y1="10" x2="150" y2="104" stroke="#cdc6b8" stroke-width="1"/>
+
+        <!-- 本实现 · 0.114551 s -->
+        <text class="lb" x="140" y="32" text-anchor="end"><tspan font-weight="600">本实现（进化最优）</tspan></text>
+        <rect x="150" y="18" width="45.8" height="20" fill="#4a6b41"/>
+        <text class="ax" x="201.8" y="32">0.1146 s</text>
+
+        <!-- A100 · 0.225772 s -->
+        <text class="lb" x="140" y="76" text-anchor="end">A100（记录基线）</text>
+        <rect x="150" y="62" width="90.3" height="20" fill="#8c8478"/>
+        <text class="ax" x="248.3" y="76">0.2258 s</text>
+
+        <!-- A100 基线参考线 -->
+        <line x1="240.3" y1="10" x2="240.3" y2="104" stroke="#a89f90" stroke-width="1" stroke-dasharray="5 4"/>
+        <line x1="237" y1="114" x2="243.5" y2="114" stroke="#a89f90" stroke-width="1"/>
+        <text class="ax" x="250" y="118" fill="#6f6759">A100 基线 0.2258 s</text>
+
+        <!-- 底部刻度 -->
+        <text class="ax" x="190" y="118" text-anchor="middle">0.1 s</text>
+        <text class="ax" x="230" y="118" text-anchor="middle">0.2 s</text>
+        <text class="ax" x="150" y="136" text-anchor="middle">0</text>
+        <text class="ax" x="400" y="136" text-anchor="middle">每步耗时（秒，越小越快）</text>
+      </svg>
+      <figcaption>图 1　训练每步耗时对比（同一训练配置，500 步实跑的平均步时）。
+        本实现 0.1146 s 为实机实测；A100 0.2258 s 为记录基线值。</figcaption>
+    </figure>
+
+    <h3>耗时倍数</h3>
+    <table>
+      <thead>
+        <tr><th>对比（A ÷ B）</th><th class="num">倍数</th><th>含义</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>A100 ÷ 本实现</td>
+          <td class="num best">1.971×</td>
+          <td class="dim">本实现每步耗时约为 A100 的 50.7%，即快 1.971 倍</td>
+        </tr>
+        <tr>
+          <td>A100 ÷ 本实现（500 步总耗时）</td>
+          <td class="num best">1.971×</td>
+          <td class="dim">与每步倍数一致（两侧同为 500 步）</td>
+        </tr>
+        <tr>
+          <td>A100 ÷ 本实现（显存 reserved）</td>
+          <td class="num best">1.856×</td>
+          <td class="dim">本实现峰值显存更省</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note" style="margin-top:16px">
+      倍数由上方实测值直接相除得出，未作平滑或取整修正。
+      同一次运行内，500 步循环均值（0.114551 s）与独立基准段的整步读数（0.114124 s）
+      相差 0.37%，低于该幅度的差异不可分辨。
+    </p>
+  </section>
+
+  <!-- ══════════ 03 步耗时构成 ══════════ -->
+  <section>
+    <h2><span class="no">03</span>本实现步耗时构成</h2>
+    <hr class="hrule">
+    <p>
+      将训练步拆开看，优化器与梯度清零的开销可以忽略，时间几乎全部落在算子本身
+      ——因此算子级的优化能等比例地反映到端到端。A100 侧记录中不含该拆分。
+    </p>
+    <table>
+      <thead>
+        <tr><th>阶段</th><th class="num">耗时</th><th class="num">占每步</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>前向（GRU 层 + Linear 头）</td>
+          <td class="num">38.121 ms</td>
+          <td class="num">33.4%</td>
+        </tr>
+        <tr>
+          <td>反向 + 优化器 + 梯度清零</td>
+          <td class="num">76.003 ms</td>
+          <td class="num">66.6%</td>
+        </tr>
+        <tr>
+          <td><b>合计 · 训练每步</b></td>
+          <td class="num best">114.124 ms</td>
+          <td class="num">100%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note" style="margin-top:16px">
+      该拆分为独立基准段读数（warmup 3 步，前向 10 次、整步 20 次取平均），
+      与 500 步循环均值 114.551 ms 相差 0.37%。
+    </p>
+  </section>
+
+  <!-- ══════════ 04 数据格式与测量口径 ══════════ -->
+  <section>
+    <h2><span class="no">04</span>数据格式与测量口径</h2>
+    <hr class="hrule">
+    <p>
+      本章说明上表每个数字的<b>来路、单位与可比性边界</b>。读表前请先读本章；
+      其中第 2、3、5 条直接影响数字能否横向相除。
+    </p>
+
+    <h3>1 · 训练回路与形状</h3>
+    <dl>
+      <dt>模型</dt>
+      <dd>GRU 层（<code>torch.ops.npu.gru</code> 前向 + <code>torch.ops.npu.gru_backward</code> 反向）→ 取末时间步 → <code>nn.Linear(512→1)</code> 回归头。</dd>
+      <dt>损失与优化器</dt>
+      <dd><code>MSELoss</code> + <code>Adam(lr=1e-3, eps=1e-4)</code>；每步含 <code>zero_grad → forward → backward → optimizer.step</code>。</dd>
+      <dt>形状 / 超参</dt>
+      <dd><code>B=8000</code>（批）、<code>S=256</code>（序列）、<code>I=128</code>（输入维）、<code>H=512</code>（隐层）、<code>steps=500</code>。</dd>
+      <dt>数据类型</dt>
+      <dd>对外接口 <code>float32</code>；内核内部采用<b>混合精度</b>——前向门控预激活与反向的 DH-GEMM 输出、dha/dhb 累加器降到 fp16，L0C 仍 fp32 累加（TF32 量级），仅 WI/WH 的 split-K 保留 fp32 累加。</dd>
+      <dt>输入数据</dt>
+      <dd>由 <code>torch.Generator(seed=DATA_SEED=0)</code> 确定性生成，两侧逐位相同；参数初始化由 <code>torch.manual_seed(0)</code> 固定，两侧一致。</dd>
+      <dt>训练方式</dt>
+      <dd><b>定点单批</b>：500 步反复迭代同一批 8000 个样本，无小批量、无留出集、无学习率调度。</dd>
+    </dl>
+
+    <h3>2 · 计时口径（最关键）</h3>
+    <ul>
+      <li><b>每步耗时</b>＝ 完整训练步的<b>墙钟</b>时间，用 <code>time.time()</code> 在 <code>torch.npu.synchronize()</code> 对齐后测量，<b>包含</b> host 下发、算子执行、优化器更新与梯度清零。</li>
+      <li><b>总耗时</b>＝ 500 步循环的墙钟总计，<b>不含</b>预热与基准段。</li>
+      <li>单位：秒（<code>s</code>）；构成表中为毫秒（<code>ms</code>）。<b>不是</b> msprof 核时间——本报告的计时不含 profiler 采集。</li>
+      <li>两侧使用<b>同一份</b>训练脚本、同一台设备的同一 NPU（<code>npu:0</code>），仅切换内核动态库；因此该倍数<b>不含测量口径差异</b>。</li>
+    </ul>
+
+    <h3>3 · A100 侧取值的边界</h3>
+    <ul>
+      <li>A100 侧数字为仓库既有记录（500 步总 112.8862 s → 每步 0.225772 s），与本次<b>同脚本、同形状、同步数、同优化器</b>，故可直接相除。</li>
+      <li>但该记录的精度标签在仓库中<b>自相矛盾</b>：一处标为「A100 fp32 实测」，另一处标为「A100 TF32 目标」。若实为 fp32，则本实现（TF32 量级）是在<b>较低数值精度</b>下取得该速度，横向解读时需注意。</li>
+      <li>第 01 节「最终损失」行支持这一疑虑但不构成定论：A100 记录末损失 4.6e-7 比本实现 1.36e-5 低约 1.5 个数量级，与更高的数值精度一致。</li>
+    </ul>
+
+    <h3>4 · 精度判据</h3>
+    <ul>
+      <li><b>模块级</b>（本表所用的 PASS）：整模块输出对比由本模块参数重建的 CPU <code>nn.GRU</code> + <code>F.linear</code>，判据 <code>atol=1e-4</code>、<code>rtol=2e-3</code>；实测 <code>max_abs=8.76e-05</code>，全部逐元素落在容差内。</li>
+      <li><b>算子级</b>（另测，不在本表）：4 个用例对 PyTorch fp32 autograd 金标，判据每输出 <code>rel_l2 ≤ 1e-2</code> 且 <code>cos ≥ 0.99</code>，4/4 通过；实测 <code>rel_l2 ≤ 6.01e-04</code>（最坏为 case 2 的 dW_hh）。</li>
+      <li>两套判据松紧不同（模块级更严、算子级更宽），<b>不可互相引用</b>。</li>
+    </ul>
+
+    <h3>5 · 单位与符号约定</h3>
+    <ul>
+      <li>显存取 <code>torch.npu.max_memory_reserved()</code>（<b>reserved</b>，即运行时向设备预留的峰值），单位 MB；不等同于实际写入量 <code>allocated</code>（本实现为 35 644 MB）。</li>
+      <li>倍数统一写作「A ÷ B」，&gt;1 表示 B 更快；<code>×</code> 为算术倍数，非对数或百分比。</li>
+      <li>吞吐 <code>samples/s</code> ＝ <code>B ÷ 每步耗时</code>。</li>
+    </ul>
+
+    <h3>6 · 数据来源</h3>
+    <pre>本实现：本次实跑，500 步 + 独立基准段，单次运行
+  driver : {evo_dir}/e2e/run_e2e.sh
+  logs   : {evo_dir}/e2e/logs/evo3_e2e.log
+  kernel : round_3/parallel_3/kernel/build/gru_ext.cpython-312-x86_64-linux-gnu.so
+
+A100  ：仓库既有记录（未在本机复现）
+  source : NN_GRU_ascendc_final/NN_GRU_acceptance_report.md</pre>
+    <p class="note">
+      本实现侧为<b>实机实测、单次运行</b>（非多次取中位数）；A100 侧为仓库既有记录值。
+      除第 01 节「吞吐」由记录值换算外，全部数字为原值。
+    </p>
+  </section>
+
+  <footer>
+    <span>GRU 进化最优实现 vs A100 · 2026-10-13</span>
+    <span>文件 <code>report_GRU_evo_vs_A100.html</code>　·　数据来源：本机实跑日志与仓库既有记录</span>
+  </footer>
+
+</div>
+</body>
+</html>

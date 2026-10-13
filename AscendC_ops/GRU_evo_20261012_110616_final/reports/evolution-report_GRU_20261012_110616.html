@@ -1,0 +1,2946 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{OP_NAME}} 进化优化报告</title>
+<style>
+:root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --orange: #d29922;
+    --purple: #bc8cff;
+    --cyan: #56d4dd;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+}
+.container { max-width: 1280px; margin: 0 auto; }
+h1 { color: #fff; font-size: 1.8rem; margin-bottom: 0.5rem; }
+h2 { color: var(--accent); font-size: 1.3rem; margin: 2.5rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+h3 { color: var(--purple); font-size: 1.1rem; margin: 1.5rem 0 0.8rem; }
+.subtitle { color: var(--text-muted); margin-bottom: 2rem; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.metric { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; text-align: center; }
+.metric-value { font-size: 2rem; font-weight: bold; color: var(--green); }
+.metric-value.baseline { color: var(--text-muted); }
+.metric-value.highlight { color: var(--green); }
+.metric-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+th, td { padding: 0.55rem 0.7rem; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--accent); font-weight: 600; background: rgba(88,166,255,0.05); position: sticky; top: 0; }
+tr:hover { background: rgba(88,166,255,0.03); }
+tr.best { background: rgba(63,185,80,0.12); }
+tr.best td { color: var(--green); font-weight: 600; }
+tr.invalid { opacity: 0.45; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+.badge-pass { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-fail { background: rgba(248,81,73,0.15); color: var(--red); }
+.badge-warn { background: rgba(210,153,34,0.15); color: var(--orange); }
+.badge-skip { background: rgba(139,148,158,0.15); color: var(--text-muted); }
+.badge-best { background: rgba(63,185,80,0.25); color: var(--green); border: 1px solid var(--green); }
+pre { background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; font-size: 0.82rem; line-height: 1.5; position: relative; }
+code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+.diff-add { color: var(--green); }
+.diff-del { color: var(--red); }
+.diff-hunk { color: var(--purple); }
+.chart-container { position: relative; height: 320px; margin: 1rem 0; }
+canvas { width: 100% !important; }
+.tag { display: inline-block; background: rgba(188,140,255,0.15); color: var(--purple); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.78rem; margin-right: 0.4rem; }
+.tag-strategy { background: rgba(88,166,255,0.15); color: var(--accent); }
+.tag-node { background: rgba(86,212,221,0.15); color: var(--cyan); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+.copy-wrapper { position: relative; }
+.copy-btn { position: absolute; top: 8px; right: 8px; background: var(--border); border: 1px solid var(--text-muted); color: var(--text); padding: 4px 10px; border-radius: 4px; font-size: 0.72rem; cursor: pointer; transition: all 0.2s; z-index: 10; }
+.copy-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.copy-btn.copied { background: var(--green); border-color: var(--green); color: #fff; }
+.vid { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--cyan); font-weight: 600; }
+.sid { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--purple); }
+/* Vertical Tree */
+.vtree-container { overflow-x: auto; padding: 1rem 0; }
+.vtree { display: flex; flex-direction: column; align-items: center; min-width: 900px; }
+.vtree-level { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: nowrap; }
+.vtree-connectors { width: 100%; height: 40px; }
+.vtree-svg { width: 100%; height: 40px; }
+.vline-best { stroke: var(--green); stroke-width: 2.5; }
+.vline-other { stroke: var(--border); stroke-width: 1.5; stroke-dasharray: 4 2; }
+.vtree-node {
+    min-width: 120px; max-width: 155px; padding: 0.6rem 0.7rem; border-radius: 8px;
+    text-align: center; font-size: 0.78rem; transition: transform 0.2s, box-shadow 0.2s; flex-shrink: 0;
+}
+.vtree-node:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+.vtree-node.node-best-path { background: rgba(63,185,80,0.12); border: 2px solid var(--green); }
+.vtree-node.node-best-leaf { background: rgba(63,185,80,0.25); border: 2px solid var(--green); box-shadow: 0 0 12px rgba(63,185,80,0.3); }
+.vtree-node.node-root { background: rgba(88,166,255,0.15); border: 2px solid var(--accent); }
+.vtree-node.node-minor { background: rgba(139,148,158,0.08); border: 1px solid var(--border); }
+.vtree-node.node-regress { background: rgba(248,81,73,0.08); border: 1px solid rgba(248,81,73,0.4); }
+.vtree-node.node-invalid { background: rgba(139,148,158,0.05); border: 1px dashed var(--border); opacity: 0.6; }
+.vnode-title { font-weight: 700; font-size: 0.82rem; color: #fff; margin-bottom: 0.2rem; font-family: 'JetBrains Mono', monospace; }
+.vnode-strategy { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--purple); margin-bottom: 0.15rem; }
+.vnode-desc { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vnode-perf { font-size: 0.7rem; color: var(--text-muted); }
+.vnode-speedup { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-top: 0.15rem; }
+.vnode-speedup.good { color: var(--green); }
+.vnode-speedup.bad { color: var(--red); }
+.vnode-speedup.best { color: var(--green); font-size: 0.9rem; text-shadow: 0 0 8px rgba(63,185,80,0.5); }
+<!-- PLACEHOLDER_STYLE_CONTINUE -->
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+<h1>GRU 进化优化报告</h1>
+<p class="subtitle">deepseek-v4-flash | 2026-10-12 | Ascend Ascend950PR_9579 | 3轮 x 5变体 </p>
+
+<!-- Key Metrics -->
+<div class="metrics">
+    <div class="metric">
+        <div class="metric-value baseline">65945.72 us</div>
+        <div class="metric-label">基线耗时</div>
+    </div>
+    <div class="metric">
+        <div class="metric-value highlight">32167.39 us</div>
+        <div class="metric-label">最优耗时</div>
+    </div>
+    <div class="metric">
+        <div class="metric-value highlight">2.050x</div>
+        <div class="metric-label">加速比</div>
+    </div>
+    <div class="metric">
+        <div class="metric-value highlight">-51.2%</div>
+        <div class="metric-label">耗时变化</div>
+    </div>
+</div>
+
+<!-- Test Case & Hardware -->
+<div class="two-col">
+<div class="card">
+<h3 style="margin-top:0">测试用例</h3>
+<table>
+<tr><th>参数</th><th>值</th><th>参数</th><th>值</th></tr>
+<tr><td>x</td><td>shape=[8000, 256, 128], dtype=float32</td><td></td><td></td></tr>
+</table>
+</div>
+<div class="card">
+<h3 style="margin-top:0">硬件环境</h3>
+<table>
+<tr><th>项目</th><th>规格</th></tr>
+<tr><td>芯片</td><td>Ascend Ascend950PR_9579</td></tr>
+<tr><td>CubeCore / VectorCore</td><td>28 / 28</td></tr>
+<tr><td colspan="2" style="color:var(--text-muted);font-size:0.8rem;">注：VectorCore 数量未单独提供，按 Ascend Ascend950PR_9579 架构推断与 CubeCore 相同（每 AI Core 含 1 Cube + 1 Vector）</td></tr>
+<tr><td>峰值带宽</td><td>51.15 GB/s</td></tr>
+<tr><td>评估后端</td><td>forge</td></tr>
+<tr><td>性能采集</td><td>msprof</td></tr>
+</table>
+</div>
+</div>
+
+<!-- Evolution Chart -->
+<h2>进化轨迹</h2>
+<div class="card">
+<div class="chart-container">
+    <canvas id="evolutionChart"></canvas>
+</div>
+</div>
+
+<!-- Full Evolution Table -->
+<h2>完整进化轨迹</h2>
+<div class="card" style="overflow-x:auto; max-height:600px; overflow-y:auto;">
+<table>
+<tr><th>变体编号</th><th>世界模型节点</th><th>策略组合</th><th>优化方案</th><th>耗时(us)</th><th>加速比</th><th>状态</th></tr>
+<tr><td><span class="vid">1-V0</span></td><td><span class="tag tag-node">n5</span></td><td><span class="sid">P66+P52+P93+P26+P74</span></td><td>反向 colsum/WI/hprev 的 GM 对齐与 L2 策略微调：gru_</td><td>65290.08</td><td>1.010x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr><td><span class="vid">1-V1</span></td><td><span class="tag tag-node">n4</span></td><td><span class="sid">P54+P53+P83+P71</span></td><td>反向 DH 逐 step GEMM 的启动开销与权重常驻：gru_bwd_gem</td><td>66011.60</td><td>0.999x</td><td><span class="badge badge-fail">退化</span></td></tr>
+<tr><td><span class="vid">1-V2</span></td><td><span class="tag tag-node">n1</span></td><td><span class="sid">P46+P51+P73+P29+P102</span></td><td>前向 GEMM×逐元素 AIC/AIV 重叠：把每步的递归 GEMM（h@U^T</td><td>63606.72</td><td>1.037x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr><td><span class="vid">1-V3</span></td><td><span class="tag tag-node">x0</span></td><td><span class="sid">open</span></td><td>[开放探索] 从第一原理自主推理的新优化方向。证据: 前向 gru_rec_el</td><td>63400.77</td><td>1.040x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr><td><span class="vid">1-V4</span></td><td><span class="tag tag-node">x1</span></td><td><span class="sid">open</span></td><td>[开放探索] 从第一原理自主推理的新优化方向。证据: 前向递推 cell 把门预</td><td>61119.60</td><td>1.079x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr><td><span class="vid">2-V0</span></td><td><span class="tag tag-node">n5_cont</span></td><td><span class="sid">P93+P26+P56+P59</span></td><td>延续探索: n5(1.01x) 无显著提升，尝试变化</td><td>61224.05</td><td>1.077x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr><td><span class="vid">2-V1</span></td><td><span class="tag tag-node">n8</span></td><td><span class="sid">P92+P47+P93+P72+P51+P90</span></td><td>立方体受限 GEMM 的分块/核配比再平衡：WH 31.48ms@102.3TF</td><td>62552.37</td><td>1.054x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr class="invalid"><td><span class="vid">2-V2</span></td><td><span class="tag tag-node">N/A</span></td><td><span class="sid">分层采样</span></td><td>[round_2/parallel_2] GRU 前向 row-group 融合</td><td>-1.00</td><td>—</td><td><span class="badge badge-fail">精度失败</span></td></tr>
+<tr><td><span class="vid">2-V3</span></td><td><span class="tag tag-node">x1_x1</span></td><td><span class="sid">open</span></td><td>[开放探索] 基于父节点 x1 分析继续探索。 瓶颈: undersize_tr</td><td>33591.58</td><td>1.963x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr><td><span class="vid">2-V4</span></td><td><span class="tag tag-node">x0_x1</span></td><td><span class="sid">open</span></td><td>[开放探索] 基于父节点 x0 分析继续探索。 瓶颈: partial_over</td><td>48646.22</td><td>1.356x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr><td><span class="vid">3-V0</span></td><td><span class="tag tag-node">n5_cont_s1</span></td><td><span class="sid">P26+P56+P59+P69</span></td><td>深度探索: 在 n5_cont(1.08x) 基础上继续优化</td><td>58392.94</td><td>1.129x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr><td><span class="vid">3-V1</span></td><td><span class="tag tag-node">n8_s1</span></td><td><span class="sid">P47+P93+P92</span></td><td>深度探索: 在 n8(1.05x) 基础上继续优化</td><td>62528.97</td><td>1.055x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr><td><span class="vid">3-V2</span></td><td><span class="tag tag-node">n7</span></td><td><span class="sid">open</span></td><td>[MODE OVERRIDE: 全部策略 (D1, A1, A3, P86) 被</td><td>33069.80</td><td>1.994x</td><td><span class="badge badge-pass">有效</span></td></tr>
+<tr class="best"><td><span class="vid">3-V3</span></td><td><span class="tag tag-node">x1_x1_x1</span></td><td><span class="sid">open</span></td><td>[开放探索] 基于父节点 x1_x1 分析继续探索。 瓶颈: near_opti</td><td>32167.39</td><td>2.050x</td><td><span class="badge badge-best">最优</span></td></tr>
+<tr><td><span class="vid">3-V4</span></td><td><span class="tag tag-node">x0_x1_x1</span></td><td><span class="sid">open</span></td><td>[开放探索] 基于父节点 x0_x1 分析继续探索。 瓶颈: near_opti</td><td>34278.18</td><td>1.924x</td><td><span class="badge badge-pass">有效</span></td></tr>
+</table>
+<p style="color:var(--text-muted);font-size:0.8rem;margin-top:0.8rem;">
+策略编号: P1=双缓冲 P10=预取 P102 P19 P20 P26 P29 P35 P37 P40 P43 P46 P47 P51 P52 P53 P54 P56 P59 P66 P69 P71 P72 P73 P74 P8=流水线优化 P83 P84 P86 P90 P92 P93 | open=开放探索模式
+</p>
+</div>
+
+<!-- BODY_PART2 -->
+
+<!-- Best Strategy Analysis -->
+<h2>最优策略分析</h2>
+<div class="card">
+<h3 style="margin-top:0">优化概述</h3>
+<p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:0.8rem;">[开放探索] 基于父节点 x1_x1 分析继续探索。 瓶颈: near_optimal, partial_overlap。 优先: D1。 避免: P19。 依据: fp16 门缓存已落地且精度余量 ~17x；下一步把混合精度推到反向 GEMM(D1)最有希望越过 2.0x；不要加深 cell 队列(P19)。。 诊断: 把门控预激活(gi/gh)GEMM 输出从 fp32 降到 fp16(L0C 仍 fp32 累加)后，cube 不再饱和(AIV 侧 MTE2 减半)，聚合管线 vec=0.316 / mte2=0.295；生产 case 234-&gt;117ms，全局最优 1.963x，距目标</p>
+
+<h3>关键数据</h3>
+<ul style="color:var(--text);font-size:0.88rem;line-height:1.8;">
+<li><strong>Baseline</strong>: 65945.72 us → <strong>最优</strong>: 32167.39 us (2.050x)</li>
+<li><strong>策略组合</strong>: 开放探索</li>
+<li><strong>Profiling</strong>: aic_mac_ratio=0.32699 | aic_mte2_ratio=0.4082 | aiv_mte2_ratio=0.28824 | aiv_mte3_ratio=0.08717 | bottleneck=balanced</li>
+
+</ul>
+
+</div>
+
+<!-- Code Diffs -->
+<h2>代码修改详情</h2>
+<div class="card"><h3 style="margin-top:0">op_kernel/gru_tiling_data.h</h3><div class="copy-wrapper"><button class="copy-btn" onclick="copyCode(this,'diff-1')">复制</button><pre><code id="diff-1">--- a/op_kernel/gru_tiling_data.h
++++ b/op_kernel/gru_tiling_data.h
+<span class="diff-hunk">@@ -79,10 +79,12 @@</span>
+     //          block writes a distinct [M, N] partial that the host reduces.
+     //   == 0 -&gt; split-M: the legacy layout (block index partitions M).
+     int64_t wKsplit;
+<span class="diff-del">-    // 0 -&gt; the GH gate pre-activations come from the forward's gate cache and</span>
+<span class="diff-del">-    //      are row-major [rows*S, 3H]; 1 -&gt; the backward recomputes GH as</span>
+<span class="diff-del">-    //      hp @ w_hh^T, and since hp is step-major [S, rows, H] the result is</span>
+<span class="diff-del">-    //      step-major too. The cell reads gh with the stride this selects.</span>
+<span class="diff-add">+    // 1 -&gt; gh is step-major [S, B, 3H]: with the gate cache on the forward's</span>
+<span class="diff-add">+    //      recurrent projection wrote it directly (its step-t slab is contiguous</span>
+<span class="diff-add">+    //      [rows, 3H]); with the cache off the backward recomputes GH from the</span>
+<span class="diff-add">+    //      step-major hp and inherits the same layout. The cell reads gh with</span>
+<span class="diff-add">+    //      the [rows, 3H]-slab stride (3H per row). 0 is the legacy row-major</span>
+<span class="diff-add">+    //      [rows*S, 3H] layout, kept only for reference.</span>
+     int64_t ghStepMajor;
+     AscendC::tiling::TCubeTiling mm[BWD_GEMM_COUNT];
+ };</code></pre></div></div>
+<div class="card"><h3 style="margin-top:0">op_kernel/gru_bwd_vector.cpp</h3><div class="copy-wrapper"><button class="copy-btn" onclick="copyCode(this,'diff-2')">复制</button><pre><code id="diff-2">--- a/op_kernel/gru_bwd_vector.cpp
++++ b/op_kernel/gru_bwd_vector.cpp
+<span class="diff-hunk">@@ -65,12 +65,13 @@</span>
+     TQue&lt;QuePosition::VECIN, 1&gt; qIn;
+     TQue&lt;QuePosition::VECOUT, 1&gt; qOut;
+     pipe.InitBuffer(qIn, 1, BWD_SHIFT_CHUNK * sizeof(float));
+<span class="diff-del">-    pipe.InitBuffer(qOut, 1, BWD_SHIFT_CHUNK * sizeof(float));</span>
+<span class="diff-add">+    // hp is fp16 (GEMM operand precision); `out` stays fp32.</span>
+<span class="diff-add">+    pipe.InitBuffer(qOut, 1, BWD_SHIFT_CHUNK * sizeof(half));</span>
+ 
+     GlobalTensor&lt;float&gt; outG;
+     outG.SetGlobalBuffer((__gm__ float *)out_);
+<span class="diff-del">-    GlobalTensor&lt;float&gt; hpG;</span>
+<span class="diff-del">-    hpG.SetGlobalBuffer((__gm__ float *)hp_);</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; hpG;</span>
+<span class="diff-add">+    hpG.SetGlobalBuffer((__gm__ half *)hp_);</span>
+ 
+     // hp is written step-major [S, rows, H] (hp[t, b, :] = out[b, t-1, :]) so
+     // that the recurrent GEMM's step-t operand is one contiguous block and the
+<span class="diff-hunk">@@ -101,10 +102,10 @@</span>
+         if (c &gt; BWD_SHIFT_CHUNK) {
+             c = BWD_SHIFT_CHUNK;
+         }
+<span class="diff-del">-        auto o = qOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        Duplicate(o, 0.0f, (int32_t)c);</span>
+<span class="diff-add">+        auto o = qOut.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        Duplicate(o, (half)0.0f, (int32_t)c);</span>
+         qOut.EnQue(o);
+<span class="diff-del">-        auto od = qOut.DeQue&lt;float&gt;();</span>
+<span class="diff-add">+        auto od = qOut.DeQue&lt;half&gt;();</span>
+         DataCopy(hpG[b0 * H + off], od, (uint32_t)c);
+         qOut.FreeTensor(od);
+     }
+<span class="diff-hunk">@@ -127,11 +128,11 @@</span>
+             DataCopy(in, outG[((b0 + r) * S + (t - 1)) * H], dp);
+             qIn.EnQue(in);
+             auto ind = qIn.DeQue&lt;float&gt;();
+<span class="diff-del">-            auto o = qOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-            Adds(o, ind, 0.0f, (int32_t)cnt);</span>
+<span class="diff-add">+            auto o = qOut.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+            Cast(o, ind, RoundMode::CAST_RINT, (int32_t)cnt);</span>
+             qOut.EnQue(o);
+             qIn.FreeTensor(ind);
+<span class="diff-del">-            auto od = qOut.DeQue&lt;float&gt;();</span>
+<span class="diff-add">+            auto od = qOut.DeQue&lt;half&gt;();</span>
+             DataCopy(hpG[dstBase + r * H], od, (uint32_t)cnt);
+             qOut.FreeTensor(od);
+         }
+<span class="diff-hunk">@@ -144,7 +145,12 @@</span>
+ 
+ // Rows of the hidden state per UB tile. Sized so the 25 float tiles this kernel
+ // keeps live (10 inputs, 5 outputs, 9 scratch, 1 constant) fit comfortably in UB.
+<span class="diff-del">-constexpr int64_t BWD_CELL_ROWS = 2;</span>
+<span class="diff-add">+// 4 rows =&gt; 25*4*512*4 = 200 KB of the 248 KB UB, still with headroom for the</span>
+<span class="diff-add">+// runtime reserves. The cell is MTE2-limited: its 17 per-tile DataCopies are</span>
+<span class="diff-add">+// small (&lt;= 8 KB) and strided, so it runs at ~1.36 TB/s against a ~1.57 TB/s</span>
+<span class="diff-add">+// bus. Doubling the tile halves the number of DMA instructions and doubles the</span>
+<span class="diff-add">+// burst size without changing the byte count.</span>
+<span class="diff-add">+constexpr int64_t BWD_CELL_ROWS = 4;</span>
+ constexpr int64_t BWD_CELL_TEMPS = 8;
+ // Buffers per queue. Kept at 1: the cell issues 15 queues, and a depth of 2
+ // (30 buffers) exhausts the AIV hardware event pool -&gt; the kernel wedges and
+<span class="diff-hunk">@@ -179,9 +185,14 @@</span>
+     constexpr int64_t R = BWD_CELL_ROWS;
+     constexpr int64_t NT = BWD_CELL_TEMPS;
+     const uint16_t rowLenF = (uint16_t)(H * sizeof(float) / 32);
+<span class="diff-add">+    const uint16_t rowLenF16 = (uint16_t)(H * sizeof(half) / 32);</span>
+     const uint16_t stride3H = (uint16_t)((S * 3 * H - H) * sizeof(float) / 32);
+     const uint16_t strideSH = (uint16_t)((S * H - H) * sizeof(float) / 32);
+     const uint16_t strideT = (uint16_t)((3 * H - H) * sizeof(float) / 32);
+<span class="diff-add">+    // fp16 strides for the dgx / dgh gradient stores (wK: they are GEMM A</span>
+<span class="diff-add">+    // operands now, so they are kept at the 11-bit precision the cube rounds to).</span>
+<span class="diff-add">+    const uint16_t stride3Hf16 = (uint16_t)((S * 3 * H - H) * sizeof(half) / 32);</span>
+<span class="diff-add">+    const uint16_t strideTf16 = (uint16_t)((3 * H - H) * sizeof(half) / 32);</span>
+     // hp and dgh are step-major [S, rows, *]; gh is step-major only when the
+     // backward recomputed it from hp (gate cache off). See gru_tiling_data.h.
+     const bool ghStepMajor = (td.ghStepMajor != 0);
+<span class="diff-hunk">@@ -193,23 +204,35 @@</span>
+     TPipe pipe;
+     TQue&lt;QuePosition::VECIN, BWD_CELL_QDEPTH&gt; qGiR, qGiZ, qGiN, qGhR, qGhZ, qGhN, qHp, qDy, qDha, qDhb;
+     TQue&lt;QuePosition::VECOUT, BWD_CELL_QDEPTH&gt; qDur, qDuz, qDun, qDghN, qDhaOut;
+<span class="diff-del">-    pipe.InitBuffer(qGiR, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGiZ, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGiN, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGhR, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGhZ, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGhN, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qHp, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-add">+    // The six gate pre-activations are staged at fp16 (the forward GH/GI GEMMs</span>
+<span class="diff-add">+    // write them at the cube's operand precision) and widened to fp32 into the</span>
+<span class="diff-add">+    // tmpBuf scratch right after the DMA lands. They are the largest AIV MTE2</span>
+<span class="diff-add">+    // stream in the cell, so halving their width is the single biggest win; a</span>
+<span class="diff-add">+    // proper half-&gt;half Cast does not exist, hence the explicit Widen.</span>
+<span class="diff-add">+    pipe.InitBuffer(qGiR, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGiZ, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGiN, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGhR, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGhZ, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGhN, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    // hp is fp16 (the forward stages it at the cube's operand precision).</span>
+<span class="diff-add">+    pipe.InitBuffer(qHp, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+     pipe.InitBuffer(qDy, BWD_CELL_QDEPTH, R * H * sizeof(float));
+<span class="diff-del">-    pipe.InitBuffer(qDha, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDhb, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDur, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDuz, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDun, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDghN, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDhaOut, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-add">+    // dha / dhb are the cell's hidden-gradient working set (read every step,</span>
+<span class="diff-add">+    // and for dha re-written every step). They are stored at fp16 -- the same</span>
+<span class="diff-add">+    // 11-bit mantissa the cube already rounds every operand to -- so the cell's</span>
+<span class="diff-add">+    // single largest remaining fp32 stream halves with the fp32 arithmetic</span>
+<span class="diff-add">+    // untouched (the tiles are widened straight after the DMA lands).</span>
+<span class="diff-add">+    pipe.InitBuffer(qDha, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDhb, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    // dgx / dgh are the A operands of the WI / WH / DH GEMMs -&gt; fp16.</span>
+<span class="diff-add">+    pipe.InitBuffer(qDur, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDuz, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDun, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDghN, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDhaOut, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+     TBuf&lt;TPosition::VECCALC&gt; tmpBuf;
+<span class="diff-del">-    pipe.InitBuffer(tmpBuf, (NT + 1) * R * H * sizeof(float));</span>
+<span class="diff-add">+    pipe.InitBuffer(tmpBuf, (NT + 10) * R * H * sizeof(float));</span>
+ 
+     LocalTensor&lt;float&gt; s0 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 0);
+     LocalTensor&lt;float&gt; s1 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), R * H * sizeof(float));
+<span class="diff-hunk">@@ -220,16 +243,30 @@</span>
+     LocalTensor&lt;float&gt; s6 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 6 * R * H * sizeof(float));
+     LocalTensor&lt;float&gt; s7 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 7 * R * H * sizeof(float));
+     LocalTensor&lt;float&gt; ones = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 8 * R * H * sizeof(float));
+<span class="diff-del">-</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; giG, ghG, hpG, dyG, dhaG, dhbG, dgxG, dghG;</span>
+<span class="diff-del">-    giG.SetGlobalBuffer((__gm__ float *)gi_, tot3H);</span>
+<span class="diff-del">-    ghG.SetGlobalBuffer((__gm__ float *)gh_, tot3H);</span>
+<span class="diff-del">-    hpG.SetGlobalBuffer((__gm__ float *)hp_, totSH);</span>
+<span class="diff-add">+    // fp32 view of the fp16 hp operand.</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; hpF32 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 9 * R * H * sizeof(float));</span>
+<span class="diff-add">+    // fp32 scratch for the widened gate slabs (slots NT+2 .. NT+7).</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; giRf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 2) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; giZf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 3) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; giNf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 4) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; ghRf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 5) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; ghZf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 6) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; ghNf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 7) * R * H * sizeof(float));</span>
+<span class="diff-add">+    // fp32 scratch for the widened dha / dhb gradient tiles (slots NT+8, NT+9).</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; dhaF32 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 8) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; dhbF32 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 9) * R * H * sizeof(float));</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    GlobalTensor&lt;float&gt; dyG;</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; dhaG, dhbG;</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; giG, ghG, hpG, dgxG, dghG;</span>
+<span class="diff-add">+    giG.SetGlobalBuffer((__gm__ half *)gi_, tot3H);</span>
+<span class="diff-add">+    ghG.SetGlobalBuffer((__gm__ half *)gh_, tot3H);</span>
+<span class="diff-add">+    hpG.SetGlobalBuffer((__gm__ half *)hp_, totSH);</span>
+     dyG.SetGlobalBuffer((__gm__ float *)dy_, totSH);
+<span class="diff-del">-    dhaG.SetGlobalBuffer((__gm__ float *)dha_, totH);</span>
+<span class="diff-del">-    dhbG.SetGlobalBuffer((__gm__ float *)dhb_, totH);</span>
+<span class="diff-del">-    dgxG.SetGlobalBuffer((__gm__ float *)dgx_, tot3H);</span>
+<span class="diff-del">-    dghG.SetGlobalBuffer((__gm__ float *)dgh_, B * 3 * H);</span>
+<span class="diff-add">+    dhaG.SetGlobalBuffer((__gm__ half *)dha_, totH);</span>
+<span class="diff-add">+    dhbG.SetGlobalBuffer((__gm__ half *)dhb_, totH);</span>
+<span class="diff-add">+    dgxG.SetGlobalBuffer((__gm__ half *)dgx_, tot3H);</span>
+<span class="diff-add">+    dghG.SetGlobalBuffer((__gm__ half *)dgh_, B * 3 * H);</span>
+ 
+     for (int64_t r0 = 0; r0 &lt; rows; r0 += R) {
+         int64_t r = rows - r0;
+<span class="diff-hunk">@@ -250,10 +287,10 @@</span>
+         const int64_t rowBaseH = rowBase * H;
+         const int64_t tgBase = rowBase * 3 * H;
+ 
+<span class="diff-del">-        DataCopyParams dp3H;</span>
+<span class="diff-add">+        DataCopyParams dp3H;  // fp16 strided read of the gi gate slab</span>
+         dp3H.blockCount = rr;
+<span class="diff-del">-        dp3H.blockLen = rowLenF;</span>
+<span class="diff-del">-        dp3H.srcStride = stride3H;</span>
+<span class="diff-add">+        dp3H.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dp3H.srcStride = stride3Hf16;</span>
+         dp3H.dstStride = 0;
+ 
+         DataCopyParams dpSH;
+<span class="diff-hunk">@@ -262,94 +299,116 @@</span>
+         dpSH.srcStride = strideSH;
+         dpSH.dstStride = 0;
+ 
+<span class="diff-del">-        DataCopyParams dpRow;</span>
+<span class="diff-del">-        dpRow.blockCount = rr;</span>
+<span class="diff-del">-        dpRow.blockLen = rowLenF;</span>
+<span class="diff-del">-        dpRow.srcStride = 0;</span>
+<span class="diff-del">-        dpRow.dstStride = 0;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        // gh source: contiguous rows for the step-major recomputed path, the</span>
+<span class="diff-del">-        // S*3H row stride of the forward's row-major gate store otherwise.</span>
+<span class="diff-del">-        DataCopyParams dpGh = ghStepMajor ? dpRow : dp3H;</span>
+<span class="diff-add">+        DataCopyParams dpRowH;  // fp16 contiguous row tile (hp / dha / dhb)</span>
+<span class="diff-add">+        dpRowH.blockCount = rr;</span>
+<span class="diff-add">+        dpRowH.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpRowH.srcStride = 0;</span>
+<span class="diff-add">+        dpRowH.dstStride = 0;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        // gh is step-major with a [rows, 3H] slab, so gate g of row i sits at</span>
+<span class="diff-add">+        // +i*3H: the inter-block gap (blockLen + srcStride) is 3H, not S*3H.</span>
+<span class="diff-add">+        // strideT == (3H - H) in 32B units, which is what yields that 3H pitch.</span>
+<span class="diff-add">+        DataCopyParams dpGh;  // fp16 read of the gh gate slab</span>
+<span class="diff-add">+        dpGh.blockCount = rr;</span>
+<span class="diff-add">+        dpGh.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpGh.srcStride = ghStepMajor ? strideTf16 : stride3Hf16;</span>
+<span class="diff-add">+        dpGh.dstStride = 0;</span>
+ 
+         // ---- CopyIn -------------------------------------------------------
+<span class="diff-del">-        auto giR = qGiR.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto giR = qGiR.AllocTensor&lt;half&gt;();</span>
+         DataCopy(giR, giG[giBase], dp3H);
+         qGiR.EnQue(giR);
+<span class="diff-del">-        auto giZ = qGiZ.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto giZ = qGiZ.AllocTensor&lt;half&gt;();</span>
+         DataCopy(giZ, giG[giBase + H], dp3H);
+         qGiZ.EnQue(giZ);
+<span class="diff-del">-        auto giN = qGiN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto giN = qGiN.AllocTensor&lt;half&gt;();</span>
+         DataCopy(giN, giG[giBase + 2 * H], dp3H);
+         qGiN.EnQue(giN);
+ 
+<span class="diff-del">-        auto ghR = qGhR.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto ghR = qGhR.AllocTensor&lt;half&gt;();</span>
+         DataCopy(ghR, ghG[ghBase], dpGh);
+         qGhR.EnQue(ghR);
+<span class="diff-del">-        auto ghZ = qGhZ.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto ghZ = qGhZ.AllocTensor&lt;half&gt;();</span>
+         DataCopy(ghZ, ghG[ghBase + H], dpGh);
+         qGhZ.EnQue(ghZ);
+<span class="diff-del">-        auto ghN = qGhN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto ghN = qGhN.AllocTensor&lt;half&gt;();</span>
+         DataCopy(ghN, ghG[ghBase + 2 * H], dpGh);
+         qGhN.EnQue(ghN);
+ 
+<span class="diff-del">-        auto hp = qHp.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(hp, hpG[hpBase], dpRow);</span>
+<span class="diff-add">+        auto hp = qHp.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hp, hpG[hpBase], dpRowH);</span>
+         qHp.EnQue(hp);
+ 
+         auto dy = qDy.AllocTensor&lt;float&gt;();
+         DataCopy(dy, dyG[shBase], dpSH);
+         qDy.EnQue(dy);
+ 
+<span class="diff-del">-        auto dha = qDha.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dha, dhaG[rowBaseH], dpRow);</span>
+<span class="diff-add">+        auto dha = qDha.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dha, dhaG[rowBaseH], dpRowH);</span>
+         qDha.EnQue(dha);
+ 
+<span class="diff-del">-        auto dhb = qDhb.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dhb, dhbG[rowBaseH], dpRow);</span>
+<span class="diff-add">+        auto dhb = qDhb.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dhb, dhbG[rowBaseH], dpRowH);</span>
+         qDhb.EnQue(dhb);
+ 
+<span class="diff-del">-        auto giRl = qGiR.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto giZl = qGiZ.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto giNl = qGiN.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto ghRl = qGhR.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto ghZl = qGhZ.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto ghNl = qGhN.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto hpL = qHp.DeQue&lt;float&gt;();</span>
+<span class="diff-add">+        // widen the six fp16 gate slabs into their fp32 scratch slots</span>
+<span class="diff-add">+        auto giRD = qGiR.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(giRf, giRD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGiR.FreeTensor(giRD);</span>
+<span class="diff-add">+        auto giZD = qGiZ.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(giZf, giZD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGiZ.FreeTensor(giZD);</span>
+<span class="diff-add">+        auto giND = qGiN.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(giNf, giND, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGiN.FreeTensor(giND);</span>
+<span class="diff-add">+        auto ghRD = qGhR.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(ghRf, ghRD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGhR.FreeTensor(ghRD);</span>
+<span class="diff-add">+        auto ghZD = qGhZ.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(ghZf, ghZD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGhZ.FreeTensor(ghZD);</span>
+<span class="diff-add">+        auto ghND = qGhN.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(ghNf, ghND, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGhN.FreeTensor(ghND);</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        auto hpL = qHp.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(hpF32, hpL, RoundMode::CAST_NONE, cnt);</span>
+         auto dyL = qDy.DeQue&lt;float&gt;();
+<span class="diff-del">-        auto dhaL = qDha.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto dhbL = qDhb.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        auto durL = qDur.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto duzL = qDuz.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto dunL = qDun.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto dghNL = qDghN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto dhaOutL = qDhaOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto dhaH = qDha.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(dhaF32, dhaH, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        auto dhbH = qDhb.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(dhbF32, dhbH, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        auto durL = qDur.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        auto duzL = qDuz.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        auto dunL = qDun.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        auto dghNL = qDghN.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        auto dhaOutL = qDhaOut.AllocTensor&lt;half&gt;();</span>
+ 
+         // ---- Compute ------------------------------------------------------
+         Duplicate(ones, 1.0f, cnt);
+ 
+<span class="diff-del">-        // s0 = dht = dy + dha + dhb</span>
+<span class="diff-del">-        Add(s0, dyL, dhaL, cnt);</span>
+<span class="diff-del">-        Add(s0, s0, dhbL, cnt);</span>
+<span class="diff-add">+        // s0 = dht = dy + dha + dhb   (dha / dhb widened from fp16)</span>
+<span class="diff-add">+        Add(s0, dyL, dhaF32, cnt);</span>
+<span class="diff-add">+        Add(s0, s0, dhbF32, cnt);</span>
+ 
+         // s6 = r = sigmoid(giR + ghR)
+<span class="diff-del">-        Add(s2, giRl, ghRl, cnt);</span>
+<span class="diff-add">+        Add(s2, giRf, ghRf, cnt);</span>
+         Muls(s2, s2, -1.0f, cnt);
+         Exp(s2, s2, cnt);
+         Adds(s2, s2, 1.0f, cnt);
+         Div(s6, ones, s2, cnt);
+ 
+         // s7 = z = sigmoid(giZ + ghZ)
+<span class="diff-del">-        Add(s3, giZl, ghZl, cnt);</span>
+<span class="diff-add">+        Add(s3, giZf, ghZf, cnt);</span>
+         Muls(s3, s3, -1.0f, cnt);
+         Exp(s3, s3, cnt);
+         Adds(s3, s3, 1.0f, cnt);
+         Div(s7, ones, s3, cnt);
+ 
+         // s1 = n = tanh(giN + r * ghN)
+<span class="diff-del">-        Mul(s4, s6, ghNl, cnt);</span>
+<span class="diff-del">-        Add(s4, giNl, s4, cnt);</span>
+<span class="diff-add">+        Mul(s4, s6, ghNf, cnt);</span>
+<span class="diff-add">+        Add(s4, giNf, s4, cnt);</span>
+         Muls(s5, s4, 2.0f, cnt);
+         Exp(s5, s5, cnt);
+         Adds(s5, s5, 1.0f, cnt);
+<span class="diff-hunk">@@ -365,7 +424,7 @@</span>
+         Mul(s2, s2, s0, cnt);
+ 
+         // s3 = dz = dht * (hp - n)
+<span class="diff-del">-        Sub(s3, hpL, s1, cnt);</span>
+<span class="diff-add">+        Sub(s3, hpF32, s1, cnt);</span>
+         Mul(s3, s3, s0, cnt);
+ 
+         // s4 = dun = dn * (1 - n^2)
+<span class="diff-hunk">@@ -379,35 +438,31 @@</span>
+         Adds(s5, s5, 1.0f, cnt);
+         Mul(s5, s5, s7, cnt);
+         Mul(s5, s5, s3, cnt);
+<span class="diff-del">-        Adds(duzL, s5, 0.0f, (int32_t)cnt);</span>
+<span class="diff-add">+        Cast(duzL, s5, RoundMode::CAST_RINT, cnt);</span>
+ 
+         // dghN = dun * r
+<span class="diff-del">-        Mul(dghNL, s4, s6, cnt);</span>
+<span class="diff-add">+        Mul(s5, s4, s6, cnt);</span>
+<span class="diff-add">+        Cast(dghNL, s5, RoundMode::CAST_RINT, cnt);</span>
+ 
+         // dur = dun * ghN * r * (1 - r)
+<span class="diff-del">-        Mul(s5, s4, ghNl, cnt);</span>
+<span class="diff-add">+        Mul(s5, s4, ghNf, cnt);</span>
+         Muls(s2, s6, -1.0f, cnt);
+         Adds(s2, s2, 1.0f, cnt);
+         Mul(s2, s2, s6, cnt);
+         Mul(s2, s2, s5, cnt);
+<span class="diff-del">-        Adds(durL, s2, 0.0f, (int32_t)cnt);</span>
+<span class="diff-add">+        Cast(durL, s2, RoundMode::CAST_RINT, cnt);</span>
+ 
+         // dun
+<span class="diff-del">-        Adds(dunL, s4, 0.0f, (int32_t)cnt);</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        // dha' = dht * z</span>
+<span class="diff-del">-        Mul(dhaOutL, s0, s7, cnt);</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        qGiR.FreeTensor(giRl);</span>
+<span class="diff-del">-        qGiZ.FreeTensor(giZl);</span>
+<span class="diff-del">-        qGiN.FreeTensor(giNl);</span>
+<span class="diff-del">-        qGhR.FreeTensor(ghRl);</span>
+<span class="diff-del">-        qGhZ.FreeTensor(ghZl);</span>
+<span class="diff-del">-        qGhN.FreeTensor(ghNl);</span>
+<span class="diff-add">+        Cast(dunL, s4, RoundMode::CAST_RINT, cnt);</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        // dha' = dht * z  (fp32 product, narrowed at the store)</span>
+<span class="diff-add">+        Mul(s0, s0, s7, cnt);</span>
+<span class="diff-add">+        Cast(dhaOutL, s0, RoundMode::CAST_RINT, cnt);</span>
+<span class="diff-add">+</span>
+         qHp.FreeTensor(hpL);
+         qDy.FreeTensor(dyL);
+<span class="diff-del">-        qDha.FreeTensor(dhaL);</span>
+<span class="diff-del">-        qDhb.FreeTensor(dhbL);</span>
+<span class="diff-add">+        qDha.FreeTensor(dhaH);</span>
+<span class="diff-add">+        qDhb.FreeTensor(dhbH);</span>
+ 
+         qDur.EnQue(durL);
+         qDuz.EnQue(duzL);
+<span class="diff-hunk">@@ -416,13 +471,17 @@</span>
+         qDhaOut.EnQue(dhaOutL);
+ 
+         // ---- CopyOut ------------------------------------------------------
+<span class="diff-del">-        DataCopyParams dpW3H = dp3H;  // strided into [rows, S, 3H]</span>
+<span class="diff-del">-        dpW3H.srcStride = 0;</span>
+<span class="diff-del">-        dpW3H.dstStride = stride3H;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        DataCopyParams dpWT = dp3H;  // contiguous [rows, 3H]</span>
+<span class="diff-del">-        dpWT.srcStride = 0;</span>
+<span class="diff-del">-        dpWT.dstStride = strideT;</span>
+<span class="diff-add">+        DataCopyParams dpX16;  // strided into dgx [rows*S, 3H], fp16</span>
+<span class="diff-add">+        dpX16.blockCount = rr;</span>
+<span class="diff-add">+        dpX16.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpX16.srcStride = 0;</span>
+<span class="diff-add">+        dpX16.dstStride = stride3Hf16;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        DataCopyParams dpG16;  // contiguous [rows, 3H] step slab of dgh, fp16</span>
+<span class="diff-add">+        dpG16.blockCount = rr;</span>
+<span class="diff-add">+        dpG16.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpG16.srcStride = 0;</span>
+<span class="diff-add">+        dpG16.dstStride = strideTf16;</span>
+ 
+         // dgx = (dur, duz, dun); dgh = (dur, duz, dghN). Each shared tile feeds
+         // two destinations before it is freed: the [rows*S, 3H] buffer that the
+<span class="diff-hunk">@@ -430,30 +489,27 @@</span>
+         // this step's [rows, 3H] block of the [S, rows, 3H] gradient buffer --
+         // which is exactly the A operand the next step's recurrent GEMM reads,
+         // so no separate per-step scratch copy is materialised.
+<span class="diff-del">-        auto durD = qDur.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dgxG[giBase], durD, dpW3H);</span>
+<span class="diff-del">-        DataCopy(dghG[tgBase], durD, dpWT);</span>
+<span class="diff-add">+        auto durD = qDur.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dgxG[giBase], durD, dpX16);</span>
+<span class="diff-add">+        DataCopy(dghG[tgBase], durD, dpG16);</span>
+         qDur.FreeTensor(durD);
+ 
+<span class="diff-del">-        auto duzD = qDuz.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dgxG[giBase + H], duzD, dpW3H);</span>
+<span class="diff-del">-        DataCopy(dghG[tgBase + H], duzD, dpWT);</span>
+<span class="diff-add">+        auto duzD = qDuz.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dgxG[giBase + H], duzD, dpX16);</span>
+<span class="diff-add">+        DataCopy(dghG[tgBase + H], duzD, dpG16);</span>
+         qDuz.FreeTensor(duzD);
+ 
+<span class="diff-del">-        auto dunD = qDun.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dgxG[giBase + 2 * H], dunD, dpW3H);</span>
+<span class="diff-add">+        auto dunD = qDun.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dgxG[giBase + 2 * H], dunD, dpX16);</span>
+         qDun.FreeTensor(dunD);
+ 
+<span class="diff-del">-        auto dghND = qDghN.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dghG[tgBase + 2 * H], dghND, dpWT);</span>
+<span class="diff-add">+        auto dghND = qDghN.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dghG[tgBase + 2 * H], dghND, dpG16);</span>
+         qDghN.FreeTensor(dghND);
+ 
+<span class="diff-del">-        // dha is contiguous [rows, H]</span>
+<span class="diff-del">-        DataCopyParams dpRowW = dpRow;</span>
+<span class="diff-del">-        dpRowW.srcStride = 0;</span>
+<span class="diff-del">-        dpRowW.dstStride = 0;</span>
+<span class="diff-del">-        auto dhaOutD = qDhaOut.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dhaG[rowBaseH], dhaOutD, dpRowW);</span>
+<span class="diff-add">+        // dha is contiguous [rows, H], stored at fp16</span>
+<span class="diff-add">+        auto dhaOutD = qDhaOut.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dhaG[rowBaseH], dhaOutD, dpRowH);</span>
+         qDhaOut.FreeTensor(dhaOutD);
+     }
+ }
+<span class="diff-hunk">@@ -496,68 +552,115 @@</span>
+ 
+     constexpr int64_t RR = BWD_RED_ROWS;
+     TPipe pipe;
+<span class="diff-del">-    TQue&lt;QuePosition::VECIN, 1&gt; qLoad;</span>
+<span class="diff-add">+    TQue&lt;QuePosition::VECIN, 2&gt; qLoad;</span>
+     TQue&lt;QuePosition::VECOUT, 1&gt; qOut;
+<span class="diff-del">-    pipe.InitBuffer(qLoad, 1, RR * G * sizeof(float));</span>
+<span class="diff-add">+    pipe.InitBuffer(qLoad, 2, RR * G * sizeof(half));</span>
+     pipe.InitBuffer(qOut, 1, G * sizeof(float));
+     TBuf&lt;TPosition::VECCALC&gt; accBuf;
+     pipe.InitBuffer(accBuf, (G + H) * sizeof(float));
+<span class="diff-del">-</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; dgxG;</span>
+<span class="diff-del">-    dgxG.SetGlobalBuffer((__gm__ float *)dgx_, td.chunkRows * td.S * G);</span>
+<span class="diff-add">+    TBuf&lt;TPosition::VECCALC&gt; castBuf;</span>
+<span class="diff-add">+    pipe.InitBuffer(castBuf, RR * G * sizeof(float));</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; dgxG;</span>
+<span class="diff-add">+    dgxG.SetGlobalBuffer((__gm__ half *)dgx_, td.chunkRows * td.S * G);</span>
+     // dgh is step-major [S, rows, 3H] = (dur, duz, dghN). Only the n block
+<span class="diff-del">-    // (columns 2H..3H) is read here: the r/z blocks carry the very same fp32</span>
+<span class="diff-del">-    // values the cell stored into dgx (both are DataCopy'd from the same UB</span>
+<span class="diff-del">-    // tile), so reading them a second time only to re-sum the identical addends</span>
+<span class="diff-del">-    // is pure redundant traffic. See the store step below.</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; dghG;</span>
+<span class="diff-del">-    dghG.SetGlobalBuffer((__gm__ float *)dgh_, td.chunkRows * td.S * G);</span>
+<span class="diff-add">+    // (columns 2H..3H) is read here: the r/z blocks carry the very same values</span>
+<span class="diff-add">+    // the cell stored into dgx (both are DataCopy'd from the same UB tile), so</span>
+<span class="diff-add">+    // reading them a second time only to re-sum the identical addends is pure</span>
+<span class="diff-add">+    // redundant traffic. See the store step below.</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; dghG;</span>
+<span class="diff-add">+    dghG.SetGlobalBuffer((__gm__ half *)dgh_, td.chunkRows * td.S * G);</span>
+     GlobalTensor&lt;float&gt; wsG;
+     wsG.SetGlobalBuffer((__gm__ float *)ws_, 2 * blkNum * G);
+ 
+     auto acc = accBuf.GetWithOffset&lt;float&gt;((uint32_t)G, 0);
+     auto accN = accBuf.GetWithOffset&lt;float&gt;((uint32_t)H, (uint32_t)(G * sizeof(float)));
+<span class="diff-add">+    auto ldF = castBuf.Get&lt;float&gt;();</span>
+     Duplicate(acc, 0.0f, (int32_t)G);
+     Duplicate(accN, 0.0f, (int32_t)H);
+ 
+<span class="diff-del">-    // Pass 1: (dur, duz, dun) straight out of dgx, contiguous rows.</span>
+<span class="diff-del">-    for (int64_t rr = 0; rr &lt; rn; rr += RR) {</span>
+<span class="diff-del">-        int64_t c = rn - rr;</span>
+<span class="diff-del">-        if (c &gt; RR) {</span>
+<span class="diff-del">-            c = RR;</span>
+<span class="diff-del">-        }</span>
+<span class="diff-del">-        auto ld = qLoad.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(ld, dgxG[(r0 + rr) * G], (uint32_t)(c * G));</span>
+<span class="diff-del">-        qLoad.EnQue(ld);</span>
+<span class="diff-del">-        auto ldd = qLoad.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        for (int64_t i = 0; i &lt; c; ++i) {</span>
+<span class="diff-del">-            Add(acc, acc, ldd[i * G], (int32_t)G);</span>
+<span class="diff-del">-        }</span>
+<span class="diff-del">-        qLoad.FreeTensor(ldd);</span>
+<span class="diff-del">-    }</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-    // Pass 2: dghN = dgh[:, 2H:3H] -- one H-wide strided block per row. The</span>
+<span class="diff-del">-    // block is H*4 bytes contiguous, so the read stays line-aligned.</span>
+<span class="diff-add">+    // Pass 1: (dur, duz, dun) straight out of dgx, contiguous rows. dgx is fp16</span>
+<span class="diff-add">+    // (the cell stores it at the cube's operand precision), so widen before the</span>
+<span class="diff-add">+    // fp32 accumulation.</span>
+<span class="diff-add">+    // The next tile's load is issued before the current tile is consumed, so the</span>
+<span class="diff-add">+    // MTE2 of tile i+1 overlaps the cast + row Adds of tile i. A depth-1 queue</span>
+<span class="diff-add">+    // serialised copy latency with compute and left MTE2 barely half busy.</span>
+<span class="diff-add">+    if (rn &gt; 0) {</span>
+<span class="diff-add">+        {</span>
+<span class="diff-add">+            int64_t cp = rn;</span>
+<span class="diff-add">+            if (cp &gt; RR) {</span>
+<span class="diff-add">+                cp = RR;</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            auto lp = qLoad.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+            DataCopy(lp, dgxG[(r0 + 0) * G], (uint32_t)(cp * G));</span>
+<span class="diff-add">+            qLoad.EnQue(lp);</span>
+<span class="diff-add">+        }</span>
+<span class="diff-add">+        for (int64_t rr = 0; rr &lt; rn; rr += RR) {</span>
+<span class="diff-add">+            int64_t next = rr + RR;</span>
+<span class="diff-add">+            if (next &lt; rn) {</span>
+<span class="diff-add">+                int64_t cn = rn - next;</span>
+<span class="diff-add">+                if (cn &gt; RR) {</span>
+<span class="diff-add">+                    cn = RR;</span>
+<span class="diff-add">+                }</span>
+<span class="diff-add">+                auto ln = qLoad.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+                DataCopy(ln, dgxG[(r0 + next) * G], (uint32_t)(cn * G));</span>
+<span class="diff-add">+                qLoad.EnQue(ln);</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            int64_t c = rn - rr;</span>
+<span class="diff-add">+            if (c &gt; RR) {</span>
+<span class="diff-add">+                c = RR;</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            auto ldd = qLoad.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+            Cast(ldF, ldd, RoundMode::CAST_NONE, (int32_t)(c * G));</span>
+<span class="diff-add">+            for (int64_t i = 0; i &lt; c; ++i) {</span>
+<span class="diff-add">+                Add(acc, acc, ldF[i * G], (int32_t)G);</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            qLoad.FreeTensor(ldd);</span>
+<span class="diff-add">+        }</span>
+<span class="diff-add">+    }</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    // Pass 2: dghN = dgh[:, 2H:3H] -- one H-wide strided block per row.</span>
+     DataCopyParams dpN;
+     dpN.blockCount = (uint16_t)RR;
+<span class="diff-del">-    dpN.blockLen = (uint16_t)(H * sizeof(float) / 32);</span>
+<span class="diff-del">-    dpN.srcStride = (uint16_t)((G - H) * sizeof(float) / 32);</span>
+<span class="diff-add">+    dpN.blockLen = (uint16_t)(H * sizeof(half) / 32);</span>
+<span class="diff-add">+    dpN.srcStride = (uint16_t)((G - H) * sizeof(half) / 32);</span>
+     dpN.dstStride = 0;
+<span class="diff-del">-    for (int64_t rr = 0; rr &lt; rn; rr += RR) {</span>
+<span class="diff-del">-        int64_t c = rn - rr;</span>
+<span class="diff-del">-        if (c &gt; RR) {</span>
+<span class="diff-del">-            c = RR;</span>
+<span class="diff-del">-        }</span>
+<span class="diff-del">-        DataCopyParams dpc = dpN;</span>
+<span class="diff-del">-        dpc.blockCount = (uint16_t)c;</span>
+<span class="diff-del">-        auto ld = qLoad.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(ld, dghG[(r0 + rr) * G + 2 * H], dpc);</span>
+<span class="diff-del">-        qLoad.EnQue(ld);</span>
+<span class="diff-del">-        auto ldd = qLoad.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        for (int64_t i = 0; i &lt; c; ++i) {</span>
+<span class="diff-del">-            Add(accN, accN, ldd[i * H], (int32_t)H);</span>
+<span class="diff-del">-        }</span>
+<span class="diff-del">-        qLoad.FreeTensor(ldd);</span>
+<span class="diff-add">+    if (rn &gt; 0) {</span>
+<span class="diff-add">+        {</span>
+<span class="diff-add">+            int64_t cp = rn;</span>
+<span class="diff-add">+            if (cp &gt; RR) {</span>
+<span class="diff-add">+                cp = RR;</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            DataCopyParams dpp = dpN;</span>
+<span class="diff-add">+            dpp.blockCount = (uint16_t)cp;</span>
+<span class="diff-add">+            auto lp = qLoad.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+            DataCopy(lp, dghG[(r0 + 0) * G + 2 * H], dpp);</span>
+<span class="diff-add">+            qLoad.EnQue(lp);</span>
+<span class="diff-add">+        }</span>
+<span class="diff-add">+        for (int64_t rr = 0; rr &lt; rn; rr += RR) {</span>
+<span class="diff-add">+            int64_t next = rr + RR;</span>
+<span class="diff-add">+            if (next &lt; rn) {</span>
+<span class="diff-add">+                int64_t cn = rn - next;</span>
+<span class="diff-add">+                if (cn &gt; RR) {</span>
+<span class="diff-add">+                    cn = RR;</span>
+<span class="diff-add">+                }</span>
+<span class="diff-add">+                DataCopyParams dpn2 = dpN;</span>
+<span class="diff-add">+                dpn2.blockCount = (uint16_t)cn;</span>
+<span class="diff-add">+                auto ln = qLoad.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+                DataCopy(ln, dghG[(r0 + next) * G + 2 * H], dpn2);</span>
+<span class="diff-add">+                qLoad.EnQue(ln);</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            int64_t c = rn - rr;</span>
+<span class="diff-add">+            if (c &gt; RR) {</span>
+<span class="diff-add">+                c = RR;</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            auto ldd = qLoad.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+            Cast(ldF, ldd, RoundMode::CAST_NONE, (int32_t)(c * H));</span>
+<span class="diff-add">+            for (int64_t i = 0; i &lt; c; ++i) {</span>
+<span class="diff-add">+                Add(accN, accN, ldF[i * H], (int32_t)H);</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            qLoad.FreeTensor(ldd);</span>
+<span class="diff-add">+        }</span>
+     }
+ 
+     // Route the stores through a VECOUT queue so the V -&gt; MTE3 edge is</code></pre></div></div>
+<div class="card"><h3 style="margin-top:0">op_kernel/gru_bwd_bodies.h</h3><div class="copy-wrapper"><button class="copy-btn" onclick="copyCode(this,'diff-3')">复制</button><pre><code id="diff-3">--- a/op_kernel/gru_bwd_bodies.h
++++ b/op_kernel/gru_bwd_bodies.h
+<span class="diff-hunk">@@ -10,6 +10,8 @@</span>
+ #ifndef GRU_BWD_BODIES_H
+ #define GRU_BWD_BODIES_H
+ 
+<span class="diff-add">+#include &lt;type_traits&gt;</span>
+<span class="diff-add">+</span>
+ #include "lib/matmul_intf.h"
+ 
+ #include "gru_common.h"
+<span class="diff-hunk">@@ -21,19 +23,34 @@</span>
+ // ===== from gru_bwd_cube.cpp =====
+ namespace {
+ 
+<span class="diff-del">-using bF = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, false&gt;;</span>
+<span class="diff-del">-using cF = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, false&gt;;</span>
+<span class="diff-add">+// fp16 operands, fp32 accumulate -- same 11-bit mantissa rounding as HF32, but</span>
+<span class="diff-add">+// at the fp16 cube rate. See gru_cube.cpp.</span>
+<span class="diff-add">+using bF = MatmulType&lt;TPosition::GM, CubeFormat::ND, half, false&gt;;</span>
+<span class="diff-add">+using cFH = MatmulType&lt;TPosition::GM, CubeFormat::ND, half, false&gt;;</span>
+<span class="diff-add">+using cFF = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, false&gt;;</span>
+<span class="diff-add">+// Every non-transposed-A output is written at fp16: GI/GH write the gate</span>
+<span class="diff-add">+// pre-activations the vector cells read back at fp16, and the transB=F flavour</span>
+<span class="diff-add">+// (used only by DH / DH_T) writes dhb, the recurrent hidden-gradient the cell</span>
+<span class="diff-add">+// reads back and re-narrows anyway. Only the transpose-A weight-gradient GEMMs</span>
+<span class="diff-add">+// (WI / WH) accumulate fp32 gradients. Matches the host tiling rule</span>
+<span class="diff-add">+// c16 = !transA in FillMatmulTilingEx.</span>
+<span class="diff-add">+template &lt;bool TA, bool TB&gt;</span>
+<span class="diff-add">+using cTypeOf = std::conditional_t&lt;TA, cFF, cFH&gt;;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+// MatmulImpl defaults BiasT to CType; the bias is a small [3H] fp32 vector added</span>
+<span class="diff-add">+// inside the fp32 L0C accumulator, so pin it to fp32 explicitly.</span>
+<span class="diff-add">+using biasT = MatmulType&lt;TPosition::GM, CubeFormat::ND, float&gt;;</span>
+ 
+ // A in [M, K] (ISTRANS = false) or [K, M] (ISTRANS = true).
+ template &lt;bool TA&gt;
+ struct ATypeOf;
+ template &lt;&gt;
+ struct ATypeOf&lt;false&gt; {
+<span class="diff-del">-    using type = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, false&gt;;</span>
+<span class="diff-add">+    using type = MatmulType&lt;TPosition::GM, CubeFormat::ND, half, false&gt;;</span>
+ };
+ template &lt;&gt;
+ struct ATypeOf&lt;true&gt; {
+<span class="diff-del">-    using type = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, true&gt;;</span>
+<span class="diff-add">+    using type = MatmulType&lt;TPosition::GM, CubeFormat::ND, half, true&gt;;</span>
+ };
+ 
+ template &lt;bool TA, bool TB&gt;
+<span class="diff-hunk">@@ -67,21 +84,22 @@</span>
+     const int64_t offsetC = mIdx * N * tileM;
+ 
+     using aT = typename ATypeOf&lt;TA&gt;::type;
+<span class="diff-del">-    using GemmF = MatmulImpl&lt;aT, bF, cF&gt;;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; aG;</span>
+<span class="diff-del">-    aG.SetGlobalBuffer((__gm__ float *)a_ + offsetA);</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; bG;</span>
+<span class="diff-del">-    bG.SetGlobalBuffer((__gm__ float *)b_);</span>
+<span class="diff-add">+    using cT = cTypeOf&lt;TA, TB&gt;;</span>
+<span class="diff-add">+    using GemmF = MatmulImpl&lt;aT, bF, cT, biasT&gt;;</span>
+<span class="diff-add">+    using cgElem = std::conditional_t&lt;TA, float, half&gt;;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; aG;</span>
+<span class="diff-add">+    aG.SetGlobalBuffer((__gm__ half *)a_ + offsetA);</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; bG;</span>
+<span class="diff-add">+    bG.SetGlobalBuffer((__gm__ half *)b_);</span>
+     GlobalTensor&lt;float&gt; biasG;
+     biasG.SetGlobalBuffer((__gm__ float *)bias_);
+<span class="diff-del">-    GlobalTensor&lt;float&gt; cG;</span>
+<span class="diff-del">-    cG.SetGlobalBuffer((__gm__ float *)c_ + offsetC);</span>
+<span class="diff-add">+    GlobalTensor&lt;cgElem&gt; cG;</span>
+<span class="diff-add">+    cG.SetGlobalBuffer((__gm__ cgElem *)c_ + offsetC);</span>
+ 
+     TPipe pipe;
+     GemmF mm;
+     mm.Init(&amp;tiling, &amp;pipe);
+<span class="diff-del">-    mm.SetHF32(true, 0);  // HF32 in the MIX_AIC_1_2 fused kernel (verified live)</span>
+     mm.SetOrgShape((int32_t)(TA ? fullM : tailM), (int32_t)N, (int32_t)K);
+     mm.SetSingleShape((int32_t)tailM, (int32_t)N, (int32_t)K);
+     mm.SetTensorA(aG, TA);
+<span class="diff-hunk">@@ -134,12 +152,12 @@</span>
+     const int64_t offsetC = kIdx * M * N;
+ 
+     using aT = typename ATypeOf&lt;TA&gt;::type;
+<span class="diff-del">-    using GemmF = MatmulImpl&lt;aT, bF, cF&gt;;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; aG;</span>
+<span class="diff-del">-    aG.SetGlobalBuffer((__gm__ float *)a_ + offsetA);</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; bG;</span>
+<span class="diff-del">-    bG.SetGlobalBuffer((__gm__ float *)b_ + offsetB);</span>
+<span class="diff-add">+    using GemmF = MatmulImpl&lt;aT, bF, cFF, biasT&gt;;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; aG;</span>
+<span class="diff-add">+    aG.SetGlobalBuffer((__gm__ half *)a_ + offsetA);</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; bG;</span>
+<span class="diff-add">+    bG.SetGlobalBuffer((__gm__ half *)b_ + offsetB);</span>
+     GlobalTensor&lt;float&gt; biasG;
+     biasG.SetGlobalBuffer((__gm__ float *)bias_);
+     GlobalTensor&lt;float&gt; cG;
+<span class="diff-hunk">@@ -148,7 +166,6 @@</span>
+     TPipe pipe;
+     GemmF mm;
+     mm.Init(&amp;tiling, &amp;pipe);
+<span class="diff-del">-    mm.SetHF32(true, 0);  // HF32 (10-bit mantissa, fp32 exponent), fp32 accumulate</span>
+     mm.SetOrgShape((int32_t)M, (int32_t)N, (int32_t)tailK);
+     mm.SetSingleShape((int32_t)M, (int32_t)N, (int32_t)tailK);
+     mm.SetTensorA(aG, TA);
+<span class="diff-hunk">@@ -185,22 +202,19 @@</span>
+     TQue&lt;QuePosition::VECIN, 1&gt; qIn;
+     TQue&lt;QuePosition::VECOUT, 1&gt; qOut;
+     pipe.InitBuffer(qIn, 1, BWD_SHIFT_CHUNK * sizeof(float));
+<span class="diff-del">-    pipe.InitBuffer(qOut, 1, BWD_SHIFT_CHUNK * sizeof(float));</span>
+<span class="diff-add">+    // hp is fp16 (GEMM operand precision); `out` stays fp32.</span>
+<span class="diff-add">+    pipe.InitBuffer(qOut, 1, BWD_SHIFT_CHUNK * sizeof(half));</span>
+ 
+     GlobalTensor&lt;float&gt; outG;
+     outG.SetGlobalBuffer((__gm__ float *)out_);
+<span class="diff-del">-    GlobalTensor&lt;float&gt; hpG;</span>
+<span class="diff-del">-    hpG.SetGlobalBuffer((__gm__ float *)hp_);</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; hpG;</span>
+<span class="diff-add">+    hpG.SetGlobalBuffer((__gm__ half *)hp_);</span>
+ 
+     // hp is written step-major [S, rows, H] (hp[t, b, :] = out[b, t-1, :]) so
+     // that the recurrent GEMM's step-t operand is one contiguous block and the
+     // dW_hh GEMM sees hp and dgh under the same row permutation. `out` stays
+     // the caller's row-major [rows, S, H], so the copy is a strided read of H
+     // floats per (b, t) into a contiguous destination.
+<span class="diff-del">-    //</span>
+<span class="diff-del">-    // Each core owns a contiguous slab of batch rows and sweeps t inside it,</span>
+<span class="diff-del">-    // which keeps the destination side streaming while the source pays one</span>
+<span class="diff-del">-    // H-float (2 KB) transaction per row.</span>
+     const int64_t rowsPerCore = (rows + blkNum - 1) / blkNum;
+     const int64_t b0 = blk * rowsPerCore;
+     if (b0 &gt;= rows) {
+<span class="diff-hunk">@@ -225,10 +239,10 @@</span>
+         if (c &gt; BWD_SHIFT_CHUNK) {
+             c = BWD_SHIFT_CHUNK;
+         }
+<span class="diff-del">-        auto o = qOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        Duplicate(o, 0.0f, (int32_t)c);</span>
+<span class="diff-add">+        auto o = qOut.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        Duplicate(o, (half)0.0f, (int32_t)c);</span>
+         qOut.EnQue(o);
+<span class="diff-del">-        auto od = qOut.DeQue&lt;float&gt;();</span>
+<span class="diff-add">+        auto od = qOut.DeQue&lt;half&gt;();</span>
+         DataCopy(hpG[b0 * H + off], od, (uint32_t)c);
+         qOut.FreeTensor(od);
+     }
+<span class="diff-hunk">@@ -251,11 +265,11 @@</span>
+             DataCopy(in, outG[((b0 + r) * S + (t - 1)) * H], dp);
+             qIn.EnQue(in);
+             auto ind = qIn.DeQue&lt;float&gt;();
+<span class="diff-del">-            auto o = qOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-            Adds(o, ind, 0.0f, (int32_t)cnt);</span>
+<span class="diff-add">+            auto o = qOut.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+            Cast(o, ind, RoundMode::CAST_RINT, (int32_t)cnt);</span>
+             qOut.EnQue(o);
+             qIn.FreeTensor(ind);
+<span class="diff-del">-            auto od = qOut.DeQue&lt;float&gt;();</span>
+<span class="diff-add">+            auto od = qOut.DeQue&lt;half&gt;();</span>
+             DataCopy(hpG[dstBase + r * H], od, (uint32_t)cnt);
+             qOut.FreeTensor(od);
+         }
+<span class="diff-hunk">@@ -268,7 +282,12 @@</span>
+ 
+ // Rows of the hidden state per UB tile. Sized so the 25 float tiles this kernel
+ // keeps live (10 inputs, 5 outputs, 9 scratch, 1 constant) fit comfortably in UB.
+<span class="diff-del">-constexpr int64_t BWD_CELL_ROWS = 2;</span>
+<span class="diff-add">+// 4 rows =&gt; 25*4*512*4 = 200 KB of the 248 KB UB, still with headroom for the</span>
+<span class="diff-add">+// runtime reserves. The cell is MTE2-limited: its 17 per-tile DataCopies are</span>
+<span class="diff-add">+// small (&lt;= 8 KB) and strided, so it runs at ~1.36 TB/s against a ~1.57 TB/s</span>
+<span class="diff-add">+// bus. Doubling the tile halves the number of DMA instructions and doubles the</span>
+<span class="diff-add">+// burst size without changing the byte count.</span>
+<span class="diff-add">+constexpr int64_t BWD_CELL_ROWS = 4;</span>
+ constexpr int64_t BWD_CELL_TEMPS = 8;
+ // Buffers per queue. Kept at 1: the cell issues 15 queues, and a depth of 2
+ // (30 buffers) exhausts the AIV hardware event pool -&gt; the kernel wedges and
+<span class="diff-hunk">@@ -278,9 +297,6 @@</span>
+ // the number of live queues instead, not by deepening them.
+ constexpr int64_t BWD_CELL_QDEPTH = 1;
+ 
+<span class="diff-del">-// `dgh_` is the [rows, 3H] block for THIS timestep inside the caller's</span>
+<span class="diff-del">-// [S, rows, 3H] gradient buffer, so the block can be written with plain</span>
+<span class="diff-del">-// contiguous rows.</span>
+ __aicore__ inline void BwdCellBody(GM_ADDR gi_, GM_ADDR gh_, GM_ADDR hp_, GM_ADDR dy_,
+                                    GM_ADDR dha_, GM_ADDR dhb_, GM_ADDR dgx_, GM_ADDR dgh_,
+                                    GM_ADDR tilingGM, int64_t t)
+<span class="diff-hunk">@@ -306,9 +322,14 @@</span>
+     constexpr int64_t R = BWD_CELL_ROWS;
+     constexpr int64_t NT = BWD_CELL_TEMPS;
+     const uint16_t rowLenF = (uint16_t)(H * sizeof(float) / 32);
+<span class="diff-add">+    const uint16_t rowLenF16 = (uint16_t)(H * sizeof(half) / 32);</span>
+     const uint16_t stride3H = (uint16_t)((S * 3 * H - H) * sizeof(float) / 32);
+     const uint16_t strideSH = (uint16_t)((S * H - H) * sizeof(float) / 32);
+     const uint16_t strideT = (uint16_t)((3 * H - H) * sizeof(float) / 32);
+<span class="diff-add">+    // fp16 strides for the dgx / dgh gradient stores (wK: they are GEMM A</span>
+<span class="diff-add">+    // operands now, so they are kept at the 11-bit precision the cube rounds to).</span>
+<span class="diff-add">+    const uint16_t stride3Hf16 = (uint16_t)((S * 3 * H - H) * sizeof(half) / 32);</span>
+<span class="diff-add">+    const uint16_t strideTf16 = (uint16_t)((3 * H - H) * sizeof(half) / 32);</span>
+     // hp and dgh are step-major [S, rows, *]; gh is step-major only when the
+     // backward recomputed it from hp (gate cache off). See gru_tiling_data.h.
+     const bool ghStepMajor = (td.ghStepMajor != 0);
+<span class="diff-hunk">@@ -320,23 +341,35 @@</span>
+     TPipe pipe;
+     TQue&lt;QuePosition::VECIN, BWD_CELL_QDEPTH&gt; qGiR, qGiZ, qGiN, qGhR, qGhZ, qGhN, qHp, qDy, qDha, qDhb;
+     TQue&lt;QuePosition::VECOUT, BWD_CELL_QDEPTH&gt; qDur, qDuz, qDun, qDghN, qDhaOut;
+<span class="diff-del">-    pipe.InitBuffer(qGiR, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGiZ, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGiN, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGhR, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGhZ, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qGhN, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qHp, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-add">+    // The six gate pre-activations are staged at fp16 (the forward GH/GI GEMMs</span>
+<span class="diff-add">+    // write them at the cube's operand precision) and widened to fp32 into the</span>
+<span class="diff-add">+    // tmpBuf scratch right after the DMA lands. They are the largest AIV MTE2</span>
+<span class="diff-add">+    // stream in the cell, so halving their width is the single biggest win; a</span>
+<span class="diff-add">+    // proper half-&gt;half Cast does not exist, hence the explicit Widen.</span>
+<span class="diff-add">+    pipe.InitBuffer(qGiR, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGiZ, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGiN, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGhR, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGhZ, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGhN, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    // hp is fp16 (the forward stages it at the cube's operand precision).</span>
+<span class="diff-add">+    pipe.InitBuffer(qHp, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+     pipe.InitBuffer(qDy, BWD_CELL_QDEPTH, R * H * sizeof(float));
+<span class="diff-del">-    pipe.InitBuffer(qDha, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDhb, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDur, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDuz, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDun, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDghN, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qDhaOut, BWD_CELL_QDEPTH, R * H * sizeof(float));</span>
+<span class="diff-add">+    // dha / dhb are the cell's hidden-gradient working set (read every step,</span>
+<span class="diff-add">+    // and for dha re-written every step). They are stored at fp16 -- the same</span>
+<span class="diff-add">+    // 11-bit mantissa the cube already rounds every operand to -- so the cell's</span>
+<span class="diff-add">+    // single largest remaining fp32 stream halves with the fp32 arithmetic</span>
+<span class="diff-add">+    // untouched (the tiles are widened straight after the DMA lands).</span>
+<span class="diff-add">+    pipe.InitBuffer(qDha, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDhb, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    // dgx / dgh are the A operands of the WI / WH / DH GEMMs -&gt; fp16.</span>
+<span class="diff-add">+    pipe.InitBuffer(qDur, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDuz, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDun, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDghN, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qDhaOut, BWD_CELL_QDEPTH, R * H * sizeof(half));</span>
+     TBuf&lt;TPosition::VECCALC&gt; tmpBuf;
+<span class="diff-del">-    pipe.InitBuffer(tmpBuf, (NT + 1) * R * H * sizeof(float));</span>
+<span class="diff-add">+    pipe.InitBuffer(tmpBuf, (NT + 10) * R * H * sizeof(float));</span>
+ 
+     LocalTensor&lt;float&gt; s0 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 0);
+     LocalTensor&lt;float&gt; s1 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), R * H * sizeof(float));
+<span class="diff-hunk">@@ -347,16 +380,30 @@</span>
+     LocalTensor&lt;float&gt; s6 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 6 * R * H * sizeof(float));
+     LocalTensor&lt;float&gt; s7 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 7 * R * H * sizeof(float));
+     LocalTensor&lt;float&gt; ones = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 8 * R * H * sizeof(float));
+<span class="diff-del">-</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; giG, ghG, hpG, dyG, dhaG, dhbG, dgxG, dghG;</span>
+<span class="diff-del">-    giG.SetGlobalBuffer((__gm__ float *)gi_, tot3H);</span>
+<span class="diff-del">-    ghG.SetGlobalBuffer((__gm__ float *)gh_, tot3H);</span>
+<span class="diff-del">-    hpG.SetGlobalBuffer((__gm__ float *)hp_, totSH);</span>
+<span class="diff-add">+    // fp32 view of the fp16 hp operand.</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; hpF32 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 9 * R * H * sizeof(float));</span>
+<span class="diff-add">+    // fp32 scratch for the widened gate slabs (slots NT+2 .. NT+7).</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; giRf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 2) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; giZf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 3) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; giNf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 4) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; ghRf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 5) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; ghZf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 6) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; ghNf = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 7) * R * H * sizeof(float));</span>
+<span class="diff-add">+    // fp32 scratch for the widened dha / dhb gradient tiles (slots NT+8, NT+9).</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; dhaF32 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 8) * R * H * sizeof(float));</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; dhbF32 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), (NT + 9) * R * H * sizeof(float));</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    GlobalTensor&lt;float&gt; dyG;</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; dhaG, dhbG;</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; giG, ghG, hpG, dgxG, dghG;</span>
+<span class="diff-add">+    giG.SetGlobalBuffer((__gm__ half *)gi_, tot3H);</span>
+<span class="diff-add">+    ghG.SetGlobalBuffer((__gm__ half *)gh_, tot3H);</span>
+<span class="diff-add">+    hpG.SetGlobalBuffer((__gm__ half *)hp_, totSH);</span>
+     dyG.SetGlobalBuffer((__gm__ float *)dy_, totSH);
+<span class="diff-del">-    dhaG.SetGlobalBuffer((__gm__ float *)dha_, totH);</span>
+<span class="diff-del">-    dhbG.SetGlobalBuffer((__gm__ float *)dhb_, totH);</span>
+<span class="diff-del">-    dgxG.SetGlobalBuffer((__gm__ float *)dgx_, tot3H);</span>
+<span class="diff-del">-    dghG.SetGlobalBuffer((__gm__ float *)dgh_, B * 3 * H);</span>
+<span class="diff-add">+    dhaG.SetGlobalBuffer((__gm__ half *)dha_, totH);</span>
+<span class="diff-add">+    dhbG.SetGlobalBuffer((__gm__ half *)dhb_, totH);</span>
+<span class="diff-add">+    dgxG.SetGlobalBuffer((__gm__ half *)dgx_, tot3H);</span>
+<span class="diff-add">+    dghG.SetGlobalBuffer((__gm__ half *)dgh_, B * 3 * H);</span>
+ 
+     for (int64_t r0 = 0; r0 &lt; rows; r0 += R) {
+         int64_t r = rows - r0;
+<span class="diff-hunk">@@ -377,10 +424,10 @@</span>
+         const int64_t rowBaseH = rowBase * H;
+         const int64_t tgBase = rowBase * 3 * H;
+ 
+<span class="diff-del">-        DataCopyParams dp3H;</span>
+<span class="diff-add">+        DataCopyParams dp3H;  // fp16 strided read of the gi gate slab</span>
+         dp3H.blockCount = rr;
+<span class="diff-del">-        dp3H.blockLen = rowLenF;</span>
+<span class="diff-del">-        dp3H.srcStride = stride3H;</span>
+<span class="diff-add">+        dp3H.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dp3H.srcStride = stride3Hf16;</span>
+         dp3H.dstStride = 0;
+ 
+         DataCopyParams dpSH;
+<span class="diff-hunk">@@ -389,94 +436,116 @@</span>
+         dpSH.srcStride = strideSH;
+         dpSH.dstStride = 0;
+ 
+<span class="diff-del">-        DataCopyParams dpRow;</span>
+<span class="diff-del">-        dpRow.blockCount = rr;</span>
+<span class="diff-del">-        dpRow.blockLen = rowLenF;</span>
+<span class="diff-del">-        dpRow.srcStride = 0;</span>
+<span class="diff-del">-        dpRow.dstStride = 0;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        // gh source: contiguous rows for the step-major recomputed path, the</span>
+<span class="diff-del">-        // S*3H row stride of the forward's row-major gate store otherwise.</span>
+<span class="diff-del">-        DataCopyParams dpGh = ghStepMajor ? dpRow : dp3H;</span>
+<span class="diff-add">+        DataCopyParams dpRowH;  // fp16 contiguous row tile (hp / dha / dhb)</span>
+<span class="diff-add">+        dpRowH.blockCount = rr;</span>
+<span class="diff-add">+        dpRowH.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpRowH.srcStride = 0;</span>
+<span class="diff-add">+        dpRowH.dstStride = 0;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        // gh is step-major with a [rows, 3H] slab, so gate g of row i sits at</span>
+<span class="diff-add">+        // +i*3H: the inter-block gap (blockLen + srcStride) is 3H, not S*3H.</span>
+<span class="diff-add">+        // strideT == (3H - H) in 32B units, which is what yields that 3H pitch.</span>
+<span class="diff-add">+        DataCopyParams dpGh;  // fp16 read of the gh gate slab</span>
+<span class="diff-add">+        dpGh.blockCount = rr;</span>
+<span class="diff-add">+        dpGh.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpGh.srcStride = ghStepMajor ? strideTf16 : stride3Hf16;</span>
+<span class="diff-add">+        dpGh.dstStride = 0;</span>
+ 
+         // ---- CopyIn -------------------------------------------------------
+<span class="diff-del">-        auto giR = qGiR.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto giR = qGiR.AllocTensor&lt;half&gt;();</span>
+         DataCopy(giR, giG[giBase], dp3H);
+         qGiR.EnQue(giR);
+<span class="diff-del">-        auto giZ = qGiZ.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto giZ = qGiZ.AllocTensor&lt;half&gt;();</span>
+         DataCopy(giZ, giG[giBase + H], dp3H);
+         qGiZ.EnQue(giZ);
+<span class="diff-del">-        auto giN = qGiN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto giN = qGiN.AllocTensor&lt;half&gt;();</span>
+         DataCopy(giN, giG[giBase + 2 * H], dp3H);
+         qGiN.EnQue(giN);
+ 
+<span class="diff-del">-        auto ghR = qGhR.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto ghR = qGhR.AllocTensor&lt;half&gt;();</span>
+         DataCopy(ghR, ghG[ghBase], dpGh);
+         qGhR.EnQue(ghR);
+<span class="diff-del">-        auto ghZ = qGhZ.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto ghZ = qGhZ.AllocTensor&lt;half&gt;();</span>
+         DataCopy(ghZ, ghG[ghBase + H], dpGh);
+         qGhZ.EnQue(ghZ);
+<span class="diff-del">-        auto ghN = qGhN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto ghN = qGhN.AllocTensor&lt;half&gt;();</span>
+         DataCopy(ghN, ghG[ghBase + 2 * H], dpGh);
+         qGhN.EnQue(ghN);
+ 
+<span class="diff-del">-        auto hp = qHp.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(hp, hpG[hpBase], dpRow);</span>
+<span class="diff-add">+        auto hp = qHp.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hp, hpG[hpBase], dpRowH);</span>
+         qHp.EnQue(hp);
+ 
+         auto dy = qDy.AllocTensor&lt;float&gt;();
+         DataCopy(dy, dyG[shBase], dpSH);
+         qDy.EnQue(dy);
+ 
+<span class="diff-del">-        auto dha = qDha.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dha, dhaG[rowBaseH], dpRow);</span>
+<span class="diff-add">+        auto dha = qDha.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dha, dhaG[rowBaseH], dpRowH);</span>
+         qDha.EnQue(dha);
+ 
+<span class="diff-del">-        auto dhb = qDhb.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dhb, dhbG[rowBaseH], dpRow);</span>
+<span class="diff-add">+        auto dhb = qDhb.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dhb, dhbG[rowBaseH], dpRowH);</span>
+         qDhb.EnQue(dhb);
+ 
+<span class="diff-del">-        auto giRl = qGiR.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto giZl = qGiZ.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto giNl = qGiN.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto ghRl = qGhR.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto ghZl = qGhZ.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto ghNl = qGhN.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto hpL = qHp.DeQue&lt;float&gt;();</span>
+<span class="diff-add">+        // widen the six fp16 gate slabs into their fp32 scratch slots</span>
+<span class="diff-add">+        auto giRD = qGiR.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(giRf, giRD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGiR.FreeTensor(giRD);</span>
+<span class="diff-add">+        auto giZD = qGiZ.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(giZf, giZD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGiZ.FreeTensor(giZD);</span>
+<span class="diff-add">+        auto giND = qGiN.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(giNf, giND, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGiN.FreeTensor(giND);</span>
+<span class="diff-add">+        auto ghRD = qGhR.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(ghRf, ghRD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGhR.FreeTensor(ghRD);</span>
+<span class="diff-add">+        auto ghZD = qGhZ.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(ghZf, ghZD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGhZ.FreeTensor(ghZD);</span>
+<span class="diff-add">+        auto ghND = qGhN.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(ghNf, ghND, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGhN.FreeTensor(ghND);</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        auto hpL = qHp.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(hpF32, hpL, RoundMode::CAST_NONE, cnt);</span>
+         auto dyL = qDy.DeQue&lt;float&gt;();
+<span class="diff-del">-        auto dhaL = qDha.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        auto dhbL = qDhb.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        auto durL = qDur.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto duzL = qDuz.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto dunL = qDun.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto dghNL = qDghN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto dhaOutL = qDhaOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto dhaH = qDha.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(dhaF32, dhaH, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        auto dhbH = qDhb.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(dhbF32, dhbH, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        auto durL = qDur.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        auto duzL = qDuz.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        auto dunL = qDun.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        auto dghNL = qDghN.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        auto dhaOutL = qDhaOut.AllocTensor&lt;half&gt;();</span>
+ 
+         // ---- Compute ------------------------------------------------------
+         Duplicate(ones, 1.0f, cnt);
+ 
+<span class="diff-del">-        // s0 = dht = dy + dha + dhb</span>
+<span class="diff-del">-        Add(s0, dyL, dhaL, cnt);</span>
+<span class="diff-del">-        Add(s0, s0, dhbL, cnt);</span>
+<span class="diff-add">+        // s0 = dht = dy + dha + dhb   (dha / dhb widened from fp16)</span>
+<span class="diff-add">+        Add(s0, dyL, dhaF32, cnt);</span>
+<span class="diff-add">+        Add(s0, s0, dhbF32, cnt);</span>
+ 
+         // s6 = r = sigmoid(giR + ghR)
+<span class="diff-del">-        Add(s2, giRl, ghRl, cnt);</span>
+<span class="diff-add">+        Add(s2, giRf, ghRf, cnt);</span>
+         Muls(s2, s2, -1.0f, cnt);
+         Exp(s2, s2, cnt);
+         Adds(s2, s2, 1.0f, cnt);
+         Div(s6, ones, s2, cnt);
+ 
+         // s7 = z = sigmoid(giZ + ghZ)
+<span class="diff-del">-        Add(s3, giZl, ghZl, cnt);</span>
+<span class="diff-add">+        Add(s3, giZf, ghZf, cnt);</span>
+         Muls(s3, s3, -1.0f, cnt);
+         Exp(s3, s3, cnt);
+         Adds(s3, s3, 1.0f, cnt);
+         Div(s7, ones, s3, cnt);
+ 
+         // s1 = n = tanh(giN + r * ghN)
+<span class="diff-del">-        Mul(s4, s6, ghNl, cnt);</span>
+<span class="diff-del">-        Add(s4, giNl, s4, cnt);</span>
+<span class="diff-add">+        Mul(s4, s6, ghNf, cnt);</span>
+<span class="diff-add">+        Add(s4, giNf, s4, cnt);</span>
+         Muls(s5, s4, 2.0f, cnt);
+         Exp(s5, s5, cnt);
+         Adds(s5, s5, 1.0f, cnt);
+<span class="diff-hunk">@@ -492,7 +561,7 @@</span>
+         Mul(s2, s2, s0, cnt);
+ 
+         // s3 = dz = dht * (hp - n)
+<span class="diff-del">-        Sub(s3, hpL, s1, cnt);</span>
+<span class="diff-add">+        Sub(s3, hpF32, s1, cnt);</span>
+         Mul(s3, s3, s0, cnt);
+ 
+         // s4 = dun = dn * (1 - n^2)
+<span class="diff-hunk">@@ -506,35 +575,31 @@</span>
+         Adds(s5, s5, 1.0f, cnt);
+         Mul(s5, s5, s7, cnt);
+         Mul(s5, s5, s3, cnt);
+<span class="diff-del">-        Adds(duzL, s5, 0.0f, (int32_t)cnt);</span>
+<span class="diff-add">+        Cast(duzL, s5, RoundMode::CAST_RINT, cnt);</span>
+ 
+         // dghN = dun * r
+<span class="diff-del">-        Mul(dghNL, s4, s6, cnt);</span>
+<span class="diff-add">+        Mul(s5, s4, s6, cnt);</span>
+<span class="diff-add">+        Cast(dghNL, s5, RoundMode::CAST_RINT, cnt);</span>
+ 
+         // dur = dun * ghN * r * (1 - r)
+<span class="diff-del">-        Mul(s5, s4, ghNl, cnt);</span>
+<span class="diff-add">+        Mul(s5, s4, ghNf, cnt);</span>
+         Muls(s2, s6, -1.0f, cnt);
+         Adds(s2, s2, 1.0f, cnt);
+         Mul(s2, s2, s6, cnt);
+         Mul(s2, s2, s5, cnt);
+<span class="diff-del">-        Adds(durL, s2, 0.0f, (int32_t)cnt);</span>
+<span class="diff-add">+        Cast(durL, s2, RoundMode::CAST_RINT, cnt);</span>
+ 
+         // dun
+<span class="diff-del">-        Adds(dunL, s4, 0.0f, (int32_t)cnt);</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        // dha' = dht * z</span>
+<span class="diff-del">-        Mul(dhaOutL, s0, s7, cnt);</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        qGiR.FreeTensor(giRl);</span>
+<span class="diff-del">-        qGiZ.FreeTensor(giZl);</span>
+<span class="diff-del">-        qGiN.FreeTensor(giNl);</span>
+<span class="diff-del">-        qGhR.FreeTensor(ghRl);</span>
+<span class="diff-del">-        qGhZ.FreeTensor(ghZl);</span>
+<span class="diff-del">-        qGhN.FreeTensor(ghNl);</span>
+<span class="diff-add">+        Cast(dunL, s4, RoundMode::CAST_RINT, cnt);</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        // dha' = dht * z  (fp32 product, narrowed at the store)</span>
+<span class="diff-add">+        Mul(s0, s0, s7, cnt);</span>
+<span class="diff-add">+        Cast(dhaOutL, s0, RoundMode::CAST_RINT, cnt);</span>
+<span class="diff-add">+</span>
+         qHp.FreeTensor(hpL);
+         qDy.FreeTensor(dyL);
+<span class="diff-del">-        qDha.FreeTensor(dhaL);</span>
+<span class="diff-del">-        qDhb.FreeTensor(dhbL);</span>
+<span class="diff-add">+        qDha.FreeTensor(dhaH);</span>
+<span class="diff-add">+        qDhb.FreeTensor(dhbH);</span>
+ 
+         qDur.EnQue(durL);
+         qDuz.EnQue(duzL);
+<span class="diff-hunk">@@ -543,49 +608,45 @@</span>
+         qDhaOut.EnQue(dhaOutL);
+ 
+         // ---- CopyOut ------------------------------------------------------
+<span class="diff-del">-        DataCopyParams dpW3H = dp3H;  // strided into [rows, S, 3H]</span>
+<span class="diff-del">-        dpW3H.srcStride = 0;</span>
+<span class="diff-del">-        dpW3H.dstStride = stride3H;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        DataCopyParams dpWT = dp3H;  // contiguous [rows, 3H]</span>
+<span class="diff-del">-        dpWT.srcStride = 0;</span>
+<span class="diff-del">-        dpWT.dstStride = strideT;</span>
+<span class="diff-add">+        DataCopyParams dpX16;  // strided into dgx [rows*S, 3H], fp16</span>
+<span class="diff-add">+        dpX16.blockCount = rr;</span>
+<span class="diff-add">+        dpX16.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpX16.srcStride = 0;</span>
+<span class="diff-add">+        dpX16.dstStride = stride3Hf16;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        DataCopyParams dpG16;  // contiguous [rows, 3H] step slab of dgh, fp16</span>
+<span class="diff-add">+        dpG16.blockCount = rr;</span>
+<span class="diff-add">+        dpG16.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpG16.srcStride = 0;</span>
+<span class="diff-add">+        dpG16.dstStride = strideTf16;</span>
+ 
+         // dgx = (dur, duz, dun); dgh = (dur, duz, dghN). Each shared tile feeds
+         // two destinations before it is freed: the [rows*S, 3H] buffer that the
+         // parameter-gradient GEMMs and the bias reduction consume, and (for dgh)
+<span class="diff-del">-        // the per-step [rows, 3H] scratch read by the recurrent GEMM.</span>
+<span class="diff-del">-        // dgh is written straight into this step's [rows, 3H] block of the</span>
+<span class="diff-del">-        // caller's [S, rows, 3H] buffer. That block IS the A operand of the</span>
+<span class="diff-del">-        // next step's recurrent GEMM (dhb = dgh @ w_hh), so the previous</span>
+<span class="diff-del">-        // design's separate [rows, 3H] "dghC" scratch -- an exact copy of this</span>
+<span class="diff-del">-        // block, re-materialised every step -- is gone: one whole-tensor write</span>
+<span class="diff-del">-        // per step removed, and the block lands contiguously instead of at a</span>
+<span class="diff-del">-        // S*3H-element row stride.</span>
+<span class="diff-del">-        auto durD = qDur.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dgxG[giBase], durD, dpW3H);</span>
+<span class="diff-del">-        DataCopy(dghG[tgBase], durD, dpWT);</span>
+<span class="diff-add">+        // this step's [rows, 3H] block of the [S, rows, 3H] gradient buffer --</span>
+<span class="diff-add">+        // which is exactly the A operand the next step's recurrent GEMM reads,</span>
+<span class="diff-add">+        // so no separate per-step scratch copy is materialised.</span>
+<span class="diff-add">+        auto durD = qDur.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dgxG[giBase], durD, dpX16);</span>
+<span class="diff-add">+        DataCopy(dghG[tgBase], durD, dpG16);</span>
+         qDur.FreeTensor(durD);
+ 
+<span class="diff-del">-        auto duzD = qDuz.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dgxG[giBase + H], duzD, dpW3H);</span>
+<span class="diff-del">-        DataCopy(dghG[tgBase + H], duzD, dpWT);</span>
+<span class="diff-add">+        auto duzD = qDuz.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dgxG[giBase + H], duzD, dpX16);</span>
+<span class="diff-add">+        DataCopy(dghG[tgBase + H], duzD, dpG16);</span>
+         qDuz.FreeTensor(duzD);
+ 
+<span class="diff-del">-        auto dunD = qDun.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dgxG[giBase + 2 * H], dunD, dpW3H);</span>
+<span class="diff-add">+        auto dunD = qDun.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dgxG[giBase + 2 * H], dunD, dpX16);</span>
+         qDun.FreeTensor(dunD);
+ 
+<span class="diff-del">-        auto dghND = qDghN.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dghG[tgBase + 2 * H], dghND, dpWT);</span>
+<span class="diff-add">+        auto dghND = qDghN.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dghG[tgBase + 2 * H], dghND, dpG16);</span>
+         qDghN.FreeTensor(dghND);
+ 
+<span class="diff-del">-        // dha is contiguous [rows, H]</span>
+<span class="diff-del">-        DataCopyParams dpRowW = dpRow;</span>
+<span class="diff-del">-        dpRowW.srcStride = 0;</span>
+<span class="diff-del">-        dpRowW.dstStride = 0;</span>
+<span class="diff-del">-        auto dhaOutD = qDhaOut.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(dhaG[rowBaseH], dhaOutD, dpRowW);</span>
+<span class="diff-add">+        // dha is contiguous [rows, H], stored at fp16</span>
+<span class="diff-add">+        auto dhaOutD = qDhaOut.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(dhaG[rowBaseH], dhaOutD, dpRowH);</span>
+         qDhaOut.FreeTensor(dhaOutD);
+     }
+ }
+<span class="diff-hunk">@@ -628,68 +689,115 @@</span>
+ 
+     constexpr int64_t RR = BWD_RED_ROWS;
+     TPipe pipe;
+<span class="diff-del">-    TQue&lt;QuePosition::VECIN, 1&gt; qLoad;</span>
+<span class="diff-add">+    TQue&lt;QuePosition::VECIN, 2&gt; qLoad;</span>
+     TQue&lt;QuePosition::VECOUT, 1&gt; qOut;
+<span class="diff-del">-    pipe.InitBuffer(qLoad, 1, RR * G * sizeof(float));</span>
+<span class="diff-add">+    pipe.InitBuffer(qLoad, 2, RR * G * sizeof(half));</span>
+     pipe.InitBuffer(qOut, 1, G * sizeof(float));
+     TBuf&lt;TPosition::VECCALC&gt; accBuf;
+     pipe.InitBuffer(accBuf, (G + H) * sizeof(float));
+<span class="diff-del">-</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; dgxG;</span>
+<span class="diff-del">-    dgxG.SetGlobalBuffer((__gm__ float *)dgx_, td.chunkRows * td.S * G);</span>
+<span class="diff-add">+    TBuf&lt;TPosition::VECCALC&gt; castBuf;</span>
+<span class="diff-add">+    pipe.InitBuffer(castBuf, RR * G * sizeof(float));</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; dgxG;</span>
+<span class="diff-add">+    dgxG.SetGlobalBuffer((__gm__ half *)dgx_, td.chunkRows * td.S * G);</span>
+     // dgh is step-major [S, rows, 3H] = (dur, duz, dghN). Only the n block
+<span class="diff-del">-    // (columns 2H..3H) is read here: the r/z blocks carry the very same fp32</span>
+<span class="diff-del">-    // values the cell stored into dgx (both are DataCopy'd from the same UB</span>
+<span class="diff-del">-    // tile), so reading them a second time only to re-sum the identical addends</span>
+<span class="diff-del">-    // is pure redundant traffic. See the store step below.</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; dghG;</span>
+<span class="diff-del">-    dghG.SetGlobalBuffer((__gm__ float *)dgh_, td.chunkRows * td.S * G);</span>
+<span class="diff-add">+    // (columns 2H..3H) is read here: the r/z blocks carry the very same values</span>
+<span class="diff-add">+    // the cell stored into dgx (both are DataCopy'd from the same UB tile), so</span>
+<span class="diff-add">+    // reading them a second time only to re-sum the identical addends is pure</span>
+<span class="diff-add">+    // redundant traffic. See the store step below.</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; dghG;</span>
+<span class="diff-add">+    dghG.SetGlobalBuffer((__gm__ half *)dgh_, td.chunkRows * td.S * G);</span>
+     GlobalTensor&lt;float&gt; wsG;
+     wsG.SetGlobalBuffer((__gm__ float *)ws_, 2 * blkNum * G);
+ 
+     auto acc = accBuf.GetWithOffset&lt;float&gt;((uint32_t)G, 0);
+     auto accN = accBuf.GetWithOffset&lt;float&gt;((uint32_t)H, (uint32_t)(G * sizeof(float)));
+<span class="diff-add">+    auto ldF = castBuf.Get&lt;float&gt;();</span>
+     Duplicate(acc, 0.0f, (int32_t)G);
+     Duplicate(accN, 0.0f, (int32_t)H);
+ 
+<span class="diff-del">-    // Pass 1: (dur, duz, dun) straight out of dgx, contiguous rows.</span>
+<span class="diff-del">-    for (int64_t rr = 0; rr &lt; rn; rr += RR) {</span>
+<span class="diff-del">-        int64_t c = rn - rr;</span>
+<span class="diff-del">-        if (c &gt; RR) {</span>
+<span class="diff-del">-            c = RR;</span>
+<span class="diff-add">+    // Pass 1: (dur, duz, dun) straight out of dgx, contiguous rows. dgx is fp16</span>
+<span class="diff-add">+    // (the cell stores it at the cube's operand precision), so widen before the</span>
+<span class="diff-add">+    // fp32 accumulation.</span>
+<span class="diff-add">+    // The next tile's load is issued before the current tile is consumed, so the</span>
+<span class="diff-add">+    // MTE2 of tile i+1 overlaps the cast + row Adds of tile i. A depth-1 queue</span>
+<span class="diff-add">+    // serialised copy latency with compute and left MTE2 barely half busy.</span>
+<span class="diff-add">+    if (rn &gt; 0) {</span>
+<span class="diff-add">+        {</span>
+<span class="diff-add">+            int64_t cp = rn;</span>
+<span class="diff-add">+            if (cp &gt; RR) {</span>
+<span class="diff-add">+                cp = RR;</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            auto lp = qLoad.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+            DataCopy(lp, dgxG[(r0 + 0) * G], (uint32_t)(cp * G));</span>
+<span class="diff-add">+            qLoad.EnQue(lp);</span>
+         }
+<span class="diff-del">-        auto ld = qLoad.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(ld, dgxG[(r0 + rr) * G], (uint32_t)(c * G));</span>
+<span class="diff-del">-        qLoad.EnQue(ld);</span>
+<span class="diff-del">-        auto ldd = qLoad.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        for (int64_t i = 0; i &lt; c; ++i) {</span>
+<span class="diff-del">-            Add(acc, acc, ldd[i * G], (int32_t)G);</span>
+<span class="diff-add">+        for (int64_t rr = 0; rr &lt; rn; rr += RR) {</span>
+<span class="diff-add">+            int64_t next = rr + RR;</span>
+<span class="diff-add">+            if (next &lt; rn) {</span>
+<span class="diff-add">+                int64_t cn = rn - next;</span>
+<span class="diff-add">+                if (cn &gt; RR) {</span>
+<span class="diff-add">+                    cn = RR;</span>
+<span class="diff-add">+                }</span>
+<span class="diff-add">+                auto ln = qLoad.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+                DataCopy(ln, dgxG[(r0 + next) * G], (uint32_t)(cn * G));</span>
+<span class="diff-add">+                qLoad.EnQue(ln);</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            int64_t c = rn - rr;</span>
+<span class="diff-add">+            if (c &gt; RR) {</span>
+<span class="diff-add">+                c = RR;</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            auto ldd = qLoad.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+            Cast(ldF, ldd, RoundMode::CAST_NONE, (int32_t)(c * G));</span>
+<span class="diff-add">+            for (int64_t i = 0; i &lt; c; ++i) {</span>
+<span class="diff-add">+                Add(acc, acc, ldF[i * G], (int32_t)G);</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            qLoad.FreeTensor(ldd);</span>
+         }
+<span class="diff-del">-        qLoad.FreeTensor(ldd);</span>
+<span class="diff-del">-    }</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-    // Pass 2: dghN = dgh[:, 2H:3H] -- one H-wide strided block per row. The</span>
+<span class="diff-del">-    // block is H*4 bytes contiguous, so the read stays line-aligned.</span>
+<span class="diff-add">+    }</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    // Pass 2: dghN = dgh[:, 2H:3H] -- one H-wide strided block per row.</span>
+     DataCopyParams dpN;
+     dpN.blockCount = (uint16_t)RR;
+<span class="diff-del">-    dpN.blockLen = (uint16_t)(H * sizeof(float) / 32);</span>
+<span class="diff-del">-    dpN.srcStride = (uint16_t)((G - H) * sizeof(float) / 32);</span>
+<span class="diff-add">+    dpN.blockLen = (uint16_t)(H * sizeof(half) / 32);</span>
+<span class="diff-add">+    dpN.srcStride = (uint16_t)((G - H) * sizeof(half) / 32);</span>
+     dpN.dstStride = 0;
+<span class="diff-del">-    for (int64_t rr = 0; rr &lt; rn; rr += RR) {</span>
+<span class="diff-del">-        int64_t c = rn - rr;</span>
+<span class="diff-del">-        if (c &gt; RR) {</span>
+<span class="diff-del">-            c = RR;</span>
+<span class="diff-add">+    if (rn &gt; 0) {</span>
+<span class="diff-add">+        {</span>
+<span class="diff-add">+            int64_t cp = rn;</span>
+<span class="diff-add">+            if (cp &gt; RR) {</span>
+<span class="diff-add">+                cp = RR;</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            DataCopyParams dpp = dpN;</span>
+<span class="diff-add">+            dpp.blockCount = (uint16_t)cp;</span>
+<span class="diff-add">+            auto lp = qLoad.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+            DataCopy(lp, dghG[(r0 + 0) * G + 2 * H], dpp);</span>
+<span class="diff-add">+            qLoad.EnQue(lp);</span>
+         }
+<span class="diff-del">-        DataCopyParams dpc = dpN;</span>
+<span class="diff-del">-        dpc.blockCount = (uint16_t)c;</span>
+<span class="diff-del">-        auto ld = qLoad.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(ld, dghG[(r0 + rr) * G + 2 * H], dpc);</span>
+<span class="diff-del">-        qLoad.EnQue(ld);</span>
+<span class="diff-del">-        auto ldd = qLoad.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        for (int64_t i = 0; i &lt; c; ++i) {</span>
+<span class="diff-del">-            Add(accN, accN, ldd[i * H], (int32_t)H);</span>
+<span class="diff-add">+        for (int64_t rr = 0; rr &lt; rn; rr += RR) {</span>
+<span class="diff-add">+            int64_t next = rr + RR;</span>
+<span class="diff-add">+            if (next &lt; rn) {</span>
+<span class="diff-add">+                int64_t cn = rn - next;</span>
+<span class="diff-add">+                if (cn &gt; RR) {</span>
+<span class="diff-add">+                    cn = RR;</span>
+<span class="diff-add">+                }</span>
+<span class="diff-add">+                DataCopyParams dpn2 = dpN;</span>
+<span class="diff-add">+                dpn2.blockCount = (uint16_t)cn;</span>
+<span class="diff-add">+                auto ln = qLoad.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+                DataCopy(ln, dghG[(r0 + next) * G + 2 * H], dpn2);</span>
+<span class="diff-add">+                qLoad.EnQue(ln);</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            int64_t c = rn - rr;</span>
+<span class="diff-add">+            if (c &gt; RR) {</span>
+<span class="diff-add">+                c = RR;</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            auto ldd = qLoad.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+            Cast(ldF, ldd, RoundMode::CAST_NONE, (int32_t)(c * H));</span>
+<span class="diff-add">+            for (int64_t i = 0; i &lt; c; ++i) {</span>
+<span class="diff-add">+                Add(accN, accN, ldF[i * H], (int32_t)H);</span>
+<span class="diff-add">+            }</span>
+<span class="diff-add">+            qLoad.FreeTensor(ldd);</span>
+         }
+<span class="diff-del">-        qLoad.FreeTensor(ldd);</span>
+     }
+ 
+     // Route the stores through a VECOUT queue so the V -&gt; MTE3 edge is</code></pre></div></div>
+<div class="card"><h3 style="margin-top:0">op_kernel/gru_vector.cpp</h3><div class="copy-wrapper"><button class="copy-btn" onclick="copyCode(this,'diff-4')">复制</button><pre><code id="diff-4">--- a/op_kernel/gru_vector.cpp
++++ b/op_kernel/gru_vector.cpp
+<span class="diff-hunk">@@ -62,13 +62,15 @@</span>
+     TPipe pipe;
+     TQue&lt;QuePosition::VECIN, 2&gt; qIn;
+     TQue&lt;QuePosition::VECOUT, 2&gt; qOut;
+<span class="diff-add">+    // fp16 destination: the cast output feeds the fp16 GEMM A operand, so the</span>
+<span class="diff-add">+    // copy pass narrows to half (round-to-nearest) rather than widening to fp32.</span>
+     pipe.InitBuffer(qIn, 2, CH * sizeof(inT));
+<span class="diff-del">-    pipe.InitBuffer(qOut, 2, CH * sizeof(float));</span>
+<span class="diff-add">+    pipe.InitBuffer(qOut, 2, CH * sizeof(half));</span>
+ 
+     GlobalTensor&lt;inT&gt; srcG;
+     srcG.SetGlobalBuffer((__gm__ inT *)src + start, cnt);
+<span class="diff-del">-    GlobalTensor&lt;float&gt; dstG;</span>
+<span class="diff-del">-    dstG.SetGlobalBuffer((__gm__ float *)dst + start, cnt);</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; dstG;</span>
+<span class="diff-add">+    dstG.SetGlobalBuffer((__gm__ half *)dst + start, cnt);</span>
+ 
+     for (int64_t off = 0; off &lt; cnt; off += CH) {
+         int64_t c = cnt - off;
+<span class="diff-hunk">@@ -80,12 +82,12 @@</span>
+         qIn.EnQue(inLocal);
+ 
+         auto inD = qIn.DeQue&lt;inT&gt;();
+<span class="diff-del">-        auto outLocal = qOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        Cast(outLocal, inD, RoundMode::CAST_NONE, (uint32_t)c);</span>
+<span class="diff-add">+        auto outLocal = qOut.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(outLocal, inD, RoundMode::CAST_RINT, (uint32_t)c);</span>
+         qOut.EnQue(outLocal);
+         qIn.FreeTensor(inD);
+ 
+<span class="diff-del">-        auto outD = qOut.DeQue&lt;float&gt;();</span>
+<span class="diff-add">+        auto outD = qOut.DeQue&lt;half&gt;();</span>
+         DataCopy(dstG[off], outD, (uint32_t)c);
+         qOut.FreeTensor(outD);
+     }
+<span class="diff-hunk">@@ -117,8 +119,8 @@</span>
+ 
+ template &lt;typename outT&gt;
+ __aicore__ inline void GruRecElemBody(GM_ADDR gi_, GM_ADDR gh_,
+<span class="diff-del">-                                      GM_ADDR hs_, GM_ADDR out_, GM_ADDR ghStore_,</span>
+<span class="diff-del">-                                      GM_ADDR tilingGM, int64_t t, int64_t doStore)</span>
+<span class="diff-add">+                                      GM_ADDR hs_, GM_ADDR out_, GM_ADDR hp_,</span>
+<span class="diff-add">+                                      GM_ADDR tilingGM, int64_t t, int64_t doStoreHp)</span>
+ {
+     GruTilingData td;
+     CopyTilingToLocal(&amp;td, tilingGM);
+<span class="diff-hunk">@@ -126,6 +128,10 @@</span>
+     const int64_t S = td.S;
+     const int64_t H = td.H;
+     const int64_t G = 3 * H;  // merged gate extent (r | z | n contiguous)
+<span class="diff-add">+    // hp is step-major [S, Bfull, H] over the full batch; the host passes a</span>
+<span class="diff-add">+    // view pre-offset by this chunk's first row, so the index below combines</span>
+<span class="diff-add">+    // the full-batch step stride with the chunk-local row.</span>
+<span class="diff-add">+    const int64_t Bfull = td.B;</span>
+ 
+     const int64_t blkNum = (int64_t)GetBlockNum();
+     const int64_t blk = (int64_t)GetBlockIdx();
+<span class="diff-hunk">@@ -142,16 +148,24 @@</span>
+     constexpr int64_t R = GRU_TILE_ROWS;
+     const uint32_t tileCnt = (uint32_t)(R * H);
+     const uint16_t rowLenF32 = (uint16_t)(H * sizeof(float) / 32);        // blocks of 32B
+<span class="diff-add">+    const uint16_t rowLenF16 = (uint16_t)(H * sizeof(half) / 32);         // fp16 row length</span>
+     // gi is [rows*S, 3H] and gh is [rows, 3H]: within one gate the rows sit G
+     // floats apart (gi) / G floats apart (gh), so the per-gate block stride is
+     // (S*G - H) for gi and (G - H) for gh.
+     const uint16_t giRowStride = (uint16_t)((S * G - H) * sizeof(float) / 32);
+     const uint16_t ghRowStride = (uint16_t)((G - H) * sizeof(float) / 32);
+<span class="diff-add">+    // The gate pre-activations are fp16 in GM (the cube's C output), so the</span>
+<span class="diff-add">+    // strided gate reads use fp16 pitches.</span>
+<span class="diff-add">+    const uint16_t giRowStride16 = (uint16_t)((S * G - H) * sizeof(half) / 32);</span>
+<span class="diff-add">+    const uint16_t ghRowStride16 = (uint16_t)((G - H) * sizeof(half) / 32);</span>
+     const uint16_t outRowLen = (uint16_t)(H * sizeof(outT) / 32);
+     const uint16_t outRowStride = (uint16_t)((S * H - H) * sizeof(outT) / 32);
+ 
+     TPipe pipe;
+     TQue&lt;QuePosition::VECIN, 1&gt; qGiR, qGiZ, qGiN, qGhR, qGhZ, qGhN, qHs;
+<span class="diff-add">+    // fp16 staging for the six gate slabs (depth 6 so all six loads are in</span>
+<span class="diff-add">+    // flight before the widen casts run).</span>
+<span class="diff-add">+    TQue&lt;QuePosition::VECIN, 6&gt; qGate16;</span>
+     TQue&lt;QuePosition::VECOUT, 1&gt; qHsOut, qOut;
+     pipe.InitBuffer(qGiR, 1, R * H * sizeof(float));
+     pipe.InitBuffer(qGiZ, 1, R * H * sizeof(float));
+<span class="diff-hunk">@@ -159,11 +173,17 @@</span>
+     pipe.InitBuffer(qGhR, 1, R * H * sizeof(float));
+     pipe.InitBuffer(qGhZ, 1, R * H * sizeof(float));
+     pipe.InitBuffer(qGhN, 1, R * H * sizeof(float));
+<span class="diff-del">-    pipe.InitBuffer(qHs, 1, R * H * sizeof(float));</span>
+<span class="diff-del">-    pipe.InitBuffer(qHsOut, 1, R * H * sizeof(float));</span>
+<span class="diff-add">+    pipe.InitBuffer(qGate16, 6, R * H * sizeof(half));</span>
+<span class="diff-add">+    // hs and the hp staging buffer are fp16 now: the GEMMs round their operands</span>
+<span class="diff-add">+    // to an 11-bit mantissa anyway (HF32 == fp16 mantissa), so storing the</span>
+<span class="diff-add">+    // recurrent state / hp at that precision loses nothing the cube would not</span>
+<span class="diff-add">+    // have discarded, and it halves both the cell's MTE3 writes and the cube's</span>
+<span class="diff-add">+    // MTE2 operand loads. The cell itself keeps computing in fp32.</span>
+<span class="diff-add">+    pipe.InitBuffer(qHs, 1, R * H * sizeof(half));</span>
+<span class="diff-add">+    pipe.InitBuffer(qHsOut, 1, R * H * sizeof(half));</span>
+     pipe.InitBuffer(qOut, 1, R * H * sizeof(outT));
+     TBuf&lt;TPosition::VECCALC&gt; tmpBuf;
+<span class="diff-del">-    pipe.InitBuffer(tmpBuf, 7 * R * H * sizeof(float));</span>
+<span class="diff-add">+    pipe.InitBuffer(tmpBuf, 8 * R * H * sizeof(float));</span>
+ 
+     LocalTensor&lt;float&gt; s0 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 0);
+     LocalTensor&lt;float&gt; s1 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), R * H * sizeof(float));
+<span class="diff-hunk">@@ -173,9 +193,12 @@</span>
+     LocalTensor&lt;float&gt; s5 = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 5 * R * H * sizeof(float));
+     // Constant-1 operand for the reciprocals (see the Compute section).
+     LocalTensor&lt;float&gt; ones = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 6 * R * H * sizeof(float));
+<span class="diff-del">-</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; giRg, giZg, giNg, ghRg, ghZg, ghNg, hsg;</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; ghStoreG;</span>
+<span class="diff-add">+    // fp32 view of the fp16 h_{t-1} operand (the recurrence maths stays fp32).</span>
+<span class="diff-add">+    LocalTensor&lt;float&gt; hsOldF = tmpBuf.GetWithOffset&lt;float&gt;((uint32_t)(R * H), 7 * R * H * sizeof(float));</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; giRg, giZg, giNg, ghRg, ghZg, ghNg;</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; hsg;</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; hpG;</span>
+     GlobalTensor&lt;outT&gt; outg;
+ 
+     for (int64_t r0 = 0; r0 &lt; rows; r0 += R) {
+<span class="diff-hunk">@@ -188,54 +211,94 @@</span>
+         const uint16_t rows16 = (uint16_t)r;
+ 
+         // ---- CopyIn -------------------------------------------------------
+<span class="diff-del">-        giRg.SetGlobalBuffer((__gm__ float *)gi_ + (rowBase * S + t) * G, (r - 1) * S * G + G);</span>
+<span class="diff-del">-        giZg.SetGlobalBuffer((__gm__ float *)gi_ + (rowBase * S + t) * G + H, (r - 1) * S * G + G);</span>
+<span class="diff-del">-        giNg.SetGlobalBuffer((__gm__ float *)gi_ + (rowBase * S + t) * G + 2 * H, (r - 1) * S * G + G);</span>
+<span class="diff-del">-        ghRg.SetGlobalBuffer((__gm__ float *)gh_ + rowBase * G, r * G);</span>
+<span class="diff-del">-        ghZg.SetGlobalBuffer((__gm__ float *)gh_ + rowBase * G + H, r * G);</span>
+<span class="diff-del">-        ghNg.SetGlobalBuffer((__gm__ float *)gh_ + rowBase * G + 2 * H, r * G);</span>
+<span class="diff-del">-        hsg.SetGlobalBuffer((__gm__ float *)hs_ + rowBase * H, r * H);</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        auto giRl = qGiR.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto giZl = qGiZ.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto giNl = qGiN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto ghRl = qGhR.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto ghZl = qGhZ.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto ghNl = qGhN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        auto hsL = qHs.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        giRg.SetGlobalBuffer((__gm__ half *)gi_ + (rowBase * S + t) * G, (r - 1) * S * G + G);</span>
+<span class="diff-add">+        giZg.SetGlobalBuffer((__gm__ half *)gi_ + (rowBase * S + t) * G + H, (r - 1) * S * G + G);</span>
+<span class="diff-add">+        giNg.SetGlobalBuffer((__gm__ half *)gi_ + (rowBase * S + t) * G + 2 * H, (r - 1) * S * G + G);</span>
+<span class="diff-add">+        ghRg.SetGlobalBuffer((__gm__ half *)gh_ + rowBase * G, r * G);</span>
+<span class="diff-add">+        ghZg.SetGlobalBuffer((__gm__ half *)gh_ + rowBase * G + H, r * G);</span>
+<span class="diff-add">+        ghNg.SetGlobalBuffer((__gm__ half *)gh_ + rowBase * G + 2 * H, r * G);</span>
+<span class="diff-add">+        hsg.SetGlobalBuffer((__gm__ half *)hs_ + rowBase * H, r * H);</span>
+ 
+         DataCopyParams dpGi;
+         dpGi.blockCount = rows16;
+<span class="diff-del">-        dpGi.blockLen = rowLenF32;</span>
+<span class="diff-del">-        dpGi.srcStride = giRowStride;</span>
+<span class="diff-add">+        dpGi.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpGi.srcStride = giRowStride16;</span>
+         dpGi.dstStride = 0;
+<span class="diff-del">-        DataCopy(giRl, giRg, dpGi);</span>
+<span class="diff-del">-        DataCopy(giZl, giZg, dpGi);</span>
+<span class="diff-del">-        DataCopy(giNl, giNg, dpGi);</span>
+ 
+         DataCopyParams dpGh;
+         dpGh.blockCount = rows16;
+<span class="diff-del">-        dpGh.blockLen = rowLenF32;</span>
+<span class="diff-del">-        dpGh.srcStride = ghRowStride;</span>
+<span class="diff-add">+        dpGh.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpGh.srcStride = ghRowStride16;</span>
+         dpGh.dstStride = 0;
+<span class="diff-del">-        DataCopy(ghRl, ghRg, dpGh);</span>
+<span class="diff-del">-        DataCopy(ghZl, ghZg, dpGh);</span>
+<span class="diff-del">-        DataCopy(ghNl, ghNg, dpGh);</span>
+ 
+         DataCopyParams dpRow;
+         dpRow.blockCount = rows16;
+         dpRow.blockLen = rowLenF32;
+         dpRow.srcStride = 0;
+         dpRow.dstStride = 0;
+<span class="diff-del">-        DataCopy(hsL, hsg, dpRow);</span>
+<span class="diff-del">-</span>
+<span class="diff-add">+        DataCopyParams dpRowH;</span>
+<span class="diff-add">+        dpRowH.blockCount = rows16;</span>
+<span class="diff-add">+        dpRowH.blockLen = rowLenF16;</span>
+<span class="diff-add">+        dpRowH.srcStride = 0;</span>
+<span class="diff-add">+        dpRowH.dstStride = 0;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        // The six gate slabs arrive fp16 (the cube's C output); stage them all,</span>
+<span class="diff-add">+        // then widen each into the fp32 queue the compute reads. Casting into</span>
+<span class="diff-add">+        // the VECIN tensors keeps the existing compute untouched and halves the</span>
+<span class="diff-add">+        // cell's largest MTE2 stream.</span>
+<span class="diff-add">+        auto hGiR = qGate16.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hGiR, giRg, dpGi);</span>
+<span class="diff-add">+        auto hGiZ = qGate16.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hGiZ, giZg, dpGi);</span>
+<span class="diff-add">+        auto hGiN = qGate16.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hGiN, giNg, dpGi);</span>
+<span class="diff-add">+        auto hGhR = qGate16.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hGhR, ghRg, dpGh);</span>
+<span class="diff-add">+        auto hGhZ = qGate16.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hGhZ, ghZg, dpGh);</span>
+<span class="diff-add">+        auto hGhN = qGate16.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hGhN, ghNg, dpGh);</span>
+<span class="diff-add">+        qGate16.EnQue(hGiR);</span>
+<span class="diff-add">+        qGate16.EnQue(hGiZ);</span>
+<span class="diff-add">+        qGate16.EnQue(hGiN);</span>
+<span class="diff-add">+        qGate16.EnQue(hGhR);</span>
+<span class="diff-add">+        qGate16.EnQue(hGhZ);</span>
+<span class="diff-add">+        qGate16.EnQue(hGhN);</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        auto hsL = qHs.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hsL, hsg, dpRowH);</span>
+<span class="diff-add">+        qHs.EnQue(hsL);</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        auto giRl = qGiR.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto hGiRD = qGate16.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(giRl, hGiRD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGate16.FreeTensor(hGiRD);</span>
+         qGiR.EnQue(giRl);
+<span class="diff-add">+        auto giZl = qGiZ.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto hGiZD = qGate16.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(giZl, hGiZD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGate16.FreeTensor(hGiZD);</span>
+         qGiZ.EnQue(giZl);
+<span class="diff-add">+        auto giNl = qGiN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto hGiND = qGate16.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(giNl, hGiND, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGate16.FreeTensor(hGiND);</span>
+         qGiN.EnQue(giNl);
+<span class="diff-add">+        auto ghRl = qGhR.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto hGhRD = qGate16.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(ghRl, hGhRD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGate16.FreeTensor(hGhRD);</span>
+         qGhR.EnQue(ghRl);
+<span class="diff-add">+        auto ghZl = qGhZ.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto hGhZD = qGate16.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(ghZl, hGhZD, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGate16.FreeTensor(hGhZD);</span>
+         qGhZ.EnQue(ghZl);
+<span class="diff-add">+        auto ghNl = qGhN.AllocTensor&lt;float&gt;();</span>
+<span class="diff-add">+        auto hGhND = qGate16.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(ghNl, hGhND, RoundMode::CAST_NONE, cnt);</span>
+<span class="diff-add">+        qGate16.FreeTensor(hGhND);</span>
+         qGhN.EnQue(ghNl);
+<span class="diff-del">-        qHs.EnQue(hsL);</span>
+ 
+         auto giR = qGiR.DeQue&lt;float&gt;();
+         auto giZ = qGiZ.DeQue&lt;float&gt;();
+<span class="diff-hunk">@@ -243,7 +306,9 @@</span>
+         auto ghR = qGhR.DeQue&lt;float&gt;();
+         auto ghZ = qGhZ.DeQue&lt;float&gt;();
+         auto ghN = qGhN.DeQue&lt;float&gt;();
+<span class="diff-del">-        auto hsOld = qHs.DeQue&lt;float&gt;();</span>
+<span class="diff-add">+        // hs is fp16; widen to fp32 for the recurrence maths.</span>
+<span class="diff-add">+        auto hsLd = qHs.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(hsOldF, hsLd, RoundMode::CAST_NONE, cnt);</span>
+ 
+         // ---- Compute ------------------------------------------------------
+         // The sigmoid/tanh factors below are `1 / (1 + exp(.) )`.  The reciprocal
+<span class="diff-hunk">@@ -284,54 +349,37 @@</span>
+         Muls(s5, s3, -1.0f, cnt);
+         Adds(s5, s5, 1.0f, cnt);
+         Mul(s2, s5, s4, cnt);
+<span class="diff-del">-        Mul(s0, s3, hsOld, cnt);</span>
+<span class="diff-add">+        Mul(s0, s3, hsOldF, cnt);</span>
+         Add(s5, s2, s0, cnt);
+ 
+<span class="diff-del">-        // ---- Store the recurrent pre-activation (opt-in) -------------------</span>
+<span class="diff-del">-        // When the backward is allowed to read the forward's gate</span>
+<span class="diff-del">-        // pre-activations instead of recomputing them (GRU_STORE_GATES), the</span>
+<span class="diff-del">-        // per-step gh is written here into the full-batch [B*S, 3H] store at</span>
+<span class="diff-del">-        // column t. This runs *before* the gh queues are freed (they are the</span>
+<span class="diff-del">-        // source). The destination already sits in UB, so this is one extra</span>
+<span class="diff-del">-        // MTE3 transfer of the same tile -- no extra HBM read. The row stride</span>
+<span class="diff-del">-        // is identical to the gi operand's, so the backward cell can index the</span>
+<span class="diff-del">-        // store exactly like gi. qHsOut is a spare fp32 VECOUT buffer here (its</span>
+<span class="diff-del">-        // own use is later in the same iteration), so the staging needs no</span>
+<span class="diff-del">-        // extra UB: the cell's queue set already sits close to the UB limit and</span>
+<span class="diff-del">-        // an added queue silently overlapped and corrupted the output.</span>
+<span class="diff-del">-        if (doStore != 0) {</span>
+<span class="diff-del">-            DataCopyParams dpSt;</span>
+<span class="diff-del">-            dpSt.blockCount = rows16;</span>
+<span class="diff-del">-            dpSt.blockLen = rowLenF32;</span>
+<span class="diff-del">-            dpSt.srcStride = 0;</span>
+<span class="diff-del">-            dpSt.dstStride = giRowStride;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-            const int64_t stBase = (rowBase * S + t) * G;</span>
+<span class="diff-del">-            const int64_t stExt = (r - 1) * S * G + G;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-            ghStoreG.SetGlobalBuffer((__gm__ float *)ghStore_ + stBase, stExt);</span>
+<span class="diff-del">-            auto rl0 = qHsOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-            Adds(rl0, ghR, 0.0f, (int32_t)cnt);</span>
+<span class="diff-add">+        // ---- Store h_{t-1} for the backward (opt-in) -----------------------</span>
+<span class="diff-add">+        // With the gate cache on, the backward needs h_{t-1} for every step --</span>
+<span class="diff-add">+        // both as a differential operand of its own cell and as the B operand</span>
+<span class="diff-add">+        // of the dW_hh GEMM. The tile this cell just loaded as its recurrent</span>
+<span class="diff-add">+        // operand *is* h_{t-1}, so it is staged straight out here into the</span>
+<span class="diff-add">+        // step-major [S, Bfull, H] cache. That replaces the standalone</span>
+<span class="diff-add">+        // gru_bwd_hprev pass, which read `out` back from HBM (4.19 GB) and</span>
+<span class="diff-add">+        // re-wrote the same values (4.19 GB): the values now ride out on a tile</span>
+<span class="diff-add">+        // the cell already holds in UB, and one launch disappears. hp_ is the</span>
+<span class="diff-add">+        // cache pre-offset by this chunk's first batch row, so the index is</span>
+<span class="diff-add">+        // (step, chunk-local row) while the step stride stays the full batch.</span>
+<span class="diff-add">+        // qHsOut is a spare fp32 VECOUT buffer at this point (its own use is</span>
+<span class="diff-add">+        // later in the same iteration), so the staging costs no extra UB.</span>
+<span class="diff-add">+        if (doStoreHp != 0) {</span>
+<span class="diff-add">+            DataCopyParams dpHp;</span>
+<span class="diff-add">+            dpHp.blockCount = rows16;</span>
+<span class="diff-add">+            dpHp.blockLen = rowLenF16;</span>
+<span class="diff-add">+            dpHp.srcStride = 0;</span>
+<span class="diff-add">+            dpHp.dstStride = 0;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+            const int64_t hpOff = (t * Bfull + rowBase) * H;</span>
+<span class="diff-add">+            hpG.SetGlobalBuffer((__gm__ half *)hp_ + hpOff, r * H);</span>
+<span class="diff-add">+            auto rl0 = qHsOut.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+            Cast(rl0, hsOldF, RoundMode::CAST_RINT, cnt);</span>
+             qHsOut.EnQue(rl0);
+<span class="diff-del">-            auto rd0 = qHsOut.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-            DataCopy(ghStoreG, rd0, dpSt);</span>
+<span class="diff-add">+            auto rd0 = qHsOut.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+            DataCopy(hpG, rd0, dpHp);</span>
+             qHsOut.FreeTensor(rd0);
+<span class="diff-del">-</span>
+<span class="diff-del">-            ghStoreG.SetGlobalBuffer((__gm__ float *)ghStore_ + stBase + H, stExt);</span>
+<span class="diff-del">-            auto rl1 = qHsOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-            Adds(rl1, ghZ, 0.0f, (int32_t)cnt);</span>
+<span class="diff-del">-            qHsOut.EnQue(rl1);</span>
+<span class="diff-del">-            auto rd1 = qHsOut.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-            DataCopy(ghStoreG, rd1, dpSt);</span>
+<span class="diff-del">-            qHsOut.FreeTensor(rd1);</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-            ghStoreG.SetGlobalBuffer((__gm__ float *)ghStore_ + stBase + 2 * H, stExt);</span>
+<span class="diff-del">-            auto rl2 = qHsOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-            Adds(rl2, ghN, 0.0f, (int32_t)cnt);</span>
+<span class="diff-del">-            qHsOut.EnQue(rl2);</span>
+<span class="diff-del">-            auto rd2 = qHsOut.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-            DataCopy(ghStoreG, rd2, dpSt);</span>
+<span class="diff-del">-            qHsOut.FreeTensor(rd2);</span>
+         }
+ 
+         qGiR.FreeTensor(giR);
+<span class="diff-hunk">@@ -340,22 +388,22 @@</span>
+         qGhR.FreeTensor(ghR);
+         qGhZ.FreeTensor(ghZ);
+         qGhN.FreeTensor(ghN);
+<span class="diff-del">-        qHs.FreeTensor(hsOld);</span>
+<span class="diff-add">+        qHs.FreeTensor(hsLd);</span>
+ 
+         // ---- CopyOut ------------------------------------------------------
+         // Both transfers out of the VECCALC scratch go through the vector pipe
+<span class="diff-del">-        // (Adds / Cast) so the only cross-pipe edges are the queue-managed</span>
+<span class="diff-add">+        // (Cast) so the only cross-pipe edges are the queue-managed</span>
+         // V-&gt;MTE3 ones taken care of by EnQue/DeQue.
+<span class="diff-del">-        auto hsOut = qHsOut.AllocTensor&lt;float&gt;();</span>
+<span class="diff-del">-        Adds(hsOut, s5, 0.0f, (int32_t)cnt);</span>
+<span class="diff-add">+        auto hsOut = qHsOut.AllocTensor&lt;half&gt;();</span>
+<span class="diff-add">+        Cast(hsOut, s5, RoundMode::CAST_RINT, cnt);</span>
+         qHsOut.EnQue(hsOut);
+ 
+         auto outLocal = qOut.AllocTensor&lt;outT&gt;();
+         GruCastOut&lt;outT&gt;::Run(outLocal, s5, cnt);
+         qOut.EnQue(outLocal);
+ 
+<span class="diff-del">-        auto hsOutD = qHsOut.DeQue&lt;float&gt;();</span>
+<span class="diff-del">-        DataCopy(hsg, hsOutD, dpRow);</span>
+<span class="diff-add">+        auto hsOutD = qHsOut.DeQue&lt;half&gt;();</span>
+<span class="diff-add">+        DataCopy(hsg, hsOutD, dpRowH);</span>
+         qHsOut.FreeTensor(hsOutD);
+ 
+         auto outD = qOut.DeQue&lt;outT&gt;();
+<span class="diff-hunk">@@ -385,18 +433,18 @@</span>
+ }
+ 
+ extern "C" __global__ __aicore__ void gru_rec_elem(GM_ADDR gi, GM_ADDR gh,
+<span class="diff-del">-                                                   GM_ADDR hs, GM_ADDR out, GM_ADDR ghStore,</span>
+<span class="diff-add">+                                                   GM_ADDR hs, GM_ADDR out, GM_ADDR hp,</span>
+                                                    GM_ADDR tilingGM,
+<span class="diff-del">-                                                   int64_t t, int64_t outDtype, int64_t doStore)</span>
+<span class="diff-add">+                                                   int64_t t, int64_t outDtype, int64_t doStoreHp)</span>
+ {
+     KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);
+     if ASCEND_IS_AIV {
+         if (outDtype == 1) {
+<span class="diff-del">-            GruRecElemBody&lt;half&gt;(gi, gh, hs, out, ghStore, tilingGM, t, doStore);</span>
+<span class="diff-add">+            GruRecElemBody&lt;half&gt;(gi, gh, hs, out, hp, tilingGM, t, doStoreHp);</span>
+         } else if (outDtype == 2) {
+<span class="diff-del">-            GruRecElemBody&lt;bfloat16_t&gt;(gi, gh, hs, out, ghStore, tilingGM, t, doStore);</span>
+<span class="diff-add">+            GruRecElemBody&lt;bfloat16_t&gt;(gi, gh, hs, out, hp, tilingGM, t, doStoreHp);</span>
+         } else {
+<span class="diff-del">-            GruRecElemBody&lt;float&gt;(gi, gh, hs, out, ghStore, tilingGM, t, doStore);</span>
+<span class="diff-add">+            GruRecElemBody&lt;float&gt;(gi, gh, hs, out, hp, tilingGM, t, doStoreHp);</span>
+         }
+     }
+ }</code></pre></div></div>
+<div class="card"><h3 style="margin-top:0">op_kernel/gru_cube.cpp</h3><div class="copy-wrapper"><button class="copy-btn" onclick="copyCode(this,'diff-5')">复制</button><pre><code id="diff-5">--- a/op_kernel/gru_cube.cpp
++++ b/op_kernel/gru_cube.cpp
+<span class="diff-hunk">@@ -31,10 +31,22 @@</span>
+ 
+ namespace {
+ 
+<span class="diff-del">-using aF = MatmulType&lt;TPosition::GM, CubeFormat::ND, float&gt;;</span>
+<span class="diff-del">-using bF = MatmulType&lt;TPosition::GM, CubeFormat::ND, float&gt;;</span>
+<span class="diff-del">-using cF = MatmulType&lt;TPosition::GM, CubeFormat::ND, float&gt;;</span>
+<span class="diff-del">-using GemmF = MatmulImpl&lt;aF, bF, cF&gt;;</span>
+<span class="diff-add">+// fp16 operands, fp32 accumulate: the cube rounds A/B to an 11-bit mantissa,</span>
+<span class="diff-add">+// which is exactly what HF32 (10 explicit mantissa bits, fp32 exponent) does, so</span>
+<span class="diff-add">+// the product precision is unchanged -- but the fp16 cube MAC rate is ~2x the</span>
+<span class="diff-add">+// HF32 rate and the L1 operand load halves (aic_mte2 was the saturated pipe).</span>
+<span class="diff-add">+using aF = MatmulType&lt;TPosition::GM, CubeFormat::ND, half&gt;;</span>
+<span class="diff-add">+using bF = MatmulType&lt;TPosition::GM, CubeFormat::ND, half&gt;;</span>
+<span class="diff-add">+// fp16 C: the gate pre-activations feed a sigmoid/tanh in the vector cell, so</span>
+<span class="diff-add">+// the 11-bit mantissa is far below the 1e-2 gate tolerance, and the cells read</span>
+<span class="diff-add">+// this tensor with a [rows, H] strided DataCopy once per step -- the single</span>
+<span class="diff-add">+// largest AIV MTE2 stream in the whole operator (aic_mte2 was saturated at the</span>
+<span class="diff-add">+// old fp32 width). L0C accumulation stays fp32; the writeout casts.</span>
+<span class="diff-add">+using cF = MatmulType&lt;TPosition::GM, CubeFormat::ND, half&gt;;</span>
+<span class="diff-add">+// MatmulImpl defaults BiasT to CType; the bias is a small [3H] fp32 vector and</span>
+<span class="diff-add">+// is added inside the fp32 L0C accumulator, so pin it to fp32 explicitly.</span>
+<span class="diff-add">+using biasT = MatmulType&lt;TPosition::GM, CubeFormat::ND, float&gt;;</span>
+<span class="diff-add">+using GemmF = MatmulImpl&lt;aF, bF, cF, biasT&gt;;</span>
+ 
+ __aicore__ inline void GruGemmBody(GM_ADDR a_, GM_ADDR b_, GM_ADDR bias_, GM_ADDR c_,
+                                    GM_ADDR tilingGM, int64_t sel, int64_t gate)
+<span class="diff-hunk">@@ -60,21 +72,18 @@</span>
+     const int64_t offsetA = mIdx * K * tileM;  // A is [fullM, K] row-major
+     const int64_t offsetC = mIdx * N * tileM;  // C is [fullM, N] row-major
+ 
+<span class="diff-del">-    GlobalTensor&lt;float&gt; aG;</span>
+<span class="diff-del">-    aG.SetGlobalBuffer((__gm__ float *)a_ + offsetA);</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; bG;</span>
+<span class="diff-del">-    bG.SetGlobalBuffer((__gm__ float *)b_ + gate * N * K);  // [N, K] row-major (transposed)</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; aG;</span>
+<span class="diff-add">+    aG.SetGlobalBuffer((__gm__ half *)a_ + offsetA);</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; bG;</span>
+<span class="diff-add">+    bG.SetGlobalBuffer((__gm__ half *)b_ + gate * N * K);  // [N, K] row-major (transposed)</span>
+     GlobalTensor&lt;float&gt; biasG;
+     biasG.SetGlobalBuffer((__gm__ float *)bias_ + gate * N);
+<span class="diff-del">-    GlobalTensor&lt;float&gt; cG;</span>
+<span class="diff-del">-    cG.SetGlobalBuffer((__gm__ float *)c_ + offsetC);</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; cG;</span>
+<span class="diff-add">+    cG.SetGlobalBuffer((__gm__ half *)c_ + offsetC);</span>
+ 
+     TPipe pipe;
+     GemmF mm;
+     mm.Init(&amp;tiling, &amp;pipe);
+<span class="diff-del">-    // HF32: round A and B to (10-bit mantissa, fp32 exponent) at the cube input,</span>
+<span class="diff-del">-    // accumulate in fp32. Same call site/order as _port_setup/probe_hf32.</span>
+<span class="diff-del">-    mm.SetHF32(true, 0);</span>
+     mm.SetOrgShape((int32_t)tailM, (int32_t)N, (int32_t)K);
+     mm.SetSingleShape((int32_t)tailM, (int32_t)N, (int32_t)K);
+     mm.SetTensorA(aG, false);</code></pre></div></div>
+<div class="card"><h3 style="margin-top:0">op_kernel/gru_bwd_cube.cpp</h3><div class="copy-wrapper"><button class="copy-btn" onclick="copyCode(this,'diff-6')">复制</button><pre><code id="diff-6">--- a/op_kernel/gru_bwd_cube.cpp
++++ b/op_kernel/gru_bwd_cube.cpp
+<span class="diff-hunk">@@ -29,6 +29,8 @@</span>
+  * AI cores by block index, exactly like the forward GEMM.
+  */
+ 
+<span class="diff-add">+#include &lt;type_traits&gt;</span>
+<span class="diff-add">+</span>
+ #include "lib/matmul_intf.h"
+ 
+ #include "gru_common.h"
+<span class="diff-hunk">@@ -39,19 +41,34 @@</span>
+ 
+ namespace {
+ 
+<span class="diff-del">-using bF = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, false&gt;;</span>
+<span class="diff-del">-using cF = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, false&gt;;</span>
+<span class="diff-add">+// fp16 operands, fp32 accumulate -- same 11-bit mantissa rounding as HF32, but</span>
+<span class="diff-add">+// at the fp16 cube rate. See gru_cube.cpp.</span>
+<span class="diff-add">+using bF = MatmulType&lt;TPosition::GM, CubeFormat::ND, half, false&gt;;</span>
+<span class="diff-add">+using cFH = MatmulType&lt;TPosition::GM, CubeFormat::ND, half, false&gt;;</span>
+<span class="diff-add">+using cFF = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, false&gt;;</span>
+<span class="diff-add">+// Every non-transposed-A output is written at fp16: GI/GH write the gate</span>
+<span class="diff-add">+// pre-activations the vector cells read back at fp16, and the transB=F flavour</span>
+<span class="diff-add">+// (used only by DH / DH_T) writes dhb, the recurrent hidden-gradient the cell</span>
+<span class="diff-add">+// reads back and re-narrows anyway. Only the transpose-A weight-gradient GEMMs</span>
+<span class="diff-add">+// (WI / WH) accumulate fp32 gradients. This matches the host tiling rule</span>
+<span class="diff-add">+// c16 = !transA in FillMatmulTilingEx.</span>
+<span class="diff-add">+template &lt;bool TA, bool TB&gt;</span>
+<span class="diff-add">+using cTypeOf = std::conditional_t&lt;TA, cFF, cFH&gt;;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+// MatmulImpl defaults BiasT to CType; the bias is a small [3H] fp32 vector added</span>
+<span class="diff-add">+// inside the fp32 L0C accumulator, so pin it to fp32 explicitly.</span>
+<span class="diff-add">+using biasT = MatmulType&lt;TPosition::GM, CubeFormat::ND, float&gt;;</span>
+ 
+ // A in [M, K] (ISTRANS = false) or [K, M] (ISTRANS = true).
+ template &lt;bool TA&gt;
+ struct ATypeOf;
+ template &lt;&gt;
+ struct ATypeOf&lt;false&gt; {
+<span class="diff-del">-    using type = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, false&gt;;</span>
+<span class="diff-add">+    using type = MatmulType&lt;TPosition::GM, CubeFormat::ND, half, false&gt;;</span>
+ };
+ template &lt;&gt;
+ struct ATypeOf&lt;true&gt; {
+<span class="diff-del">-    using type = MatmulType&lt;TPosition::GM, CubeFormat::ND, float, true&gt;;</span>
+<span class="diff-add">+    using type = MatmulType&lt;TPosition::GM, CubeFormat::ND, half, true&gt;;</span>
+ };
+ 
+ template &lt;bool TA, bool TB&gt;
+<span class="diff-hunk">@@ -85,21 +102,22 @@</span>
+     const int64_t offsetC = mIdx * N * tileM;
+ 
+     using aT = typename ATypeOf&lt;TA&gt;::type;
+<span class="diff-del">-    using GemmF = MatmulImpl&lt;aT, bF, cF&gt;;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; aG;</span>
+<span class="diff-del">-    aG.SetGlobalBuffer((__gm__ float *)a_ + offsetA);</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; bG;</span>
+<span class="diff-del">-    bG.SetGlobalBuffer((__gm__ float *)b_);</span>
+<span class="diff-add">+    using cT = cTypeOf&lt;TA, TB&gt;;</span>
+<span class="diff-add">+    using GemmF = MatmulImpl&lt;aT, bF, cT, biasT&gt;;</span>
+<span class="diff-add">+    using cgElem = std::conditional_t&lt;TA, float, half&gt;;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; aG;</span>
+<span class="diff-add">+    aG.SetGlobalBuffer((__gm__ half *)a_ + offsetA);</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; bG;</span>
+<span class="diff-add">+    bG.SetGlobalBuffer((__gm__ half *)b_);</span>
+     GlobalTensor&lt;float&gt; biasG;
+     biasG.SetGlobalBuffer((__gm__ float *)bias_);
+<span class="diff-del">-    GlobalTensor&lt;float&gt; cG;</span>
+<span class="diff-del">-    cG.SetGlobalBuffer((__gm__ float *)c_ + offsetC);</span>
+<span class="diff-add">+    GlobalTensor&lt;cgElem&gt; cG;</span>
+<span class="diff-add">+    cG.SetGlobalBuffer((__gm__ cgElem *)c_ + offsetC);</span>
+ 
+     TPipe pipe;
+     GemmF mm;
+     mm.Init(&amp;tiling, &amp;pipe);
+<span class="diff-del">-    mm.SetHF32(true, 0);  // HF32 (10-bit mantissa, fp32 exponent), fp32 accumulate</span>
+     mm.SetOrgShape((int32_t)(TA ? fullM : tailM), (int32_t)N, (int32_t)K);
+     mm.SetSingleShape((int32_t)tailM, (int32_t)N, (int32_t)K);
+     mm.SetTensorA(aG, TA);
+<span class="diff-hunk">@@ -152,12 +170,12 @@</span>
+     const int64_t offsetC = kIdx * M * N;
+ 
+     using aT = typename ATypeOf&lt;TA&gt;::type;
+<span class="diff-del">-    using GemmF = MatmulImpl&lt;aT, bF, cF&gt;;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; aG;</span>
+<span class="diff-del">-    aG.SetGlobalBuffer((__gm__ float *)a_ + offsetA);</span>
+<span class="diff-del">-    GlobalTensor&lt;float&gt; bG;</span>
+<span class="diff-del">-    bG.SetGlobalBuffer((__gm__ float *)b_ + offsetB);</span>
+<span class="diff-add">+    using GemmF = MatmulImpl&lt;aT, bF, cFF, biasT&gt;;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; aG;</span>
+<span class="diff-add">+    aG.SetGlobalBuffer((__gm__ half *)a_ + offsetA);</span>
+<span class="diff-add">+    GlobalTensor&lt;half&gt; bG;</span>
+<span class="diff-add">+    bG.SetGlobalBuffer((__gm__ half *)b_ + offsetB);</span>
+     GlobalTensor&lt;float&gt; biasG;
+     biasG.SetGlobalBuffer((__gm__ float *)bias_);
+     GlobalTensor&lt;float&gt; cG;
+<span class="diff-hunk">@@ -166,7 +184,6 @@</span>
+     TPipe pipe;
+     GemmF mm;
+     mm.Init(&amp;tiling, &amp;pipe);
+<span class="diff-del">-    mm.SetHF32(true, 0);  // HF32 (10-bit mantissa, fp32 exponent), fp32 accumulate</span>
+     mm.SetOrgShape((int32_t)M, (int32_t)N, (int32_t)tailK);
+     mm.SetSingleShape((int32_t)M, (int32_t)N, (int32_t)tailK);
+     mm.SetTensorA(aG, TA);</code></pre></div></div>
+<div class="card"><h3 style="margin-top:0">op_host/gru.cpp</h3><div class="copy-wrapper"><button class="copy-btn" onclick="copyCode(this,'diff-7')">复制</button><pre><code id="diff-7">--- a/op_host/gru.cpp
++++ b/op_host/gru.cpp
+<span class="diff-hunk">@@ -86,7 +86,11 @@</span>
+ // that filled it before trusting it.
+ struct GateStore {
+     at::Tensor gi;  // [B*S, 3H] fp32, forward input projection  a_x
+<span class="diff-del">-    at::Tensor gh;  // [B*S, 3H] fp32, forward recurrent projection a_h</span>
+<span class="diff-add">+    at::Tensor gh;  // [S, B, 3H] fp32, forward recurrent projection a_h (step-major)</span>
+<span class="diff-add">+    // [S, B, H] fp32, h_{t-1} for every step. The forward cell writes step t's</span>
+<span class="diff-add">+    // own h_{t-1} operand straight in, so the backward skips gru_bwd_hprev</span>
+<span class="diff-add">+    // (which otherwise reads `out` back from HBM and re-writes these values).</span>
+<span class="diff-add">+    at::Tensor hp;</span>
+     int64_t B = -1, S = -1, H = -1;
+ };
+ GateStore &amp;gateStore()
+<span class="diff-hunk">@@ -172,12 +176,16 @@</span>
+ {
+     matmul_tiling::MultiCoreMatmulTiling mm(*plat);
+     mm.SetBufferSpace(l1Size, l0cSize, ubSize);
+<span class="diff-add">+    // fp16 operands, fp32 accumulate (see gru_cube.cpp): the tiling must be</span>
+<span class="diff-add">+    // generated for the fp16 L0/L1 fractal sizes, not the fp32 ones. C is fp16</span>
+<span class="diff-add">+    // as well -- the gate pre-activations are read back at fp16 by the vector</span>
+<span class="diff-add">+    // cells (L0C accumulation stays fp32, only the writeout narrows).</span>
+     mm.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+<span class="diff-del">-                matmul_tiling::DataType::DT_FLOAT, false);</span>
+<span class="diff-add">+                matmul_tiling::DataType::DT_FLOAT16, false);</span>
+     mm.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+<span class="diff-del">-                matmul_tiling::DataType::DT_FLOAT, true);</span>
+<span class="diff-add">+                matmul_tiling::DataType::DT_FLOAT16, true);</span>
+     mm.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+<span class="diff-del">-                matmul_tiling::DataType::DT_FLOAT);</span>
+<span class="diff-add">+                matmul_tiling::DataType::DT_FLOAT16);</span>
+     mm.SetBiasType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+                    matmul_tiling::DataType::DT_FLOAT);
+     mm.EnableBias(true);
+<span class="diff-hunk">@@ -249,11 +257,17 @@</span>
+     matmul_tiling::MultiCoreMatmulTiling mm(*plat);
+     mm.SetBufferSpace(l1Size, l0cSize, ubSize);
+     mm.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+<span class="diff-del">-                matmul_tiling::DataType::DT_FLOAT, transA);</span>
+<span class="diff-add">+                matmul_tiling::DataType::DT_FLOAT16, transA);</span>
+     mm.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+<span class="diff-del">-                matmul_tiling::DataType::DT_FLOAT, transB);</span>
+<span class="diff-add">+                matmul_tiling::DataType::DT_FLOAT16, transB);</span>
+<span class="diff-add">+    // C is fp16 for every non-transposed-A output: the (transA=F, transB=T)</span>
+<span class="diff-add">+    // gate projections AND the transA=F, transB=F flavour, which is used only by</span>
+<span class="diff-add">+    // the dhb GEMM (sel DH / DH_T) whose output the cell reads back and stores at</span>
+<span class="diff-add">+    // fp16 anyway. The transpose-A weight-gradient GEMMs keep fp32 gradients.</span>
+<span class="diff-add">+    const bool c16 = !transA;</span>
+     mm.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+<span class="diff-del">-                matmul_tiling::DataType::DT_FLOAT);</span>
+<span class="diff-add">+                c16 ? matmul_tiling::DataType::DT_FLOAT16</span>
+<span class="diff-add">+                    : matmul_tiling::DataType::DT_FLOAT);</span>
+     mm.SetBiasType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND,
+                    matmul_tiling::DataType::DT_FLOAT);
+     mm.EnableBias(isBias);
+<span class="diff-hunk">@@ -436,10 +450,10 @@</span>
+     // Output dtype follows the input dtype (the reference module computes in the
+     // dtype of its input), so the recurrent cell writes with the same tag.
+     const int64_t outTag = inTag;
+<span class="diff-del">-    const bool xIsFloat = (x.scalar_type() == at::kFloat);</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-    // The GEMM path is fp32 only; promote the weights/biases if the caller</span>
+<span class="diff-del">-    // handed over a half-precision module.</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    // The caller may hand over a half-precision module; the weights/biases are</span>
+<span class="diff-add">+    // promoted to fp32 for the host-side bookkeeping and to fp16 for the GEMM</span>
+<span class="diff-add">+    // operands (see below).</span>
+     at::Tensor wih = w_ih.contiguous();
+     at::Tensor whh = w_hh.contiguous();
+     at::Tensor bih = b_ih.contiguous();
+<span class="diff-hunk">@@ -456,10 +470,16 @@</span>
+     if (bhh.scalar_type() != at::kFloat) {
+         bhh = bhh.to(at::kFloat);
+     }
+<span class="diff-add">+    // fp16 weight copies: the GEMM operands are fp16 (the cube rounds to an</span>
+<span class="diff-add">+    // 11-bit mantissa either way, so this costs no precision vs HF32). Weights</span>
+<span class="diff-add">+    // keep their fp32 copies for the bias / host-side use.</span>
+<span class="diff-add">+    const at::Tensor wih16 = wih.to(at::kHalf);</span>
+<span class="diff-add">+    const at::Tensor whh16 = whh.to(at::kHalf);</span>
+ 
+     const at::Tensor xIn = x.contiguous();
+     at::Tensor out = at::empty({B, S, H}, x.options());
+<span class="diff-del">-    const at::Tensor xfAll = at::empty({B, S, I}, x.options().dtype(at::kFloat));</span>
+<span class="diff-add">+    // fp16 input projection operand (also reused as the WI GEMM's B operand).</span>
+<span class="diff-add">+    const at::Tensor xfAll = at::empty({B, S, I}, x.options().dtype(at::kHalf));</span>
+ 
+     auto *plat = platform_ascendc::PlatformAscendCManager::GetInstance();
+     TORCH_CHECK(plat != nullptr, "gru: failed to obtain the Ascend platform");
+<span class="diff-hunk">@@ -499,12 +519,27 @@</span>
+     const bool storeGates = storeGatesEnabled();
+     GateStore &amp;gs = gateStore();
+     if (storeGates) {
+<span class="diff-del">-        const bool reuse = gs.gi.defined() &amp;&amp; gs.gh.defined() &amp;&amp;</span>
+<span class="diff-del">-                           gs.gi.numel() == B * S * G &amp;&amp; gs.gh.numel() == B * S * G &amp;&amp;</span>
+<span class="diff-add">+        // gs.gh is step-major [S, B, G], NOT the [B*S, G] row-major layout of</span>
+<span class="diff-add">+        // gs.gi. Step t's slab is then one contiguous [rows, G] block, so the</span>
+<span class="diff-add">+        // recurrent-projection GEMM writes the gate pre-activations straight</span>
+<span class="diff-add">+        // into the backward's cache and the cell reads them in place -- the cell</span>
+<span class="diff-add">+        // no longer has to re-store them (12.58 GB of strided writes per step).</span>
+<span class="diff-add">+        const bool reuse = gs.gi.defined() &amp;&amp; gs.gh.defined() &amp;&amp; gs.hp.defined() &amp;&amp;</span>
+<span class="diff-add">+                           gs.gi.numel() == B * S * G &amp;&amp;</span>
+<span class="diff-add">+                           gs.gi.scalar_type() == at::kHalf &amp;&amp;</span>
+<span class="diff-add">+                           gs.gh.scalar_type() == at::kHalf &amp;&amp;</span>
+<span class="diff-add">+                           gs.gh.dim() == 3 &amp;&amp; gs.gh.size(0) == S &amp;&amp;</span>
+<span class="diff-add">+                           gs.gh.size(1) == B &amp;&amp; gs.gh.size(2) == G &amp;&amp;</span>
+<span class="diff-add">+                           gs.hp.dim() == 3 &amp;&amp; gs.hp.size(0) == S &amp;&amp;</span>
+<span class="diff-add">+                           gs.hp.size(1) == B &amp;&amp; gs.hp.size(2) == H &amp;&amp;</span>
+                            gs.gi.device() == x.device();
+         if (!reuse) {
+<span class="diff-del">-            gs.gi = at::empty({B * S, G}, x.options().dtype(at::kFloat));</span>
+<span class="diff-del">-            gs.gh = at::empty({B * S, G}, x.options().dtype(at::kFloat));</span>
+<span class="diff-add">+            // gi/gh are the two gate pre-activation caches the vector cells read</span>
+<span class="diff-add">+            // back; both are fp16 (see the cube), which halves the cells' single</span>
+<span class="diff-add">+            // largest MTE2 stream.</span>
+<span class="diff-add">+            gs.gi = at::empty({B * S, G}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+            gs.gh = at::empty({S, B, G}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+            gs.hp = at::empty({S, B, H}, x.options().dtype(at::kHalf));</span>
+         }
+         gs.B = B;
+         gs.S = S;
+<span class="diff-hunk">@@ -529,9 +564,14 @@</span>
+         std::memcpy(tilingCpu.data_ptr(), &amp;td, sizeof(GruTilingData));
+         at::Tensor tilingNpu = tilingCpu.to(at::kPrivateUse1);
+ 
+<span class="diff-del">-        // ---- cast chunk to fp32 (skipped when x is already fp32) ----------</span>
+<span class="diff-add">+        // ---- populate the fp16 input operand ------------------------------</span>
+<span class="diff-add">+        // xf is fp16 now (it is the GI GEMM's A operand). fp32 and fp16 inputs</span>
+<span class="diff-add">+        // ride through an elementwise copy, which the framework lowers to a</span>
+<span class="diff-add">+        // dtype-converting DMA (fp32 -&gt; fp16) or a plain move (fp16 -&gt; fp16); a</span>
+<span class="diff-add">+        // same-type vector Cast is not defined and produced NaNs. Only bf16</span>
+<span class="diff-add">+        // still needs the vector cast kernel.</span>
+         at::Tensor xf = xfAll.narrow(0, b0, rows);
+<span class="diff-del">-        if (!xIsFloat) {</span>
+<span class="diff-add">+        if (inTag == TAG_BF16) {</span>
+             at::Tensor xSrc = xIn.narrow(0, b0, rows);
+             EXEC_KERNEL_CMD(gru_cast_fp32, blkAiv, xSrc, xf, tilingNpu, inTag);
+         } else {
+<span class="diff-hunk">@@ -540,24 +580,42 @@</span>
+ 
+         // ---- input projection: [rows*S, 3H] (all gates in one GEMM) --------
+         at::Tensor gi = storeGates ? gs.gi.narrow(0, b0 * S, rows * S)
+<span class="diff-del">-                                   : at::empty({rows * S, G}, x.options().dtype(at::kFloat));</span>
+<span class="diff-add">+                                   : at::empty({rows * S, G}, x.options().dtype(at::kHalf));</span>
+         const uint32_t blkIn = static_cast&lt;uint32_t&gt;(tin.nBlk);
+<span class="diff-del">-        EXEC_KERNEL_CMD(gru_gemm, blkIn, xf, wih, bih, gi, tilingNpu, selIn, gate0);</span>
+<span class="diff-add">+        EXEC_KERNEL_CMD(gru_gemm, blkIn, xf, wih16, bih, gi, tilingNpu, selIn, gate0);</span>
+ 
+         // ---- running hidden state and its per-step recurrent projections ---
+<span class="diff-del">-        at::Tensor hs = at::zeros({rows, H}, x.options().dtype(at::kFloat));</span>
+<span class="diff-del">-        at::Tensor gh = at::empty({rows, G}, x.options().dtype(at::kFloat));</span>
+<span class="diff-add">+        // fp16: the recurrent projection's A operand and the cell's h_{t-1}</span>
+<span class="diff-add">+        // carrier. The cell keeps fp32 arithmetic internally.</span>
+<span class="diff-add">+        at::Tensor hs = at::zeros({rows, H}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+        // With the gate cache on, gh is not scratch: the recurrent projection</span>
+<span class="diff-add">+        // writes step t's gate pre-activations directly into gs.gh (step-major,</span>
+<span class="diff-add">+        // so the slab is a contiguous [rows, G] view). The cell reads that very</span>
+<span class="diff-add">+        // view for its sigmoid/tanh inputs and never re-stores it -- this is</span>
+<span class="diff-add">+        // what removes the 12.58 GB per-step re-store from the cell.</span>
+<span class="diff-add">+        at::Tensor ghBuf = at::empty({rows, G}, x.options().dtype(at::kHalf));</span>
+         at::Tensor outChunk = out.narrow(0, b0, rows);
+<span class="diff-del">-        // The recurrent store target (only read when doStore != 0); pass gh as a</span>
+<span class="diff-del">-        // harmless placeholder when storage is off so the signature is uniform.</span>
+<span class="diff-del">-        at::Tensor ghStore = storeGates ? gs.gh : gh;</span>
+<span class="diff-del">-        int64_t doStore = storeGates ? 1 : 0;</span>
+         const uint32_t blkRec = static_cast&lt;uint32_t&gt;(trec.nBlk);
+<span class="diff-add">+        // The cell never re-stores gh now: the projection already put the gate</span>
+<span class="diff-add">+        // pre-activations exactly where the backward will read them.</span>
+<span class="diff-add">+        //</span>
+<span class="diff-add">+        // With the gate cache on the cell *does* write h_{t-1} to gs.hp: it is</span>
+<span class="diff-add">+        // the recurrent operand it just loaded, so staging it out costs one</span>
+<span class="diff-add">+        // MTE3 transfer that replaces the whole gru_bwd_hprev pass (which had</span>
+<span class="diff-add">+        // to read `out` back from HBM -- 4.19 GB -- and re-write the values).</span>
+<span class="diff-add">+        // The view is already offset by this chunk's first row; the kernel adds</span>
+<span class="diff-add">+        // the chunk-local row onto the full-batch step stride. gs.gh is reused</span>
+<span class="diff-add">+        // as a harmless placeholder when the cache is off.</span>
+<span class="diff-add">+        at::Tensor hpChunk = storeGates ? gs.hp.narrow(1, b0, rows) : ghBuf;</span>
+<span class="diff-add">+        // Named lvalues because EXEC_KERNEL_CMD's ConvertTypes takes refs.</span>
+<span class="diff-add">+        int64_t doStoreHp = storeGates ? 1 : 0;</span>
+ 
+         for (int64_t t = 0; t &lt; S; ++t) {
+<span class="diff-del">-            EXEC_KERNEL_CMD(gru_gemm, blkRec, hs, whh, bhh, gh, tilingNpu, selRec, gate0);</span>
+<span class="diff-del">-            EXEC_KERNEL_CMD(gru_rec_elem, blkAiv, gi, gh, hs,</span>
+<span class="diff-del">-                            outChunk, ghStore, tilingNpu, t, outTag, doStore);</span>
+<span class="diff-add">+            at::Tensor ghStep = storeGates ? gs.gh.select(0, t).narrow(0, b0, rows)</span>
+<span class="diff-add">+                                           : ghBuf;</span>
+<span class="diff-add">+            EXEC_KERNEL_CMD(gru_gemm, blkRec, hs, whh16, bhh, ghStep, tilingNpu, selRec, gate0);</span>
+<span class="diff-add">+            EXEC_KERNEL_CMD(gru_rec_elem, blkAiv, gi, ghStep, hs,</span>
+<span class="diff-add">+                            outChunk, hpChunk, tilingNpu, t, outTag, doStoreHp);</span>
+         }
+     }
+ 
+<span class="diff-hunk">@@ -631,6 +689,14 @@</span>
+     at::Tensor bih = b_ih.contiguous();
+     at::Tensor bhh = b_hh.contiguous();
+ 
+<span class="diff-add">+    // fp16 GEMM operands (see gru()): the cube rounds an fp16 operand to the</span>
+<span class="diff-add">+    // same 11-bit mantissa HF32 would, but at the fp16 MAC rate and half the L1</span>
+<span class="diff-add">+    // load. Only the A/B operands narrow; every accumulator (gate</span>
+<span class="diff-add">+    // pre-activations, dha/dhb, weight gradients, bias gradients) stays fp32.</span>
+<span class="diff-add">+    const at::Tensor xIn16 = xIn.to(at::kHalf);</span>
+<span class="diff-add">+    const at::Tensor wih16 = wih.to(at::kHalf);</span>
+<span class="diff-add">+    const at::Tensor whh16 = whh.to(at::kHalf);</span>
+<span class="diff-add">+</span>
+     at::Tensor dWih = at::zeros({G, I}, x.options());
+     at::Tensor dWhh = at::zeros({G, H}, x.options());
+     at::Tensor dbih = at::zeros({G}, x.options());
+<span class="diff-hunk">@@ -686,20 +752,23 @@</span>
+     const int64_t selDHT = Gru::BWD_GEMM_DH_T;
+     at::Tensor whhT;
+     if (dhTransB) {
+<span class="diff-del">-        whhT = whh.t().contiguous();</span>
+<span class="diff-add">+        whhT = whh16.t().contiguous();</span>
+     }
+ 
+     // Default-on: if the forward cached its gate pre-activations for this exact
+     // problem (GRU_STORE_GATES), skip the GI/GH recompute GEMMs and read the
+     // stored slices instead. See GateStore above.
+     const GateStore &amp;gs = gateStore();
+<span class="diff-del">-    const bool useStored = storeGatesEnabled() &amp;&amp; gs.gi.defined() &amp;&amp;</span>
+<span class="diff-del">-                           gs.B == B &amp;&amp; gs.S == S &amp;&amp; gs.H == H;</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-    // Layout switch consumed by the vector cell: with the cache on, gh is the</span>
+<span class="diff-del">-    // forward's row-major [rows*S, 3H] store; off, GH is recomputed from the</span>
+<span class="diff-del">-    // step-major hp and inherits that layout. dgh and hp are always step-major.</span>
+<span class="diff-del">-    td.ghStepMajor = useStored ? 0 : 1;</span>
+<span class="diff-add">+    const bool useStored = storeGatesEnabled() &amp;&amp; gs.gi.defined() &amp;&amp; gs.gh.defined() &amp;&amp;</span>
+<span class="diff-add">+                           gs.hp.defined() &amp;&amp; gs.B == B &amp;&amp; gs.S == S &amp;&amp; gs.H == H;</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+    // Both gh layouts are step-major. With the cache on, the forward's</span>
+<span class="diff-add">+    // recurrent-projection GEMM wrote its gate pre-activations into the</span>
+<span class="diff-add">+    // step-major [S, B, G] gs.gh (see gru()); off, GH is recomputed from the</span>
+<span class="diff-add">+    // step-major hp and inherits that layout. Either way the cell reads gh with</span>
+<span class="diff-add">+    // the compact [rows, 3H]-slab stride (3H per row, not S*3H). dgh and hp are</span>
+<span class="diff-add">+    // step-major as well.</span>
+<span class="diff-add">+    td.ghStepMajor = 1;</span>
+ 
+     // P3: cross-chunk MIX pipeline (on by default, disable with GRU_BWD_PIPE=0).
+     //
+<span class="diff-hunk">@@ -752,7 +821,7 @@</span>
+             td.aicNum = aicNum;
+             td.aivNum = aivNum;
+             td.chunkRows = rows;
+<span class="diff-del">-            td.ghStepMajor = useStored ? 0 : 1;</span>
+<span class="diff-add">+            td.ghStepMajor = 1;</span>
+             const CoreTile tgi = PlanCoreTile(rows * S, aicNum);
+             const CoreTile tdh = PlanCoreTile(rows, DhCores(aicNum));
+             const CoreTile tw = PlanCoreTile(G, WCores(aicNum));
+<span class="diff-hunk">@@ -801,29 +870,41 @@</span>
+             makeTiling(c.rows, td, c.nBlkGi, c.nBlkDh, c.nBlkW, c.wk);
+             c.tilingNpu = stageTiling(td);
+ 
+<span class="diff-del">-            c.xf = xIn.narrow(0, b0, c.rows);</span>
+<span class="diff-add">+            c.xf = xIn16.narrow(0, b0, c.rows);</span>
+             c.go = goIn.narrow(0, b0, c.rows);
+             c.oc = outIn.narrow(0, b0, c.rows);
+<span class="diff-del">-            // Step-major [S, rows, H] too: gru_bwd_hprev writes hp[t, b, :], the</span>
+<span class="diff-del">-            // cell reads this step's [rows, H] slab contiguously, and the dW_hh</span>
+<span class="diff-del">-            // GEMM needs hp's rows in the same order as step-major dgh's.</span>
+<span class="diff-del">-            c.hp = at::empty({S, c.rows, H}, x.options());</span>
+<span class="diff-del">-            c.gi = useStored ? gs.gi.narrow(0, b0 * S, c.KS) : at::empty({c.KS, G}, x.options());</span>
+<span class="diff-del">-            c.gh = useStored ? gs.gh.narrow(0, b0 * S, c.KS) : at::empty({c.KS, G}, x.options());</span>
+<span class="diff-del">-            c.dgx = at::empty({c.KS, G}, x.options());</span>
+<span class="diff-add">+            // Step-major [S, rows, H]: h_{t-1} per step. When the forward stored</span>
+<span class="diff-add">+            // it (gate cache on) and the whole batch is one chunk, gs.hp *is*</span>
+<span class="diff-add">+            // this buffer -- step-major [S, B, H] with the batch equal to the</span>
+<span class="diff-add">+            // chunk, so the cell's (t*rows + row) index and the dW_hh GEMM's</span>
+<span class="diff-add">+            // contiguous [rows*S, H] view both line up and gru_bwd_hprev is</span>
+<span class="diff-add">+            // skipped. Otherwise the copy pass fills a private buffer.</span>
+<span class="diff-add">+            const bool hpStored = useStored &amp;&amp; c.rows == B;</span>
+<span class="diff-add">+            c.hp = hpStored ? gs.hp : at::empty({S, c.rows, H}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+            c.gi = useStored ? gs.gi.narrow(0, b0 * S, c.KS)</span>
+<span class="diff-add">+                             : at::empty({c.KS, G}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+            // Step-major store: the cell indexes gh as [S, B, G] with the full</span>
+<span class="diff-add">+            // batch extent, so the whole tensor is handed over unchanged.</span>
+<span class="diff-add">+            c.gh = useStored ? gs.gh : at::empty({c.KS, G}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+            // fp16: the gate gradients are the A operands of the DH / WI / WH</span>
+<span class="diff-add">+            // GEMMs (and of the colsum pass), so they narrow with the rest of</span>
+<span class="diff-add">+            // the GEMM operands.</span>
+<span class="diff-add">+            c.dgx = at::empty({c.KS, G}, x.options().dtype(at::kHalf));</span>
+             // Step-major: dgh.select(0, t) is the [rows, 3H] gradient for
+             // timestep t, i.e. exactly the A operand the recurrent GEMM
+             // (dhb = dgh @ w_hh) at step t-1 needs -- so the cell writes it once
+             // and no separate per-step scratch is copied out.
+<span class="diff-del">-            c.dgh = at::empty({S, c.rows, G}, x.options());</span>
+<span class="diff-del">-            c.dha = at::zeros({c.rows, H}, x.options());</span>
+<span class="diff-del">-            c.dhb = at::zeros({c.rows, H}, x.options());</span>
+<span class="diff-add">+            c.dgh = at::empty({S, c.rows, G}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+            c.dha = at::zeros({c.rows, H}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+            c.dhb = at::zeros({c.rows, H}, x.options().dtype(at::kHalf));</span>
+ 
+             const uint32_t blkGi = static_cast&lt;uint32_t&gt;(c.nBlkGi);
+<span class="diff-del">-            EXEC_KERNEL_CMD(gru_bwd_hprev, blkAiv, c.oc, c.hp, c.tilingNpu);</span>
+<span class="diff-add">+            if (!hpStored) {</span>
+<span class="diff-add">+                EXEC_KERNEL_CMD(gru_bwd_hprev, blkAiv, c.oc, c.hp, c.tilingNpu);</span>
+<span class="diff-add">+            }</span>
+             if (!useStored) {
+<span class="diff-del">-                EXEC_KERNEL_CMD(gru_bwd_gemm, blkGi, c.xf, wih, bih, c.gi, c.tilingNpu, selGI);</span>
+<span class="diff-del">-                EXEC_KERNEL_CMD(gru_bwd_gemm, blkGi, c.hp, whh, bhh, c.gh, c.tilingNpu, selGH);</span>
+<span class="diff-add">+                EXEC_KERNEL_CMD(gru_bwd_gemm, blkGi, c.xf, wih16, bih, c.gi, c.tilingNpu, selGI);</span>
+<span class="diff-add">+                EXEC_KERNEL_CMD(gru_bwd_gemm, blkGi, c.hp, whh16, bhh, c.gh, c.tilingNpu, selGH);</span>
+             }
+         };
+ 
+<span class="diff-hunk">@@ -860,7 +941,7 @@</span>
+                 at::Tensor dghT = c.dgh.select(0, t);
+                 if (t &lt; S - 1) {
+                     at::Tensor dghPrev = c.dgh.select(0, t + 1);
+<span class="diff-del">-                    EXEC_KERNEL_CMD(gru_bwd_gemm, blkDh, dghPrev, whh, dummyBias,</span>
+<span class="diff-add">+                    EXEC_KERNEL_CMD(gru_bwd_gemm, blkDh, dghPrev, whh16, dummyBias,</span>
+                                     c.dhb, c.tilingNpu, selDH);
+                 }
+                 EXEC_KERNEL_CMD(gru_bwd_cell, blkAiv, c.gi, c.gh, c.hp, c.go, c.dha, c.dhb,
+<span class="diff-hunk">@@ -877,7 +958,7 @@</span>
+             at::Tensor cDgh = cc.dgh.select(0, tC);  // named lvalue: see serialSweep note
+             at::Tensor gDgh = gc.dgh.select(0, tC);
+             EXEC_KERNEL_CMD(gru_bwd_pipe, blkMix, cc.gi, cc.gh, cc.hp, cc.go, cc.dha, cc.dhb,
+<span class="diff-del">-                            cc.dgx, cDgh, gDgh, whh, dummyBias,</span>
+<span class="diff-add">+                            cc.dgx, cDgh, gDgh, whh16, dummyBias,</span>
+                             gc.dhb, cc.tilingNpu, gc.tilingNpu, selDH, tC, doC, doG);
+         };
+ 
+<span class="diff-hunk">@@ -950,36 +1031,42 @@</span>
+         std::memcpy(tilingCpu.data_ptr(), &amp;td, sizeof(GruBwdTilingData));
+         at::Tensor tilingNpu = tilingCpu.to(at::kPrivateUse1);
+ 
+<span class="diff-del">-        at::Tensor xf = xIn.narrow(0, b0, rows);</span>
+<span class="diff-add">+        at::Tensor xf = xIn16.narrow(0, b0, rows);</span>
+         at::Tensor go = goIn.narrow(0, b0, rows);
+         at::Tensor oc = outIn.narrow(0, b0, rows);
+ 
+         // ---- h_{t-1} for every timestep, then the two input projections -----
+<span class="diff-del">-        // Step-major [S, rows, H]: gru_bwd_hprev writes hp[t, b, :], the cell reads</span>
+<span class="diff-del">-        // this step's [rows, H] slab contiguously, and the dW_hh GEMM needs hp's</span>
+<span class="diff-del">-        // rows in the same order as step-major dgh's (see the cell's hpBase).</span>
+<span class="diff-del">-        at::Tensor hp = at::empty({S, rows, H}, x.options());</span>
+<span class="diff-del">-        EXEC_KERNEL_CMD(gru_bwd_hprev, blkAiv, oc, hp, tilingNpu);</span>
+<span class="diff-del">-</span>
+<span class="diff-del">-        at::Tensor gi = at::empty({KS, G}, x.options());</span>
+<span class="diff-del">-        at::Tensor gh = at::empty({KS, G}, x.options());</span>
+<span class="diff-add">+        // Step-major [S, rows, H]: the cell reads this step's [rows, H] slab</span>
+<span class="diff-add">+        // contiguously and the dW_hh GEMM needs hp's rows in the same order as</span>
+<span class="diff-add">+        // step-major dgh's (see the cell's hpBase). When the forward already</span>
+<span class="diff-add">+        // staged h_{t-1} into gs.hp (gate cache on) and the batch is a single</span>
+<span class="diff-add">+        // chunk, that tensor *is* this buffer -- contiguous [rows*S, H] for the</span>
+<span class="diff-add">+        // GEMM -- so the gru_bwd_hprev copy pass is skipped entirely.</span>
+<span class="diff-add">+        const bool hpStored = useStored &amp;&amp; rows == B;</span>
+<span class="diff-add">+        at::Tensor hp = hpStored ? gs.hp : at::empty({S, rows, H}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+        if (!hpStored) {</span>
+<span class="diff-add">+            EXEC_KERNEL_CMD(gru_bwd_hprev, blkAiv, oc, hp, tilingNpu);</span>
+<span class="diff-add">+        }</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+        at::Tensor gi = at::empty({KS, G}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+        at::Tensor gh = at::empty({KS, G}, x.options().dtype(at::kHalf));</span>
+         const uint32_t blkGi = static_cast&lt;uint32_t&gt;(tgi.nBlk);
+         if (useStored) {
+             gi = gs.gi.narrow(0, b0 * S, KS);
+<span class="diff-del">-            gh = gs.gh.narrow(0, b0 * S, KS);</span>
+<span class="diff-add">+            gh = gs.gh;  // step-major [S, B, G]: cell indexes by absolute row</span>
+         } else {
+<span class="diff-del">-            EXEC_KERNEL_CMD(gru_bwd_gemm, blkGi, xf, wih, bih, gi, tilingNpu, selGI);</span>
+<span class="diff-del">-            EXEC_KERNEL_CMD(gru_bwd_gemm, blkGi, hp, whh, bhh, gh, tilingNpu, selGH);</span>
+<span class="diff-add">+            EXEC_KERNEL_CMD(gru_bwd_gemm, blkGi, xf, wih16, bih, gi, tilingNpu, selGI);</span>
+<span class="diff-add">+            EXEC_KERNEL_CMD(gru_bwd_gemm, blkGi, hp, whh16, bhh, gh, tilingNpu, selGH);</span>
+         }
+ 
+         // ---- reverse sweep over the timesteps -------------------------------
+<span class="diff-del">-        at::Tensor dgx = at::empty({KS, G}, x.options());</span>
+<span class="diff-add">+        at::Tensor dgx = at::empty({KS, G}, x.options().dtype(at::kHalf));</span>
+         // Step-major: dgh.select(0, t) is the [rows, 3H] gradient for timestep t
+         // and doubles as the recurrent GEMM's A operand, so the cell writes it
+         // once instead of also copying it into a per-step scratch buffer.
+<span class="diff-del">-        at::Tensor dgh = at::empty({S, rows, G}, x.options());</span>
+<span class="diff-del">-        at::Tensor dha = at::zeros({rows, H}, x.options());</span>
+<span class="diff-del">-        at::Tensor dhb = at::zeros({rows, H}, x.options());</span>
+<span class="diff-add">+        at::Tensor dgh = at::empty({S, rows, G}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+        at::Tensor dha = at::zeros({rows, H}, x.options().dtype(at::kHalf));</span>
+<span class="diff-add">+        at::Tensor dhb = at::zeros({rows, H}, x.options().dtype(at::kHalf));</span>
+         const uint32_t blkDh = static_cast&lt;uint32_t&gt;(tdh.nBlk);
+ 
+         for (int64_t t = S - 1; t &gt;= 0; --t) {
+<span class="diff-hunk">@@ -993,7 +1080,7 @@</span>
+                     EXEC_KERNEL_CMD(gru_bwd_gemm, blkDh, dghPrev, whhT, dummyBias,
+                                     dhb, tilingNpu, selDHT);
+                 } else {
+<span class="diff-del">-                    EXEC_KERNEL_CMD(gru_bwd_gemm, blkDh, dghPrev, whh, dummyBias,</span>
+<span class="diff-add">+                    EXEC_KERNEL_CMD(gru_bwd_gemm, blkDh, dghPrev, whh16, dummyBias,</span>
+                                     dhb, tilingNpu, selDH);
+                 }
+             }</code></pre></div></div>
+
+<!-- World Model Decision Tree -->
+<h2>世界模型决策树</h2>
+<div class="card" style="overflow-x:auto;">
+<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+共 29 个节点 | 最优路径: <span style="color:var(--green);font-weight:600;">root → root → x1 → x1_x1 → x1_x1_x1</span> (2.050x)
+</p>
+<div class="vtree-container">
+<div class="vtree">
+<div class="vtree-level">
+<div class="vtree-node node-best-path node-root">
+    <div class="vnode-title">root</div>
+    <div class="vnode-desc">Baseline 65945.72us</div>
+    <div class="vnode-speedup">65945.72us</div>
+</div>
+</div>
+<div class="vtree-connectors" data-parent-level="0" data-connections='[{"pi": 0, "ci": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], "bi": 11}]'><svg class="vtree-svg"></svg></div>
+<div class="vtree-level">
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n1</div>
+    <div class="vnode-strategy">P46+P51+P73+P29+P102</div>
+    <div class="vnode-desc">前向 GEMM×逐元素 AIC/AIV 重叠：把每</div>
+    <div class="vnode-perf">63606.72us</div>
+    <div class="vnode-speedup good">1.037x</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n2</div>
+    <div class="vnode-strategy">P92+P86+P66+P52+P47</div>
+    <div class="vnode-desc">前向输入投影 GEMM 写带宽：gi=[KS,15</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n3</div>
+    <div class="vnode-strategy">P56+P19+P20+P8+P10+P1</div>
+    <div class="vnode-desc">反向细胞元指令数压缩：gru_bwd_cell×2</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-regress">
+    <div class="vnode-title">n4</div>
+    <div class="vnode-strategy">P54+P53+P83+P71</div>
+    <div class="vnode-desc">反向 DH 逐 step GEMM 的启动开销与权</div>
+    <div class="vnode-perf">66011.60us</div>
+    <div class="vnode-speedup bad">0.999x</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n5</div>
+    <div class="vnode-strategy">P66+P52+P93+P26+P74</div>
+    <div class="vnode-desc">反向 colsum/WI/hprev 的 GM 对</div>
+    <div class="vnode-perf">65290.08us</div>
+    <div class="vnode-speedup good">1.010x</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n6</div>
+    <div class="vnode-strategy">P10+P56+P69+P84+P20+P66</div>
+    <div class="vnode-desc">前向 gru_rec_elem 吞吐修复：256 </div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n7</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[MODE OVERRIDE: 全部策略 (D1,</div>
+    <div class="vnode-perf">33069.80us</div>
+    <div class="vnode-speedup good">1.994x</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n8</div>
+    <div class="vnode-strategy">P92+P47+P93+P72+P51+P90</div>
+    <div class="vnode-desc">立方体受限 GEMM 的分块/核配比再平衡：WH </div>
+    <div class="vnode-perf">62552.37us</div>
+    <div class="vnode-speedup good">1.054x</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n9</div>
+    <div class="vnode-strategy">P59+P26+P40+P1+P56</div>
+    <div class="vnode-desc">hprev 布局变换与 dy 读取的合并：gru_</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n10</div>
+    <div class="vnode-strategy">P35+P37+P43+P53+P54</div>
+    <div class="vnode-desc">反向跨 step 累加器（dha/dhb）UB 常</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">x0</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[开放探索] 从第一原理自主推理的新优化方向。证据</div>
+    <div class="vnode-perf">63400.77us</div>
+    <div class="vnode-speedup good">1.040x</div>
+</div>
+<div class="vtree-node node-best-path">
+    <div class="vnode-title">x1</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[开放探索] 从第一原理自主推理的新优化方向。证据</div>
+    <div class="vnode-perf">61119.60us</div>
+    <div class="vnode-speedup good">1.079x</div>
+</div>
+</div>
+<div class="vtree-connectors" data-parent-level="1" data-connections='[{"pi": 0, "ci": [0], "bi": -1}, {"pi": 3, "ci": [1], "bi": -1}, {"pi": 4, "ci": [2], "bi": -1}, {"pi": 6, "ci": [3], "bi": -1}, {"pi": 7, "ci": [4, 5], "bi": -1}, {"pi": 10, "ci": [6], "bi": -1}, {"pi": 11, "ci": [7], "bi": 7}]'><svg class="vtree-svg"></svg></div>
+<div class="vtree-level">
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n1_cont</div>
+    <div class="vnode-strategy">P73+P29+P92+P86+P1</div>
+    <div class="vnode-desc">延续探索: n1(1.04x) 无显著提升，尝试变</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n4_cont</div>
+    <div class="vnode-strategy">P83</div>
+    <div class="vnode-desc">延续探索: n4(1.00x) 无显著提升，尝试变</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n5_cont</div>
+    <div class="vnode-strategy">P93+P26+P56+P59</div>
+    <div class="vnode-desc">延续探索: n5(1.01x) 无显著提升，尝试变</div>
+    <div class="vnode-perf">61224.05us</div>
+    <div class="vnode-speedup good">1.077x</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n7_x1</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[开放探索] 基于父节点 n7 分析继续探索。 瓶</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n8_s1</div>
+    <div class="vnode-strategy">P47+P93+P92</div>
+    <div class="vnode-desc">深度探索: 在 n8(1.05x) 基础上继续优化</div>
+    <div class="vnode-perf">62528.97us</div>
+    <div class="vnode-speedup good">1.055x</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n8_s2</div>
+    <div class="vnode-strategy">P47+P93+P92</div>
+    <div class="vnode-desc">深度探索: 在 n8(1.05x) 基础上继续优化</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">x0_x1</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[开放探索] 基于父节点 x0 分析继续探索。 瓶</div>
+    <div class="vnode-perf">48646.22us</div>
+    <div class="vnode-speedup good">1.356x</div>
+</div>
+<div class="vtree-node node-best-path">
+    <div class="vnode-title">x1_x1</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[开放探索] 基于父节点 x1 分析继续探索。 瓶</div>
+    <div class="vnode-perf">33591.58us</div>
+    <div class="vnode-speedup good">1.963x</div>
+</div>
+</div>
+<div class="vtree-connectors" data-parent-level="2" data-connections='[{"pi": 2, "ci": [0, 1], "bi": -1}, {"pi": 4, "ci": [2], "bi": -1}, {"pi": 6, "ci": [3], "bi": -1}, {"pi": 7, "ci": [4], "bi": 4}]'><svg class="vtree-svg"></svg></div>
+<div class="vtree-level">
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n5_cont_s1</div>
+    <div class="vnode-strategy">P26+P56+P59+P69</div>
+    <div class="vnode-desc">深度探索: 在 n5_cont(1.08x) 基础</div>
+    <div class="vnode-perf">58392.94us</div>
+    <div class="vnode-speedup good">1.129x</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n5_cont_s2</div>
+    <div class="vnode-strategy">P26+P56+P59+P69</div>
+    <div class="vnode-desc">深度探索: 在 n5_cont(1.08x) 基础</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n8_s1_cont</div>
+    <div class="vnode-desc">延续探索: n8_s1(1.05x) 无显著提升，</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">x0_x1_x1</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[开放探索] 基于父节点 x0_x1 分析继续探索</div>
+    <div class="vnode-perf">34278.18us</div>
+    <div class="vnode-speedup good">1.924x</div>
+</div>
+<div class="vtree-node node-best-leaf">
+    <div class="vnode-title">x1_x1_x1</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[开放探索] 基于父节点 x1_x1 分析继续探索</div>
+    <div class="vnode-perf">32167.39us</div>
+    <div class="vnode-speedup best">2.050x 最优</div>
+</div>
+</div>
+<div class="vtree-connectors" data-parent-level="3" data-connections='[{"pi": 0, "ci": [0], "bi": -1}, {"pi": 3, "ci": [1], "bi": -1}, {"pi": 4, "ci": [2], "bi": -1}]'><svg class="vtree-svg"></svg></div>
+<div class="vtree-level">
+<div class="vtree-node node-minor">
+    <div class="vnode-title">n5_cont_s1_cont</div>
+    <div class="vnode-strategy">P59+P69+P54</div>
+    <div class="vnode-desc">延续探索: n5_cont_s1(1.13x) 无</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">x0_x1_x1_x1</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[开放探索] 基于父节点 x0_x1_x1 分析继</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+<div class="vtree-node node-minor">
+    <div class="vnode-title">x1_x1_x1_x1</div>
+    <div class="vnode-strategy">open</div>
+    <div class="vnode-desc">[开放探索] 基于父节点 x1_x1_x1 分析继</div>
+    <div class="vnode-speedup bad">无效</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Failure Analysis (optional) -->
+<h2>失败/无效轮次分析</h2>
+<div class="card">
+<table>
+<tr><th>变体</th><th>原因</th></tr>
+<tr><td>2-V2</td><td>精度失败</td></tr>
+</table>
+</div>
+
+<!-- Resource Statistics -->
+
+<h2>资源消耗统计</h2>
+<div class="two-col">
+<div class="card">
+<h3 style="margin-top:0">耗时统计</h3>
+<table>
+<tr><th>阶段</th><th>时间范围</th><th>持续时间</th><th>执行方式</th></tr>
+<tr><td>轮次 1</td><td>11:17:32 ~ 12:21:21</td><td>1 小时 4 分钟</td><td>5 变体并行</td></tr>
+<tr><td>轮次 2</td><td>12:24:38 ~ 15:42:10</td><td>3 小时 18 分钟</td><td>5 变体并行</td></tr>
+<tr><td>轮次 3</td><td>01:35:05 ~ 03:13:57</td><td>1 小时 39 分钟</td><td>5 变体并行</td></tr>
+<tr style="font-weight:600;border-top:2px solid var(--border);">
+<td>总计</td><td>-</td>
+<td>0.0 分钟</td><td>-</td>
+</tr>
+</table>
+</div>
+<div class="card">
+<h3 style="margin-top:0">词元用量统计</h3>
+<table>
+<tr><th>组件</th><th>Input</th><th>Output</th><th>Cache Read</th><th>Cache Creation</th><th>总计</th></tr>
+<tr><td colspan='6'>无 词元 数据</td></tr>
+<tr style="font-weight:600;border-top:2px solid var(--border);">
+<td>总计</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</table>
+<div style="margin-top:1rem;font-size:0.85rem;color:var(--text-muted);">
+<strong>词元分布:</strong> Cache Read 0.0% | Cache Creation 0.0%
+| Input 0.0% | Output 0.0%
+</div>
+</div>
+</div>
+
+
+<!-- Apply Best Variant -->
+<h2>应用最优变体</h2>
+<div class="card">
+<p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1rem;">
+将以下命令复制到终端执行，即可将最优变体的修改应用到源码仓库：
+</p>
+<div class="copy-wrapper">
+<button class="copy-btn" onclick="copyCode(this,'apply-cmd')">复制</button>
+<pre><code id="apply-cmd">REPO_ROOT="/workspace/Quantitave_firm/evo_kernel_a5_hf32/GRU_evo_20261012_110616/shared/kernel"
+OUTPUT_DIR="/workspace/Quantitave_firm/evo_kernel_a5_hf32/GRU_evo_20261012_110616"
+BEST_VARIANT="round_3/parallel_3"
+
+cp "$OUTPUT_DIR/$BEST_VARIANT/modified_files/op_host/gru.cpp" "$REPO_ROOT/op_host/gru.cpp"
+cp "$OUTPUT_DIR/$BEST_VARIANT/modified_files/op_kernel/gru_bwd_bodies.h" "$REPO_ROOT/op_kernel/gru_bwd_bodies.h"
+cp "$OUTPUT_DIR/$BEST_VARIANT/modified_files/op_kernel/gru_bwd_cube.cpp" "$REPO_ROOT/op_kernel/gru_bwd_cube.cpp"
+cp "$OUTPUT_DIR/$BEST_VARIANT/modified_files/op_kernel/gru_bwd_vector.cpp" "$REPO_ROOT/op_kernel/gru_bwd_vector.cpp"
+cp "$OUTPUT_DIR/$BEST_VARIANT/modified_files/op_kernel/gru_cube.cpp" "$REPO_ROOT/op_kernel/gru_cube.cpp"
+cp "$OUTPUT_DIR/$BEST_VARIANT/modified_files/op_kernel/gru_tiling_data.h" "$REPO_ROOT/op_kernel/gru_tiling_data.h"
+cp "$OUTPUT_DIR/$BEST_VARIANT/modified_files/op_kernel/gru_vector.cpp" "$REPO_ROOT/op_kernel/gru_vector.cpp"</code></pre>
+</div>
+</div>
+
+<!-- Scripts -->
+<script>
+function copyCode(btn, targetId) {
+    const code = document.getElementById(targetId).textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        btn.textContent = '已复制';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+    });
+}
+// Dynamic tree connectors (multi-parent support)
+function drawTreeConnectors() {
+    const vtree = document.querySelector('.vtree');
+    if (!vtree) return;
+    const levels = vtree.querySelectorAll('.vtree-level');
+    const connectors = vtree.querySelectorAll('.vtree-connectors');
+    connectors.forEach(conn => {
+        const svg = conn.querySelector('svg');
+        const pLevel = parseInt(conn.dataset.parentLevel);
+        const parentLevelEl = levels[pLevel];
+        const childLevelEl = conn.nextElementSibling;
+        if (!parentLevelEl || !childLevelEl) return;
+        const parentNodes = parentLevelEl.querySelectorAll('.vtree-node');
+        const childNodes = childLevelEl.querySelectorAll('.vtree-node');
+        if (childNodes.length === 0) return;
+        const cRect = vtree.getBoundingClientRect();
+        const svgW = (svg.getBoundingClientRect().width) || vtree.offsetWidth;
+        svg.setAttribute('viewBox', '0 0 ' + svgW + ' 40');
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        svg.style.width = '100%'; svg.style.height = '40px';
+        svg.innerHTML = '';
+        let connections;
+        try { connections = JSON.parse(conn.dataset.connections); } catch(e) { return; }
+        connections.forEach(c => {
+            const pNode = parentNodes[c.pi];
+            if (!pNode) return;
+            const pRect = pNode.getBoundingClientRect();
+            const pCx = pRect.left + pRect.width / 2 - cRect.left;
+            c.ci.forEach(ci => {
+                const child = childNodes[ci];
+                if (!child) return;
+                const chRect = child.getBoundingClientRect();
+                const chCx = chRect.left + chRect.width / 2 - cRect.left;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', pCx); line.setAttribute('y1', 0);
+                line.setAttribute('x2', chCx); line.setAttribute('y2', 40);
+                line.setAttribute('class', ci === c.bi ? 'vline-best' : 'vline-other');
+                svg.appendChild(line);
+            });
+        });
+    });
+}
+window.addEventListener('load', drawTreeConnectors);
+window.addEventListener('resize', drawTreeConnectors);
+</script>
+<script>
+
+var evoCtx = document.getElementById('evolutionChart');
+if (evoCtx) {
+    new Chart(evoCtx, {
+        type: 'line',
+        data: {
+            labels: ["1-V0", "1-V1", "1-V2", "1-V3", "1-V4", "2-V0", "2-V1", "2-V3", "2-V4", "3-V0", "3-V1", "3-V2", "3-V3", "3-V4"],
+            datasets: [{
+                label: '耗时 (us)',
+                data: [65290.08, 66011.6, 63606.72, 63400.77, 61119.6, 61224.05, 62552.37, 33591.58, 48646.22, 58392.94, 62528.97, 33069.8, 32167.39, 34278.18],
+                borderColor: '#58a6ff',
+                backgroundColor: 'rgba(88,166,255,0.1)',
+                fill: true, tension: 0.3, pointRadius: 4,
+                pointBackgroundColor: function(ctx) { return ctx.dataIndex === 12 ? '#3fb950' : '#58a6ff'; },
+                pointBorderColor: function(ctx) { return ctx.dataIndex === 12 ? '#3fb950' : '#58a6ff'; },
+                pointRadius: function(ctx) { return ctx.dataIndex === 12 ? 8 : 4; }
+            }, {
+                label: 'Baseline (65945.71574999999 us)',
+                data: Array(14).fill(65945.71574999999),
+                borderColor: 'rgba(248,81,73,0.5)',
+                borderDash: [6, 4], pointRadius: 0, fill: false
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: '#c9d1d9' } },
+                tooltip: { callbacks: { afterLabel: function(ctx) {
+                    if (ctx.datasetIndex === 0) return '加速比: ' + (65945.71574999999 / ctx.raw).toFixed(3) + 'x';
+                } } }
+            },
+            scales: {
+                x: { ticks: { color: '#8b949e', maxRotation: 45 }, grid: { color: 'rgba(48,54,61,0.5)' } },
+                y: { ticks: { color: '#8b949e' }, grid: { color: 'rgba(48,54,61,0.5)' },
+                      title: { display: true, text: '耗时 (us)', color: '#8b949e' } }
+            }
+        }
+    });
+}
+</script>
+
+</div>
+</body>
+</html>
