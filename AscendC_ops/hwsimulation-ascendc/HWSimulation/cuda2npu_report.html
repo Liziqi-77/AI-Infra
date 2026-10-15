@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CUDA → NPU 算子迁移报告 · HWSimulation</title>
+<style>
+  :root{
+    --plane:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --hair:rgba(11,11,11,.10);
+    --s1:#2a78d6; --s2:#eb6834; --good:#0ca30c; --good-text:#006300;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:where(:not([data-theme="light"])){
+      --plane:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,.10);
+      --s1:#3987e5; --s2:#d95926; --good:#0ca30c; --good-text:#0ca30c;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --plane:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,.10);
+    --s1:#3987e5; --s2:#d95926; --good:#0ca30c; --good-text:#0ca30c;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; padding:40px 24px 64px;
+    background:var(--plane); color:var(--ink);
+    font:15px/1.66 system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:940px; margin:0 auto}
+  .eyebrow{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:0 0 10px}
+  h1{font-size:27px; line-height:1.28; font-weight:650; margin:0 0 8px; letter-spacing:-.01em}
+  .sub{margin:0; color:var(--ink-2); font-size:14.5px}
+  .hdr{display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap}
+  .badge{
+    display:inline-flex; align-items:center; gap:7px; flex:none;
+    padding:6px 13px 6px 11px; border:1px solid var(--hair); border-radius:999px;
+    background:var(--surface); font-size:13px; font-weight:600; letter-spacing:.02em; margin-top:4px;
+  }
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--good)}
+  .tgl{
+    appearance:none; border:1px solid var(--hair); background:var(--surface); color:var(--ink-2);
+    border-radius:8px; padding:6px 10px; font:inherit; font-size:12.5px; cursor:pointer; margin-left:8px;
+  }
+  .tgl:hover{color:var(--ink)}
+  hr.rule{border:0; border-top:1px solid var(--hair); margin:28px 0}
+
+  /* ---------- hero + stat tiles ---------- */
+  .figs{display:grid; grid-template-columns:minmax(210px,1fr) 2.05fr; gap:14px; align-items:stretch}
+  .hero{
+    background:var(--surface); border:1px solid var(--hair); border-radius:14px;
+    padding:20px 22px; display:flex; flex-direction:column; justify-content:center;
+  }
+  .hero .lab{font-size:12.5px; color:var(--ink-2); margin:0 0 2px}
+  .hero .val{font-size:56px; line-height:1.02; font-weight:640; letter-spacing:-.025em}
+  .hero .val em{font-style:normal; font-size:30px; font-weight:600; color:var(--ink-2); margin-left:2px}
+  .hero .note{font-size:12.5px; color:var(--muted); margin:8px 0 0}
+  .tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  .tile{
+    background:var(--surface); border:1px solid var(--hair); border-radius:14px;
+    padding:16px 18px; display:flex; flex-direction:column; justify-content:center;
+  }
+  .tile .lab{font-size:12.5px; color:var(--ink-2); margin:0 0 6px}
+  .tile .val{font-size:26px; font-weight:620; letter-spacing:-.015em; line-height:1.2}
+  .tile .val small{font-size:14px; font-weight:500; color:var(--muted); margin-left:1px}
+  .tile .sub2{font-size:12px; color:var(--muted); margin:5px 0 0}
+  .tile .val .num{font-variant-numeric:tabular-nums}
+
+  /* ---------- sections ---------- */
+  section{margin-top:34px}
+  h2{
+    font-size:13px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 14px; display:flex; align-items:center; gap:10px;
+  }
+  h2::after{content:""; flex:1; height:1px; background:var(--hair)}
+  h3{font-size:14.5px; font-weight:620; margin:0 0 6px}
+  p{margin:0 0 12px}
+  .muted{color:var(--ink-2)}
+  .small{font-size:13px}
+  .card{background:var(--surface); border:1px solid var(--hair); border-radius:14px; padding:20px 22px}
+  .cols2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  pre{
+    margin:0; padding:15px 17px; overflow-x:auto;
+    background:var(--plane); border:1px solid var(--hair); border-radius:11px;
+    font:12.5px/1.75 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:var(--ink-2);
+  }
+  pre b{color:var(--ink); font-weight:600}
+  code{font:12.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:var(--ink-2)}
+  table{width:100%; border-collapse:collapse; font-size:13.5px}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--hair); vertical-align:top}
+  th{font-size:12px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--muted)}
+  td:first-child{color:var(--ink-2)}
+  td.num,th.num{text-align:right; font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:0}
+  .k{color:var(--ink-2)}
+  .tag{
+    display:inline-block; padding:2px 8px; border:1px solid var(--hair); border-radius:6px;
+    font-size:11.5px; color:var(--ink-2); background:var(--plane); white-space:nowrap;
+  }
+
+  /* ---------- chart ---------- */
+  .chart{padding:6px 0 0}
+  .grid-row{display:grid; grid-template-columns:150px 1fr; align-items:center; gap:14px}
+  .cat{font-size:13.5px; text-align:right; color:var(--ink-2); white-space:nowrap}
+  .plot{position:relative; height:26px; margin:9px 0}
+  .track{position:relative; width:88%; height:100%}
+  .gl{position:absolute; top:0; bottom:0; width:1px; background:var(--grid); z-index:0}
+  .bar{position:absolute; left:0; top:1px; height:24px; min-width:3px; border-radius:0 4px 4px 0; cursor:default; z-index:1}
+  .bar.s1{background:var(--s1)} .bar.s2{background:var(--s2)}
+  .tip{
+    position:absolute; left:0; top:0; height:26px; display:flex; align-items:center;
+    font-size:13px; font-weight:600; white-space:nowrap; padding-left:9px; pointer-events:none; z-index:2;
+  }
+  .axis-row{display:grid; grid-template-columns:150px 1fr; gap:14px; margin-top:2px}
+  .ticks{position:relative; width:88%; height:18px}
+  .tick{position:absolute; top:0; transform:translateX(-50%); font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+  /* axis unit rides the last tick label */
+  .hoverbox{
+    position:fixed; z-index:9; pointer-events:none; opacity:0; transition:opacity .12s;
+    background:var(--surface); border:1px solid var(--hair); border-radius:9px;
+    padding:8px 11px; font-size:12.5px; box-shadow:0 6px 22px rgba(0,0,0,.16); max-width:250px;
+  }
+  .hoverbox .t{font-weight:600; margin-bottom:3px}
+  .hoverbox .v{font-variant-numeric:tabular-nums; color:var(--ink-2)}
+  .cap{font-size:12.5px; color:var(--muted); margin:12px 0 0; line-height:1.6}
+  footer{margin-top:38px; padding-top:16px; border-top:1px solid var(--hair); font-size:12.5px; color:var(--muted); line-height:1.7}
+  @media (max-width:760px){
+    body{padding:26px 16px 48px}
+    .figs,.cols2{grid-template-columns:1fr}
+    .tiles{grid-template-columns:1fr 1fr}
+    .grid-row,.axis-row{grid-template-columns:96px 1fr}
+    .hero .val{font-size:46px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <div>
+      <p class="eyebrow">CUDA → AscendC · 迁移报告</p>
+      <h1>Hull-White 短期利率蒙特卡洛路径模拟</h1>
+      <p class="sub">算子 <code>HWMCKernel</code> → <code>torch.ops.npu.hwm</code>　·　模型场景：SOFR 折现 + BNP/BOC 信用，10Y 可赎回 CLN（<code>CallableCLN::BOC_MTM_Init_GPU_1</code> Part IV）</p>
+    </div>
+    <div>
+      <span class="badge"><span class="dot"></span>✓ 精度判定 PASS</span>
+      <button class="tgl" id="tgl" type="button">深色</button>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ 概览 ============ -->
+  <div class="figs">
+    <div class="hero">
+      <p class="lab">端到端延迟加速比</p>
+      <p class="val">51.7<em>×</em></p>
+      <p class="note">555.58 µs → 10.74 µs，NPU 3 实测</p>
+    </div>
+    <div class="tiles">
+      <div class="tile">
+        <p class="lab">最大绝对误差</p>
+        <p class="val"><span class="num">1.29</span><small>e-08</small></p>
+        <p class="sub2">对 fp64 参考重建</p>
+      </div>
+      <div class="tile">
+        <p class="lab">容差匹配率</p>
+        <p class="val"><span class="num">1.000</span></p>
+        <p class="sub2">门限 ≥ 0.99</p>
+      </div>
+      <div class="tile">
+        <p class="lab">修复迭代</p>
+        <p class="val"><span class="num">1</span><small>/5</small> · <span class="num">0</span><small>/12</small></p>
+        <p class="sub2">A 类 / D 类</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 1. 算子功能 ============ -->
+  <section>
+    <h2>一 · 算子功能</h2>
+    <div class="card">
+      <p>逐条路径顺序推进的 Hull-White 短期利率模拟。时间轴不可并行，路径轴完全独立——这是全部并行性的来源。</p>
+      <pre>rate[i][0] = r0
+for j in 0 .. MStep-2:
+    dt       = accrual[j+1] - accrual[j]
+    alpha_k  = 0.5 * ((σ/a)·(1 - exp(-a·t_k)))² + f_k        <b>k = 1, 2</b>
+    Variance = 0.5·σ²/a · (1 - exp(-2·a·dt))                  <b>a→0 时退化为 σ²·dt</b>
+    Expect   = rate[i][j]·exp(-a·dt) + alpha_2 - alpha_1·exp(-a·dt)
+    rate[i][j+1] = Expect + sqrt(Variance) · nrnd[i][j]       <b>i = 路径号</b></pre>
+      <table style="margin-top:16px">
+        <thead><tr><th>维度</th><th>CUDA 原实现</th><th>AscendC 迁移实现</th></tr></thead>
+        <tbody>
+          <tr><td>并行映射</td><td>1 block × 16 thread，一线程一路径</td><td>按路径轴切分 AIV 核，一核一段连续路径</td></tr>
+          <tr><td>时间轴</td><td>线程内 for 循环 9 步</td><td>核内顺序扫描，逐步向量化（路径轴为向量维）</td></tr>
+          <tr><td>系数推导</td><td>每线程重复计算</td><td>核内向量 <code>Exp</code>/<code>Sqrt</code> 算一次，向量回读复用</td></tr>
+          <tr><td>数据搬运</td><td><code>cudaMemcpy</code> + 全局访存</td><td><code>CopyIn → Compute → CopyOut</code>，<code>DataCopyPad</code> 按列拉取，UB 常驻状态</td></tr>
+          <tr><td>下发次数</td><td>1 次核函数 + 主/辅拷贝</td><td><b>1 次融合下发</b>：<code>torch.ops.npu.hwm(step, hwparams, accrual, f1, f2, nrnd) → rate</code></td></tr>
+          <tr><td>数据类型</td><td><code>double</code></td><td><code>float32</code>（Ascend 无 fp64 向量通路）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 2. 硬件平台 ============ -->
+  <section>
+    <h2>二 · 硬件平台</h2>
+    <div class="cols2">
+      <div class="card">
+        <h3>源端 · GPU</h3>
+        <table>
+          <tbody>
+            <tr><td>编程模型</td><td><code>CUDA C++</code>（<code>__global__</code> + <code>&lt;&lt;&lt;1, 16&gt;&gt;&gt;</code>）</td></tr>
+            <tr><td>精度</td><td>fp64（<code>double</code> 全程）</td></tr>
+            <tr><td>内核</td><td><code>GPU_Test/kernel.cu</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>目标端 · NPU</h3>
+        <table>
+          <tbody>
+            <tr><td>芯片</td><td>Ascend 910B2C（dav-c220）</td></tr>
+            <tr><td>设备</td><td>NPU 3（<code>ASCEND_RT_VISIBLE_DEVICES=3</code>）</td></tr>
+            <tr><td>软件栈</td><td>CANN 9.1.0 · torch 2.10.0 + torch_npu</td></tr>
+            <tr><td>精度</td><td><span class="tag">fp32 向量通路接管</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="cap">fp64 → fp32 是本迁移唯一的数值妥协：目标芯片无 fp64 向量通路，参考实现与候选实现统一在 fp32 下评估（数值量级 1e-2 ~ 1e-1，引入的舍入约 1e-7，远低于 1e-2 绝对门限）。</p>
+  </section>
+
+  <!-- ============ 3. 测试用例 ============ -->
+  <section>
+    <h2>三 · 测试用例</h2>
+    <div class="card">
+      <p><b>HWSimulation_BOC_2024-07-24</b>　—　估值日 2024/07/24，SOFR 折现曲线 + BNP/BOC 信用曲线，<code>NPath=16 × MStep=10</code>，信用利差 <code>CS = 0.01687</code>。全部输入在 <code>callablecln.cpp</code> 中硬编码，无外部数据文件。</p>
+      <table>
+        <thead><tr><th>输入</th><th>形状</th><th>含义</th><th class="num">取值</th></tr></thead>
+        <tbody>
+          <tr><td><code>step</code></td><td>[10]</td><td>时间步标识</td><td class="num">int32</td></tr>
+          <tr><td><code>hwparams</code></td><td>[3]</td><td>r₀, a（均值回复）, σ（波动率）</td><td class="num">0.047675, 0.039982, 0.011926</td></tr>
+          <tr><td><code>accrual</code></td><td>[10]</td><td>计息期时间格点</td><td class="num">0.0 → 9.0</td></tr>
+          <tr><td><code>f1</code> / <code>f2</code></td><td>[9] / [9]</td><td>HW 瞬时远期项</td><td class="num">—</td></tr>
+          <tr><td><code>nrnd</code></td><td>[16, 9]</td><td>标准正态随机数（MT19937, seed 1234）</td><td class="num">—</td></tr>
+          <tr><td><b>输出 <code>rate</code></b></td><td>[16, 10]</td><td>短期利率路径矩阵</td><td class="num">rate_adj = rate + CS</td></tr>
+        </tbody>
+      </table>
+      <p class="cap">基准真值：模型框架 Part IV 自身的控制台转储 <code>Output_3</code>（<code>kernel_case.json:expected_output</code>）。</p>
+    </div>
+  </section>
+
+  <!-- ============ 4. 精度 ============ -->
+  <section>
+    <h2>四 · 精度验证</h2>
+    <div class="card">
+      <p>三层校验，逐层收窄：</p>
+      <table>
+        <thead><tr><th>层</th><th>手段</th><th class="num">结果</th><th class="num">判据</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>① 正式门禁</td>
+            <td><code>evaluate_ascendc.sh</code> 混合容差比对</td>
+            <td class="num"><b>匹配率 1.000000</b><br>max_abs_error 1.490e-08</td>
+            <td class="num">≥ 0.99<br>≤ 1e-2</td>
+          </tr>
+          <tr>
+            <td>② 退化门禁</td>
+            <td><code>validate_ascendc_impl.py</code>（Type1–4）</td>
+            <td class="num"><b>PASS</b></td>
+            <td class="num">无伪实现</td>
+          </tr>
+          <tr>
+            <td>③ 独立复算</td>
+            <td>对 fp64 参考重建逐元素比对</td>
+            <td class="num"><b>1.294e-08</b></td>
+            <td class="num">—</td>
+          </tr>
+          <tr>
+            <td>③ 独立复算</td>
+            <td>对框架控制台转储比对</td>
+            <td class="num"><b>6.788e-08</b></td>
+            <td class="num">—</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="cap">
+        容差：<code>rtol = 2⁻¹⁰</code>、<code>atol = 2⁻¹⁶</code>、绝对上限 <code>1e-2</code>、ULP 因子 <code>32</code>，全 160 个元素有限、0 个越限。
+        <b>需留意的边界</b>：框架自身两条基准（<code>rate</code> 与控制台转储）互差 <code>7.216e-08</code>，已高于本次编译产物的误差——即算子误差落在基线的自洽误差之内；本任务不存在 CUDA / fp64 绝对真值可比，1.29e-08 已接近 fp32 舍入底限。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 5. 性能 ============ -->
+  <section>
+    <h2>五 · 性能</h2>
+    <div class="card">
+      <div class="chart" id="chart">
+        <div class="grid-row">
+          <div class="cat">PyTorch 参考实现</div>
+          <div class="plot"><div class="track" data-track>
+            <div class="bar s1" style="width:92.60%" data-name="PyTorch 参考实现" data-v="555.58 µs" data-n="10 个时间步顺序展开为 10 次算子下发"></div>
+            <div class="tip" style="left:calc(92.60% + 9px); color:var(--ink-2)">555.58 µs</div>
+          </div></div>
+        </div>
+        <div class="grid-row">
+          <div class="cat">AscendC 算子</div>
+          <div class="plot"><div class="track" data-track>
+            <div class="bar s2" style="width:1.79%" data-name="AscendC 算子" data-v="10.74 µs" data-n="单次融合下发，路径轴切分到 AIV 核"></div>
+            <div class="tip" style="left:calc(1.79% + 9px); color:var(--ink)">10.74 µs　<span style="color:var(--good-text); font-weight:600">51.7× 更快</span></div>
+          </div></div>
+        </div>
+        <div class="axis-row">
+          <div></div>
+          <div class="ticks">
+            <span class="tick" style="left:0%">0</span>
+            <span class="tick" style="left:16.67%">100</span>
+            <span class="tick" style="left:33.33%">200</span>
+            <span class="tick" style="left:50%">300</span>
+            <span class="tick" style="left:66.67%">400</span>
+            <span class="tick" style="left:83.33%">500</span>
+            <span class="tick" style="left:100%">600 µs</span>
+          </div>
+        </div>
+      </div>
+      <p class="cap">
+        测量口径：NPU 3，<code>msprof.quick.Task_Duration</code>，warmup = 1，repeats = 1；加速比取各用例几何平均（geomean <b>51.73×</b>）。悬停柱体可查看明细。
+      </p>
+      <p class="cap">
+        <b>如何解读</b>：该算子规模很小（16 × 10），NPath = 16 时耗时已贴近单次下发开销——同机 16 元素逐元素算子基线约 <b>4.3 µs</b>。因此 51.7× 主要来自「10 次下发合并为 1 次」的开销消除，而非算力提升；NPath 扩展实测 16 → 10.2 µs、256 → 12.1 µs、4096 → 28.2 µs，吞吐随规模平缓增长。
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <b>迁移路径</b>　复杂算子判定 → TileLang 设计表达路径（本机未安装 TileLang，依据对照实验证据 <code>perf_tuning/SKIPPED.md</code> 合法跳过）→ <code>tilelang2ascend-translator</code> 直接转译 → 精度门禁。<br>
+    <b>修复记录</b>　A 类 1 次（<code>Subs</code> 在 dav-c220 无实现，改用 <code>Adds(dst, src, -1.0f, n)</code>）；D 类 0 次。迭代预算 A 5 / D 12。<br>
+    产出目录 <code>GPU_Test/NPU_Test/HWSimulation/</code>　·　生成日期 2026-10-15
+  </footer>
+
+</div>
+
+<div class="hoverbox" id="hb" aria-hidden="true"></div>
+
+<script>
+  // gridline layer — hairline verticals behind each bar row, drawn from the bar rows' own metrics
+  document.querySelectorAll('[data-track]').forEach(function (track) {
+    for (var i = 1; i <= 6; i++) {
+      var g = document.createElement('div');
+      g.className = 'gl';
+      g.style.left = (i * 100 / 6) + '%';
+      track.appendChild(g);
+    }
+  });
+
+  // per-mark hover tooltip
+  var hb = document.getElementById('hb');
+  document.querySelectorAll('.bar').forEach(function (bar) {
+    bar.addEventListener('mouseenter', function () {
+      hb.innerHTML = '<div class="t">' + bar.dataset.name + '</div>' +
+                     '<div class="v">' + bar.dataset.v + '</div>' +
+                     '<div class="v" style="margin-top:2px">' + bar.dataset.n + '</div>';
+      hb.style.opacity = '1';
+    });
+    bar.addEventListener('mousemove', function (e) {
+      var x = e.clientX + 16, y = e.clientY + 16;
+      var r = hb.getBoundingClientRect();
+      if (x + r.width > window.innerWidth - 10) x = e.clientX - r.width - 16;
+      if (y + r.height > window.innerHeight - 10) y = e.clientY - r.height - 16;
+      hb.style.left = x + 'px';
+      hb.style.top = y + 'px';
+    });
+    bar.addEventListener('mouseleave', function () { hb.style.opacity = '0'; });
+  });
+
+  // theme toggle (media query handles the OS setting; this wins both ways)
+  var tgl = document.getElementById('tgl');
+  tgl.addEventListener('click', function () {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    tgl.textContent = dark ? '深色' : '浅色';
+  });
+</script>
+</body>
+</html>

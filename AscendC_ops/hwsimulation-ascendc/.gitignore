@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# 构建产物（本地编译后生成，勿上传）
+HWSimulation/kernel/build/
+HWSimulation/kernel/dist/
+HWSimulation/kernel/hwm.egg-info/
+*.so
+*.whl
+
+# 备份与运行时杂项
+*.bak
+.npu_profiler/

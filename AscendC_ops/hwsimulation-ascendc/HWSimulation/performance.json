@@ -1,0 +1,42 @@
+{
+  "task": "HWSimulation",
+  "task_dir": "/home/l00899543/Quantitative_Trading_Firm/GPU_Test/NPU_Test/HWSimulation",
+  "n_cases_total": 1,
+  "n_cases_valid": 1,
+  "geomean_speedup": 51.72998137802606,
+  "mean_speedup": 51.729981378026075,
+  "median_speedup": 51.729981378026075,
+  "min_speedup": 51.729981378026075,
+  "max_speedup": 51.729981378026075,
+  "mean_ref_us": 555.58,
+  "median_ref_us": 555.58,
+  "geomean_ref_us": 555.5800000000002,
+  "total_ref_us": 555.58,
+  "mean_asc_us": 10.74,
+  "median_asc_us": 10.74,
+  "geomean_asc_us": 10.739999999999998,
+  "total_asc_us": 10.74,
+  "total_speedup": 51.729981378026075,
+  "warmup": 1,
+  "repeats": 1,
+  "seed": 0,
+  "device_id": 3,
+  "device_select_source": "cli",
+  "timing_method": "msprof.quick.Task_Duration",
+  "per_case": [
+    {
+      "case": 0,
+      "shape": "[1]",
+      "dtype": "int32",
+      "ref_us": 555.58,
+      "asc_us": 10.74,
+      "speedup": 51.729981378026075,
+      "ref_error": null,
+      "asc_error": null,
+      "ref_prof_dir": "/tmp/msprof_quick_ref_HWSimulation_c0_1425162xe2d018/PROF_000001_20261014151200237_01425165JMNCKJJB",
+      "asc_prof_dir": "/tmp/msprof_quick_asc_HWSimulation_c0_1425162xe2d018/PROF_000001_20261014151213208_01425530JACLLMRC"
+    }
+  ],
+  "profiling_mode": "quick",
+  "asc_mode": "per_case"
+}
